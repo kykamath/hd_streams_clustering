@@ -1,1 +1,1 @@
-A hashmap like interface for Mongo.
+A hashmap like interface for Mongo using pymongo.
