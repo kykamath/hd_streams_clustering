@@ -1,1 +1,4 @@
-A hashmap like interface for Mongo using pymongo.
+A collection of distributed maps. 
+
+Current implementation:
+* DistributedMongoMap: A distributed map that uses mongodb.

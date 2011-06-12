@@ -4,7 +4,10 @@ Created on Jun 12, 2011
 @author: kykamath
 '''
 
-class MongoMap:
+class DistributedMongoMap:
+'''
+A distributed hashmap that uses mongodb.
+'''
     def add(self):
         print 10
 
