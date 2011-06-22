@@ -43,6 +43,10 @@ Created on Jun 12, 2011
 #print pool.map(f, iterator())
 
 from library.twitter import TweetFiles
+from library.nlp import StopWords, getWordsFromRawEnglishMessage, getPhrases
 
+StopWords.load()
+min_phrase_length = 2
+max_phrase_length = 8
 for tweets in TweetFiles.iterateTweetsFromGzip('data/sample.gz'):
-    print tweets['user']['screen_name']
+    print tweets['user']['screen_name'], getPhrases(getWordsFromRawEnglishMessage(tweets['text']), min_phrase_length, max_phrase_length)

@@ -13,7 +13,7 @@ class VectorTests(unittest.TestCase):
     
     def setUp(self):
         self.v1 = Vector({1:1, 2:3})
-        self.v2 = Vector({1:4, 2:8})
+        self.v1 = Vector({1:4, 2:8})
     
     def test_initialization(self):
         vector = Vector()
@@ -54,15 +54,15 @@ class VectorTests(unittest.TestCase):
         self.assertEqual(v1.getNormalizedVector(), {1:0.8, 2:0.6})
         
     def test_divideByScalar(self):
-        self.v2.divideByScalar(2)
-        self.assertEqual(self.v2, {1:2, 2:4})
+        self.v1.divideByScalar(2)
+        self.assertEqual(self.v1, {1:2, 2:4})
     
     def test_cosineSimilarity(self):
         self.assertEqual(math.ceil(self.v1.cosineSimilarity(self.v1)), 1)
         self.assertEqual(Vector({1:1,2:0}).cosineSimilarity(Vector({1:0,2:1})), 0)
     
     def test_getMeanVector(self): 
-        self.assertEqual(Vector.getMeanVector([self.v1,self.v2]), Vector({1:5/2., 2:11/2.}))
+        self.assertEqual(Vector.getMeanVector([self.v1,self.v1]), Vector({1:5/2., 2:11/2.}))
         self.assertEqual(Vector.getMeanVector([Vector({1:1}), Vector({2:5})]), Vector({1:1/2.,2:5/2.}))
         self.assertEqual(Vector.getMeanVector([Vector(), Vector({2:5})]), Vector({2:5/2.}))
         
