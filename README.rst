@@ -11,3 +11,8 @@ A Python project to cluster a collection of high-dimensional text streams. An ex
 Data
 =====
 The data for this project will be a stream of tweets in json format. For more details look at `Twitter Streaming API. <http://dev.twitter.com/pages/streaming_api>`_
+
+Dependancies
+=============
+* `bitarray <http://pypi.python.org/pypi/bitarray>`_
+* `Biopython <http://biopython.org/>`_
