@@ -7,3 +7,7 @@ HD Streams Clustering
 About
 ======
 A Python project to cluster a collection of high-dimensional text streams. An example of hd-streams is Twitter, where every user can be considered as a separate evolving stream of tweets. This project implements techniques to cluster such streams efficiently.
+
+Data
+=====
+The data for this project will be a stream of tweets in json format. For more details look at `Twitter Streaming API. <http://dev.twitter.com/pages/streaming_api>`_
