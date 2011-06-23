@@ -3,9 +3,8 @@ Created on Jun 23, 2011
 
 @author: kykamath
 '''
-import sys, unittest
+import unittest
 from twitter_classes import UtilityMethods
-sys.path.append('../')
 from library.nlp import StopWords, getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 
