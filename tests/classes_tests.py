@@ -23,13 +23,14 @@ class UtilityMethodsTests(unittest.TestCase):
         self.phraseTextToPhraseObjectMap = {'project': Phrase('project', test_time, score=8), 'cluster': Phrase('cluster', test_time, score=8)}
         self.vector = Vector({0:1, 1:1, 2:1, 3:1})
         self.initial_max_dimensions = twitter_stream_settings['max_dimensions']
-    def tearDown(self):  twitter_stream_settings['max_dimensions'] = self.initial_max_dimensions
+        twitter_stream_settings['max_dimensions'] = 2
+    def tearDown(self): twitter_stream_settings['max_dimensions'] = self.initial_max_dimensions
     def test_getVectorForString_PhraseMapHasLesserDimensions(self):
+        twitter_stream_settings['max_dimensions'] = 4
         self.assertEqual(['project', 'cluster', 'highdimensional', 'streams'], getPhrases(getWordsFromRawEnglishMessage(self.text), 1, 1))
         self.assertEqual(self.vector, UtilityMethods.getVectorForText(self.text, test_time, self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings))
         self.assertEqual({'project':0, 'cluster': 1, 'highdimensional':2, 'streams': 3}, self.phraseTextToIdMap)
     def test_getVectorForString_PhraseMapHasMaximumDimensions(self):
-        twitter_stream_settings['max_dimensions'] = 2
         self.assertEqual(Vector({0:1, 1:1}), UtilityMethods.getVectorForText(self.text, test_time, self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings))
         self.assertEqual({'project':0, 'cluster': 1}, self.phraseTextToIdMap)
 #        twitter_stream_settings['max_dimensions'] = tempVal
@@ -39,9 +40,7 @@ class UtilityMethodsTests(unittest.TestCase):
         self.assertEqual(5, self.phraseTextToPhraseObjectMap['project'].score)
         self.assertEqual(1, self.phraseTextToPhraseObjectMap['streams'].score)
     def test_getVectorForString_phrase_does_not_exist_in_phraseToIdMap_but_exists_in_phraseTextToPhraseObjectMap_with_dimensions_full(self): 
-        # Fill dimensions.
         twitter_stream_settings['max_dimensions'] = 1
-        # Delete a dimension for phraseTextToIdMap so that phraseTextToPhraseObjectMap has extra object
         del self.phraseTextToIdMap['cluster']
         UtilityMethods.getVectorForText(self.text, test_time+timedelta(seconds=60), self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
         self.assertEqual({'project':0}, self.phraseTextToIdMap)
@@ -56,12 +55,10 @@ class UtilityMethodsTests(unittest.TestCase):
         self.assertEqual(1, self.phraseTextToPhraseObjectMap['new_phrase'].score)
         self.assertEqual(9, self.phraseTextToPhraseObjectMap['project'].score)
     def test_updateForNewDimensions_when_phraseTextToIdMap_is_filled_to_max_dimensions(self):
-        twitter_stream_settings['max_dimensions'] = 2
         for phrase, score in zip(['added'], range(10,11)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
         UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
         self.assertEqual({'project':0, 'added': 1}, self.phraseTextToIdMap)
     def test_updateForNewDimensions_when_phraseTextToIdMap_is_filled_to_max_dimensions_and_entire_map_is_changed(self):
-        twitter_stream_settings['max_dimensions'] = 2
         for phrase, score in zip(['added', 'are'], range(10,12)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
         UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
         self.assertEqual({'added':0, 'are': 1}, self.phraseTextToIdMap)
@@ -79,13 +76,11 @@ class UtilityMethodsTests(unittest.TestCase):
         UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
         self.assertEqual(range(3), sorted(self.phraseTextToIdMap.values()))
     def test_checkCriticalErrorsInPhraseTextToIdMap_larger_than_expected_dimensions(self):
-        twitter_stream_settings['max_dimensions'] = 2
         self.phraseTextToIdMap['sdfsd']=0
         print 'Ignore this message: ',
         self.assertRaises(SystemExit, UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap, self.phraseTextToIdMap, **twitter_stream_settings)
     def test_checkCriticalErrorsInPhraseTextToIdMap_repeating_values(self):
-        twitter_stream_settings['max_dimensions'] = 2    
-        self.phraseTextToIdMap['cluster']=0
+        self.phraseTextToIdMap['cluster']=0  
         print 'Ignore this message: ',
         self.assertRaises(SystemExit, UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap, self.phraseTextToIdMap, **twitter_stream_settings)
         
@@ -127,7 +122,6 @@ class PhraseTests(unittest.TestCase):
     def test_sort(self):
         self.assertEqual([self.phrase2, self.phrase1], Phrase.sort([self.phrase1, self.phrase2]))
         self.assertEqual([self.phrase1, self.phrase2], Phrase.sort([self.phrase1, self.phrase2], reverse=True))
-            
         
 if __name__ == '__main__':
     unittest.main()
