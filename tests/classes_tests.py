@@ -6,7 +6,7 @@ Created on Jun 22, 2011
 import unittest
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
-from classes import Stream, Message, VectorUpdateMethods, UtilityMethods
+from classes import Stream, Message, VectorUpdateMethods, UtilityMethods, Phrase
 from datetime import datetime, timedelta
 
 class UtilityMethodsTests(unittest.TestCase):
@@ -51,6 +51,19 @@ class VectorUpdateMethodTests(unittest.TestCase):
     def test_exponentialDecay(self):
         VectorUpdateMethods.exponentialDecay(self.s1, self.v1, 0.5, 1)
         self.assertEqual(Vector({1: 3, 2: 1.5, 3: 3}), self.s1)
+        
+class PhraseTests(unittest.TestCase):
+    def setUp(self):
+        self.now=datetime.now()
+        self.phrase1 = Phrase('abc', self.now, score=8)
+        self.phrase2 = Phrase('xyz', self.now, score=7)
+    def test_updateScore(self):
+        self.phrase1.updateScore(self.now+timedelta(seconds=120), 0.5, 60, 0)
+        self.assertEqual(2, self.phrase1.score)
+    def test_sort(self):
+        self.assertEqual([self.phrase2, self.phrase1], Phrase.sort([self.phrase1, self.phrase2]))
+        self.assertEqual([self.phrase1, self.phrase2], Phrase.sort([self.phrase1, self.phrase2], reverse=True))
+            
         
 if __name__ == '__main__':
     unittest.main()

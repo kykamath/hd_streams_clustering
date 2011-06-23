@@ -25,7 +25,15 @@ class UtilityMethods:
                 phraseToIdMap[phrase]=len(phraseToIdMap)
                 vectorMap[phraseToIdMap[phrase]]+=1
         return Vector(vectorMap)
-
+    
+class Phrase:
+    def __init__(self, text, latestOccuranceTime, score=1): self.text, self.latestOccuranceTime, self.score = text, latestOccuranceTime, score
+    def updateScore(self, currentOccuranceTime, decayCoefficient, timeUnitInSeconds, scoreToUpdate=1):
+        timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.latestOccuranceTime, timeUnitInSeconds)
+        self.score=exponentialDecay(self.score, decayCoefficient, timeDifference)+scoreToUpdate
+    @staticmethod
+    def sort(phraseIterator, reverse=False): return sorted(phraseIterator, key=lambda phrase:phrase.score, reverse=reverse)
+    
 class VectorUpdateMethods:
     @staticmethod
     def addWithoutDecay(stream, vector, **kwargs): 

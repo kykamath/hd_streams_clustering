@@ -5,7 +5,8 @@ Created on Jun 22, 2011
 '''
 from settings import twitter_stream_settings
 from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
-from classes import Message, UtilityMethods
+from classes import Message, UtilityMethods, Phrase
+import pprint
 
 class TwitterCrowdsSpecificMethods:
     @staticmethod
@@ -23,6 +24,9 @@ def tweetsFromFile():
                                                                     min_phrase_length=twitter_stream_settings.min_phrase_length,
                                                                     max_phrase_length=twitter_stream_settings.max_phrase_length
                                                                     ).vector
-
+    print len(phraseToIdMap)
+    print pprint.pprint(phraseToIdMap)
+    
 if __name__ == '__main__':
     tweetsFromFile()
+    ph = Phrase('asd', d, score)
