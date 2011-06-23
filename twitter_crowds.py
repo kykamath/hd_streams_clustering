@@ -19,7 +19,7 @@ phraseToIdMap = {}
 
 def tweetsFromFile():
     for tweet in TweetFiles.iterateTweetsFromGzip('data/sample.gz'):
-        print TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, phraseToIdMap=phraseToIdMap, 
+        print TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, phraseTextToIdMap=phraseTextToIdMap, 
                                                                     max_dimensions=twitter_stream_settings.max_dimensions,
                                                                     min_phrase_length=twitter_stream_settings.min_phrase_length,
                                                                     max_phrase_length=twitter_stream_settings.max_phrase_length

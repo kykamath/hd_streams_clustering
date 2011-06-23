@@ -15,28 +15,59 @@ class UtilityMethods:
     Only the methods in this class have access to settings.
     '''
     @staticmethod
-    def getVectorForText(text, occuranceTime, phraseTextToIdMap, idToPhraseObjectMap, **kwargs):
+    def createOrAddNewPhraseObject(phrase, phraseTextToPhraseObjectMap, occuranceTime, **stream_settings):
+        if phrase not in phraseTextToPhraseObjectMap: phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, occuranceTime, score=1)
+        else: phraseTextToPhraseObjectMap[phrase].updateScore(occuranceTime, stream_settings['phrase_decay_coefficient'], stream_settings['time_unit_in_seconds'], scoreToUpdate=1)
+    @staticmethod
+    def getVectorForText(text, occuranceTime, phraseTextToIdMap, phraseTextToPhraseObjectMap, **stream_settings):
         '''
         On observing a new phrase in the text:
             If length of phraseTextToIdMap is lesser than the number of dimensions: 
                 Add the new phrases to phraseTextToIdMap
-                Add the phrase to idToPhraseObjectMap
             Else: Ignore it
-        Update the phraseObject scores for all known dimensions
+        For every phrase:
+            If the phrase is not found in phraseTextToPhraseObjectMap: Add the phrase to phraseTextToPhraseObjectMap
+            Else: Update the score for that phrase 
         '''
         vectorMap = defaultdict(float)
-        for phrase in getPhrases(getWordsFromRawEnglishMessage(text), kwargs['min_phrase_length'], kwargs['max_phrase_length']): 
-            if phrase in phraseTextToIdMap: 
-                id = phraseTextToIdMap[phrase]
-                vectorMap[id]+=1
-                idToPhraseObjectMap[id].updateScore(occuranceTime, kwargs['phrase_decay_coefficient'], kwargs['time_unit_in_seconds'], scoreToUpdate=vectorMap[id])
-            elif len(phraseTextToIdMap)<kwargs['max_dimensions']: 
-                phraseId = len(phraseTextToIdMap)
-                phraseTextToIdMap[phrase]=phraseId
-                vectorMap[phraseId]+=1
-                idToPhraseObjectMap[phraseId] = Phrase(phrase, occuranceTime, score=1)
+        for phrase in getPhrases(getWordsFromRawEnglishMessage(text), stream_settings['min_phrase_length'], stream_settings['max_phrase_length']): 
+            phraseId = None
+            if phrase in phraseTextToIdMap: phraseId=phraseTextToIdMap[phrase]
+            elif len(phraseTextToIdMap)<stream_settings['max_dimensions']: phraseId=len(phraseTextToIdMap); phraseTextToIdMap[phrase]=phraseId
+            if phraseId!=None: vectorMap[phraseId]+=1
+            UtilityMethods.createOrAddNewPhraseObject(phrase, phraseTextToPhraseObjectMap, occuranceTime, **stream_settings)
         return Vector(vectorMap)
-    
+    @staticmethod
+    def updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, **stream_settings):
+        '''
+        Update phraseTextToIdMap with new dimensions.
+        '''
+        def getNextNewPhrase(topPhrasesSet):
+            for phrase in topPhrasesSet: 
+                if phrase not in phraseTextToIdMap: yield phrase
+        def getNextAvailableId(setOfIds): 
+            for id in setOfIds: yield id
+        topPhrasesSet = set([p.text for p in Phrase.sort(phraseTextToPhraseObjectMap.itervalues(), reverse=True)[:stream_settings['max_dimensions']]])
+        newPhraseIterator = getNextNewPhrase(topPhrasesSet)
+        availableIds = set(list(range(stream_settings['max_dimensions'])))
+        for phrase in phraseTextToIdMap.keys()[:]:
+            availableIds.remove(phraseTextToIdMap[phrase])
+            if phrase not in topPhrasesSet:
+                newPhrase = newPhraseIterator.next()
+                phraseTextToIdMap[newPhrase]=phraseTextToIdMap[phrase]
+                del phraseTextToIdMap[phrase] 
+        availableIdsIterator = getNextAvailableId(availableIds)
+        while True: 
+            try:
+                phraseTextToIdMap[newPhraseIterator.next()] = availableIdsIterator.next()
+            except StopIteration: break
+        # Check critical mistakes with the run. Stop application here.
+        UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap(phraseTextToIdMap, **stream_settings)
+    @staticmethod
+    def checkCriticalErrorsInPhraseTextToIdMap(phraseTextToIdMap, **stream_settings):
+        if len(phraseTextToIdMap)>stream_settings['max_dimensions']: print 'Illegal number of dimensions.', exit()
+        if len(phraseTextToIdMap.values())!=len(set(phraseTextToIdMap.values())): print 'Multiple phrases with same id.', exit()
+
 class Phrase:
     def __init__(self, text, latestOccuranceTime, score=1): self.text, self.latestOccuranceTime, self.score = text, latestOccuranceTime, score
     def updateScore(self, currentOccuranceTime, decayCoefficient, timeUnitInSeconds, scoreToUpdate):

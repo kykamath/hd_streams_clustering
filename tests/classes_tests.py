@@ -19,29 +19,76 @@ twitter_stream_settings['time_unit_in_seconds'] = 60
 class UtilityMethodsTests(unittest.TestCase):
     def setUp(self):
         self.text = 'A project to cluster high-dimensional streams.'
-        self.phraseToIdMap = {'project':0, 'cluster': 1}
-        self.idToPhraseObjectMap = {0: Phrase('project', test_time, score=8), 1: Phrase('cluster', test_time, score=8)}
+        self.phraseTextToIdMap = {'project':0, 'cluster': 1}
+        self.phraseTextToPhraseObjectMap = {'project': Phrase('project', test_time, score=8), 'cluster': Phrase('cluster', test_time, score=8)}
         self.vector = Vector({0:1, 1:1, 2:1, 3:1})
+        self.initial_max_dimensions = twitter_stream_settings['max_dimensions']
+    def tearDown(self):  twitter_stream_settings['max_dimensions'] = self.initial_max_dimensions
     def test_getVectorForString_PhraseMapHasLesserDimensions(self):
         self.assertEqual(['project', 'cluster', 'highdimensional', 'streams'], getPhrases(getWordsFromRawEnglishMessage(self.text), 1, 1))
-        self.assertEqual(self.vector, UtilityMethods.getVectorForText(self.text, test_time, self.phraseToIdMap, self.idToPhraseObjectMap, **twitter_stream_settings))
-        self.assertEqual({'project':0, 'cluster': 1, 'highdimensional':2, 'streams': 3}, self.phraseToIdMap)
+        self.assertEqual(self.vector, UtilityMethods.getVectorForText(self.text, test_time, self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings))
+        self.assertEqual({'project':0, 'cluster': 1, 'highdimensional':2, 'streams': 3}, self.phraseTextToIdMap)
     def test_getVectorForString_PhraseMapHasMaximumDimensions(self):
-        tempVal = twitter_stream_settings['max_dimensions']
         twitter_stream_settings['max_dimensions'] = 2
-        self.assertEqual(Vector({0:1, 1:1}), UtilityMethods.getVectorForText(self.text, test_time, self.phraseToIdMap, self.idToPhraseObjectMap, **twitter_stream_settings))
-        self.assertEqual({'project':0, 'cluster': 1}, self.phraseToIdMap)
-        twitter_stream_settings['max_dimensions'] = tempVal
-    def test_getVectorForString_PhraseObjectIsCreated(self): 
-        UtilityMethods.getVectorForText(self.text, test_time, self.phraseToIdMap, self.idToPhraseObjectMap, **twitter_stream_settings)
-        self.assertEqual(4, len(self.idToPhraseObjectMap))
+        self.assertEqual(Vector({0:1, 1:1}), UtilityMethods.getVectorForText(self.text, test_time, self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings))
+        self.assertEqual({'project':0, 'cluster': 1}, self.phraseTextToIdMap)
+#        twitter_stream_settings['max_dimensions'] = tempVal
     def test_getVectorForString_PhraseObjectScoresAreUpdatedCorrectly(self): 
-        UtilityMethods.getVectorForText(self.text, test_time+timedelta(seconds=60), self.phraseToIdMap, self.idToPhraseObjectMap, **twitter_stream_settings)
-        self.assertEqual(5, self.idToPhraseObjectMap[0].score) # Score for 'project'
-        self.assertEqual(1, self.idToPhraseObjectMap[3].score) # Score for 'streams'
-        pass
-    # Test if scores are getting updated. Test if phrase object is created
-
+        UtilityMethods.getVectorForText(self.text, test_time+timedelta(seconds=60), self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        self.assertEqual(4, len(self.phraseTextToPhraseObjectMap))
+        self.assertEqual(5, self.phraseTextToPhraseObjectMap['project'].score)
+        self.assertEqual(1, self.phraseTextToPhraseObjectMap['streams'].score)
+    def test_getVectorForString_phrase_does_not_exist_in_phraseToIdMap_but_exists_in_phraseTextToPhraseObjectMap_with_dimensions_full(self): 
+        # Fill dimensions.
+        twitter_stream_settings['max_dimensions'] = 1
+        # Delete a dimension for phraseTextToIdMap so that phraseTextToPhraseObjectMap has extra object
+        del self.phraseTextToIdMap['cluster']
+        UtilityMethods.getVectorForText(self.text, test_time+timedelta(seconds=60), self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        self.assertEqual({'project':0}, self.phraseTextToIdMap)
+        self.assertEqual(4, len(self.phraseTextToPhraseObjectMap))
+        self.assertEqual(5, self.phraseTextToPhraseObjectMap['project'].score)
+        self.assertEqual(5, self.phraseTextToPhraseObjectMap['cluster'].score)
+        self.assertEqual(1, self.phraseTextToPhraseObjectMap['streams'].score)
+    def test_createOrAddNewPhraseObject(self):
+        UtilityMethods.createOrAddNewPhraseObject('new_phrase', self.phraseTextToPhraseObjectMap, test_time, **twitter_stream_settings)
+        UtilityMethods.createOrAddNewPhraseObject('project', self.phraseTextToPhraseObjectMap, test_time, **twitter_stream_settings)
+        self.assertEqual(3, len(self.phraseTextToPhraseObjectMap))
+        self.assertEqual(1, self.phraseTextToPhraseObjectMap['new_phrase'].score)
+        self.assertEqual(9, self.phraseTextToPhraseObjectMap['project'].score)
+    def test_updateForNewDimensions_when_phraseTextToIdMap_is_filled_to_max_dimensions(self):
+        twitter_stream_settings['max_dimensions'] = 2
+        for phrase, score in zip(['added'], range(10,11)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
+        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        self.assertEqual({'project':0, 'added': 1}, self.phraseTextToIdMap)
+    def test_updateForNewDimensions_when_phraseTextToIdMap_is_filled_to_max_dimensions_and_entire_map_is_changed(self):
+        twitter_stream_settings['max_dimensions'] = 2
+        for phrase, score in zip(['added', 'are'], range(10,12)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
+        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        self.assertEqual({'added':0, 'are': 1}, self.phraseTextToIdMap)
+    def test_updateForNewDimensions_when_phraseTextToIdMap_has_lesser_than_max_dimensions(self):
+        twitter_stream_settings['max_dimensions'] = 4
+        for phrase, score in zip(['new', 'phrases', 'are', 'added'], range(7,11)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
+        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        self.assertEqual(set({'project':0, 'phrases': 1, 'are':2, 'added':3}), set(self.phraseTextToIdMap))
+        self.assertEqual(4, len(self.phraseTextToIdMap))
+    def test_updateForNewDimensions_when_phrases_with_lower_id_are_removed_from_phraseTextToIdMap(self):
+        twitter_stream_settings['max_dimensions'] = 3
+        for phrase, score in zip(['new', 'phrases', 'are'], range(100,103)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
+        self.phraseTextToIdMap['cluster']=2
+        self.phraseTextToPhraseObjectMap['cluster'].score=100
+        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        self.assertEqual(range(3), sorted(self.phraseTextToIdMap.values()))
+    def test_checkCriticalErrorsInPhraseTextToIdMap_larger_than_expected_dimensions(self):
+        twitter_stream_settings['max_dimensions'] = 2
+        self.phraseTextToIdMap['sdfsd']=0
+        print 'Ignore this message: ',
+        self.assertRaises(SystemExit, UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap, self.phraseTextToIdMap, **twitter_stream_settings)
+    def test_checkCriticalErrorsInPhraseTextToIdMap_repeating_values(self):
+        twitter_stream_settings['max_dimensions'] = 2    
+        self.phraseTextToIdMap['cluster']=0
+        print 'Ignore this message: ',
+        self.assertRaises(SystemExit, UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap, self.phraseTextToIdMap, **twitter_stream_settings)
+        
 class StreamTests(unittest.TestCase):
     def setUp(self):
         self.m1 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time-timedelta(seconds=60))
