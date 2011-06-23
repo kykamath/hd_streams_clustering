@@ -6,8 +6,24 @@ Created on Jun 22, 2011
 import unittest
 from library.nlp import StopWords, getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
-from classes import Stream, Message, VectorUpdateMethods
+from classes import Stream, Message, VectorUpdateMethods, UtilityMethods
 from datetime import datetime, timedelta
+
+class UtilityMethodsTests(unittest.TestCase):
+    def setUp(self):
+        self.text = 'A project to cluster high-dimensional streams.'
+        self.min_phrase_length, self.max_phrase_length, self.max_dimensions = 1, 1, 4
+        self.phraseToIdMap = {'project':0, 'cluster': 1}
+        self.vector = Vector({0:1, 1:1, 2:1, 3:1})
+        StopWords.load()
+    def test_getVectorForString_PhraseMapHasLesserDimensions(self):
+        self.assertEqual(['project', 'cluster', 'highdimensional', 'streams'], getPhrases(getWordsFromRawEnglishMessage(self.text), 1, 1))
+        self.assertEqual(self.vector, UtilityMethods.getVectorForText(self.text, self.phraseToIdMap, self.max_dimensions, self.min_phrase_length, self.max_phrase_length))
+        self.assertEqual({'project':0, 'cluster': 1, 'highdimensional':2, 'streams': 3}, self.phraseToIdMap)
+    def test_getVectorForString_PhraseMapHasMaximumDimensions(self):
+        self.max_dimensions = 2
+        self.assertEqual(Vector({0:1, 1:1}), UtilityMethods.getVectorForText(self.text, self.phraseToIdMap, self.max_dimensions, self.min_phrase_length, self.max_phrase_length))
+        self.assertEqual({'project':0, 'cluster': 1}, self.phraseToIdMap)
 
 class StreamTests(unittest.TestCase):
     def setUp(self):

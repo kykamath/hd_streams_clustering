@@ -6,6 +6,25 @@ Created on Jun 22, 2011
 
 from streaming_lsh.classes import Document
 from library.math_modified import exponentialDecay, DateTimeAirthematic
+from collections import defaultdict
+from library.nlp import getPhrases, getWordsFromRawEnglishMessage
+from library.vector import Vector
+
+class UtilityMethods:
+    @staticmethod
+    def getVectorForText(text, phraseToIdMap, max_dimensions, min_phrase_length, max_phrase_length):
+        '''
+        On observing new phrases in the test:
+            If length of phraseToIdMap is lesser than the number of dimensions: Add these new phrases to phraseToIdMap
+            Else: Ignore them
+        '''
+        vectorMap = defaultdict(float)
+        for phrase in getPhrases(getWordsFromRawEnglishMessage(text), min_phrase_length, max_phrase_length): 
+            if phrase in phraseToIdMap: vectorMap[phraseToIdMap[phrase]]+=1
+            elif len(phraseToIdMap)<max_dimensions: 
+                phraseToIdMap[phrase]=len(phraseToIdMap)
+                vectorMap[phraseToIdMap[phrase]]+=1
+        return Vector(vectorMap)
 
 class VectorUpdateMethods:
     @staticmethod
@@ -32,10 +51,4 @@ class Stream(Document):
 class Message(object):
     def __init__(self, streamId, messageId, text, timeStamp): 
         self.streamId, self.messageId, self.text, self.timeStamp, self.vector = streamId, messageId, text, timeStamp, None
-#    def setVector(self, wordToIdMap=None, min_phrase_length=None, max_phrase_length=None):
-#        if 'vector' not in self.__dict__: 
-#            vectorMap = defaultdict(float)
-#            for phrase in getPhrases(getWordsFromRawEnglishMessage(self.text), min_phrase_length, max_phrase_length): 
-#                if phrase in wordToIdMap: vectorMap[wordToIdMap[phrase]]+=1
-#            self.vector = Vector(vectorMap)
     def __str__(self): return str(self.messageId)
