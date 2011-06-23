@@ -5,9 +5,6 @@ Created on Jun 22, 2011
 '''
 
 from streaming_lsh.classes import Document
-from library.nlp import getPhrases, getWordsFromRawEnglishMessage
-from collections import defaultdict
-from library.vector import Vector
 from library.math_modified import exponentialDecay, DateTimeAirthematic
 
 class VectorUpdateMethods:
@@ -34,11 +31,11 @@ class Stream(Document):
 
 class Message(object):
     def __init__(self, streamId, messageId, text, timeStamp): 
-        self.streamId, self.messageId, self.text, self.timeStamp = streamId, messageId, text, timeStamp
-    def setVector(self, wordToIdMap=None, min_phrase_length=None, max_phrase_length=None):
-        if 'vector' not in self.__dict__: 
-            vectorMap = defaultdict(float)
-            for phrase in getPhrases(getWordsFromRawEnglishMessage(self.text), min_phrase_length, max_phrase_length): 
-                if phrase in wordToIdMap: vectorMap[wordToIdMap[phrase]]+=1
-            self.vector = Vector(vectorMap)
+        self.streamId, self.messageId, self.text, self.timeStamp, self.vector = streamId, messageId, text, timeStamp, None
+#    def setVector(self, wordToIdMap=None, min_phrase_length=None, max_phrase_length=None):
+#        if 'vector' not in self.__dict__: 
+#            vectorMap = defaultdict(float)
+#            for phrase in getPhrases(getWordsFromRawEnglishMessage(self.text), min_phrase_length, max_phrase_length): 
+#                if phrase in wordToIdMap: vectorMap[wordToIdMap[phrase]]+=1
+#            self.vector = Vector(vectorMap)
     def __str__(self): return str(self.messageId)

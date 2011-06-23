@@ -26,15 +26,15 @@ class StreamTests(unittest.TestCase):
         self.stream.updateForMessage(self.m2, VectorUpdateMethods.exponentialDecay, 0.5, 60)
         self.assertEqual(self.stream, Vector({1:0.5,2:4.5}))
         
-class MessageTests(unittest.TestCase):
-    def setUp(self):
-        self.message = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', datetime.now())
-        StopWords.load()
-    def test_setVector(self):
-        wordToIdMap = {'project':1, 'cluster': 2, 'highdimensional': 3}
-        self.message.setVector(wordToIdMap, 1, 1)
-        self.assertEqual(['project', 'cluster', 'highdimensional', 'streams'], getPhrases(getWordsFromRawEnglishMessage(self.message.text), 1, 1))
-        self.assertEqual(Vector({1:1, 2:1, 3:1}), self.message.vector)
+#class MessageTests(unittest.TestCase):
+#    def setUp(self):
+#        self.message = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', datetime.now())
+#        StopWords.load()
+#    def test_setVector(self):
+#        wordToIdMap = {'project':1, 'cluster': 2, 'highdimensional': 3}
+#        self.message.setVector(wordToIdMap, 1, 1)
+#        self.assertEqual(['project', 'cluster', 'highdimensional', 'streams'], getPhrases(getWordsFromRawEnglishMessage(self.message.text), 1, 1))
+#        self.assertEqual(Vector({1:1, 2:1, 3:1}), self.message.vector)
         
 class VectorUpdateMethodTests(unittest.TestCase):
     def setUp(self): 
