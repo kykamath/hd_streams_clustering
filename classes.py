@@ -32,11 +32,13 @@ class Stream(Document):
         if timeUnitInSeconds!=None: timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, self.lastMessageTime, timeUnitInSeconds)
         updateMethod(self, message.vector, decayCoefficient=decayCoefficient, timeDifference=timeDifference)
 
-class Message:
+class Message(object):
     def __init__(self, streamId, messageId, text, timeStamp): 
         self.streamId, self.messageId, self.text, self.timeStamp = streamId, messageId, text, timeStamp
     def setVector(self, wordToIdMap=None, min_phrase_length=None, max_phrase_length=None):
         if 'vector' not in self.__dict__: 
             vectorMap = defaultdict(float)
-            for phrase in getPhrases(getWordsFromRawEnglishMessage(self.text), min_phrase_length, max_phrase_length): vectorMap[wordToIdMap[phrase]]+=1
+            for phrase in getPhrases(getWordsFromRawEnglishMessage(self.text), min_phrase_length, max_phrase_length): 
+                if phrase in wordToIdMap: vectorMap[wordToIdMap[phrase]]+=1
             self.vector = Vector(vectorMap)
+    def __str__(self): return str(self.messageId)
