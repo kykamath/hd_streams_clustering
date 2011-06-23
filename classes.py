@@ -11,26 +11,38 @@ from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 
 class UtilityMethods:
+    '''
+    Only the methods in this class have access to settings.
+    '''
     @staticmethod
-    def getVectorForText(text, phraseToIdMap, max_dimensions, min_phrase_length, max_phrase_length):
+    def getVectorForText(text, occuranceTime, phraseTextToIdMap, idToPhraseObjectMap, **kwargs):
         '''
-        On observing new phrases in the test:
-            If length of phraseToIdMap is lesser than the number of dimensions: Add these new phrases to phraseToIdMap
-            Else: Ignore them
+        On observing a new phrase in the text:
+            If length of phraseTextToIdMap is lesser than the number of dimensions: 
+                Add the new phrases to phraseTextToIdMap
+                Add the phrase to idToPhraseObjectMap
+            Else: Ignore it
+        Update the phraseObject scores for all known dimensions
         '''
         vectorMap = defaultdict(float)
-        for phrase in getPhrases(getWordsFromRawEnglishMessage(text), min_phrase_length, max_phrase_length): 
-            if phrase in phraseToIdMap: vectorMap[phraseToIdMap[phrase]]+=1
-            elif len(phraseToIdMap)<max_dimensions: 
-                phraseToIdMap[phrase]=len(phraseToIdMap)
-                vectorMap[phraseToIdMap[phrase]]+=1
+        for phrase in getPhrases(getWordsFromRawEnglishMessage(text), kwargs['min_phrase_length'], kwargs['max_phrase_length']): 
+            if phrase in phraseTextToIdMap: 
+                id = phraseTextToIdMap[phrase]
+                vectorMap[id]+=1
+                idToPhraseObjectMap[id].updateScore(occuranceTime, kwargs['phrase_decay_coefficient'], kwargs['time_unit_in_seconds'], scoreToUpdate=vectorMap[id])
+            elif len(phraseTextToIdMap)<kwargs['max_dimensions']: 
+                phraseId = len(phraseTextToIdMap)
+                phraseTextToIdMap[phrase]=phraseId
+                vectorMap[phraseId]+=1
+                idToPhraseObjectMap[phraseId] = Phrase(phrase, occuranceTime, score=1)
         return Vector(vectorMap)
     
 class Phrase:
     def __init__(self, text, latestOccuranceTime, score=1): self.text, self.latestOccuranceTime, self.score = text, latestOccuranceTime, score
-    def updateScore(self, currentOccuranceTime, decayCoefficient, timeUnitInSeconds, scoreToUpdate=1):
+    def updateScore(self, currentOccuranceTime, decayCoefficient, timeUnitInSeconds, scoreToUpdate):
         timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.latestOccuranceTime, timeUnitInSeconds)
         self.score=exponentialDecay(self.score, decayCoefficient, timeDifference)+scoreToUpdate
+        self.latestOccuranceTime=currentOccuranceTime
     @staticmethod
     def sort(phraseIterator, reverse=False): return sorted(phraseIterator, key=lambda phrase:phrase.score, reverse=reverse)
     
