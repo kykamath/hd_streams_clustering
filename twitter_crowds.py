@@ -14,13 +14,15 @@ class TwitterCrowdsSpecificMethods:
         message.vector = UtilityMethods.getVectorForText(tweet['text'], phraseToIdMap, max_dimensions, min_phrase_length, max_phrase_length)
         return message
 
-wordToIdMap = {}
+phraseToIdMap = {}
 
 def tweetsFromFile():
     for tweet in TweetFiles.iterateTweetsFromGzip('data/sample.gz'):
-#        print getMessageObjectForTweet(tweet)
-        print tweet['created_at']
-        exit()
+        print TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, phraseToIdMap=phraseToIdMap, 
+                                                                    max_dimensions=twitter_stream_settings.max_dimensions,
+                                                                    min_phrase_length=twitter_stream_settings.min_phrase_length,
+                                                                    max_phrase_length=twitter_stream_settings.max_phrase_length
+                                                                    ).vector
 
 if __name__ == '__main__':
     tweetsFromFile()

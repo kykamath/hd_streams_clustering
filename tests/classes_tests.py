@@ -4,7 +4,7 @@ Created on Jun 22, 2011
 @author: kykamath
 '''
 import unittest
-from library.nlp import StopWords, getPhrases, getWordsFromRawEnglishMessage
+from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 from classes import Stream, Message, VectorUpdateMethods, UtilityMethods
 from datetime import datetime, timedelta
@@ -15,7 +15,6 @@ class UtilityMethodsTests(unittest.TestCase):
         self.min_phrase_length, self.max_phrase_length, self.max_dimensions = 1, 1, 4
         self.phraseToIdMap = {'project':0, 'cluster': 1}
         self.vector = Vector({0:1, 1:1, 2:1, 3:1})
-        StopWords.load()
     def test_getVectorForString_PhraseMapHasLesserDimensions(self):
         self.assertEqual(['project', 'cluster', 'highdimensional', 'streams'], getPhrases(getWordsFromRawEnglishMessage(self.text), 1, 1))
         self.assertEqual(self.vector, UtilityMethods.getVectorForText(self.text, self.phraseToIdMap, self.max_dimensions, self.min_phrase_length, self.max_phrase_length))
