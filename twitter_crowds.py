@@ -11,7 +11,7 @@ from datetime import timedelta
 
 class TwitterStreamVariables:
     phraseTextToIdMap, phraseTextToPhraseObjectMap, streamIdToStreamObjectMap = {}, {}, {}
-    dimensionUpdatingFrequency = timedelta(seconds=twitter_stream_settings['time_unit_in_seconds'])
+    dimensionUpdatingFrequency = twitter_stream_settings['time_unit_in_seconds']
 #    dimensionUpdatingFrequency = timedelta(seconds=60)
 
 class TwitterCrowdsSpecificMethods:
