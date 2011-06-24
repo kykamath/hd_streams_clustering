@@ -23,6 +23,10 @@ class TwitterCrowdsSpecificMethodsTests(unittest.TestCase):
     def test_getMessageObjectForTweet(self):
         message = TwitterCrowdsSpecificMethods.getMessageObjectForTweet(self.tweet, self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
         self.assertEqual(self.vector, message.vector)
+    def test_messageInOrder(self):
+        messageSequence = [test_time+timedelta(minutes=i) for i in range(5)]
+        messageSequence[2]=messageSequence[4]=test_time
+        self.assertEqual([True, True, False, True, False], [TwitterCrowdsSpecificMethods.messageInOrder(t) for t in messageSequence])
         
 if __name__ == '__main__':
     unittest.main()
