@@ -9,8 +9,10 @@ from library.classes import GeneralMethods
 from classes import Message, UtilityMethods, Stream, VectorUpdateMethods
 from datetime import timedelta
 
-phraseTextToIdMap, phraseTextToPhraseObjectMap, streamIdToStreamObjectMap = {}, {}, {}
-#dimensionUpdatingFrequency = timedelta(twitter_stream_settings['time_unit_in_seconds'])
+class TwitterStreamVariables:
+    phraseTextToIdMap, phraseTextToPhraseObjectMap, streamIdToStreamObjectMap = {}, {}, {}
+    dimensionUpdatingFrequency = timedelta(twitter_stream_settings['time_unit_in_seconds'])
+#    dimensionUpdatingFrequency = timedelta(seconds=60)
 
 class TwitterCrowdsSpecificMethods:
     @staticmethod
@@ -21,18 +23,19 @@ class TwitterCrowdsSpecificMethods:
         return message
     @staticmethod
     def printParam(phraseTextToIdMap, phraseTextToPhraseObjectMap): 
-        print 'comes here'
+#        print 'comes here'
         UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
-        print len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
+#        print len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
 
 def tweetsFromFile():
 #    for tweet in TweetFiles.iterateTweetsFromGzip('data/sample.gz'):
     for tweet in TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
-        message = TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
-        if message.streamId not in streamIdToStreamObjectMap: streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
-        else: streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
-        streamObject=streamIdToStreamObjectMap[message.streamId]
-        GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.printParam, timedelta(twitter_stream_settings['time_unit_in_seconds']), message.timeStamp, phraseTextToIdMap=phraseTextToIdMap, phraseTextToPhraseObjectMap=phraseTextToPhraseObjectMap)
+        message = TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, TwitterStreamVariables.phraseTextToIdMap, TwitterStreamVariables.phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        if message.streamId not in TwitterStreamVariables.streamIdToStreamObjectMap: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
+        else: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
+        streamObject=TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId]
+#        print streamObject.lastMessageTime
+        GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.printParam, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap)
         
 if __name__ == '__main__':
     tweetsFromFile()

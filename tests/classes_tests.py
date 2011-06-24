@@ -56,16 +56,16 @@ class UtilityMethodsTests(unittest.TestCase):
         self.assertEqual(9, self.phraseTextToPhraseObjectMap['project'].score)
     def test_updateForNewDimensions_when_phraseTextToIdMap_is_filled_to_max_dimensions(self):
         for phrase, score in zip(['added'], range(10,11)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
-        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **stream_settings)
+        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, test_time, **stream_settings)
         self.assertEqual({'project':0, 'added': 1}, self.phraseTextToIdMap)
     def test_updateForNewDimensions_when_phraseTextToIdMap_is_filled_to_max_dimensions_and_entire_map_is_changed(self):
         for phrase, score in zip(['added', 'are'], range(10,12)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
-        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **stream_settings)
+        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, test_time, **stream_settings)
         self.assertEqual({'added':0, 'are': 1}, self.phraseTextToIdMap)
     def test_updateForNewDimensions_when_phraseTextToIdMap_has_lesser_than_max_dimensions(self):
         stream_settings['max_dimensions'] = 4
         for phrase, score in zip(['new', 'phrases', 'are', 'added'], range(7,11)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
-        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **stream_settings)
+        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, test_time, **stream_settings)
         self.assertEqual(set({'project':0, 'phrases': 1, 'are':2, 'added':3}), set(self.phraseTextToIdMap))
         self.assertEqual(4, len(self.phraseTextToIdMap))
     def test_updateForNewDimensions_when_phrases_with_lower_id_are_removed_from_phraseTextToIdMap(self):
@@ -73,7 +73,7 @@ class UtilityMethodsTests(unittest.TestCase):
         for phrase, score in zip(['new', 'phrases', 'are'], range(100,103)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
         self.phraseTextToIdMap['cluster']=2
         self.phraseTextToPhraseObjectMap['cluster'].score=100
-        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **stream_settings)
+        UtilityMethods.updateForNewDimensions(self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, test_time, **stream_settings)
         self.assertEqual(range(3), sorted(self.phraseTextToIdMap.values()))
     def test_checkCriticalErrorsInPhraseTextToIdMap_larger_than_expected_dimensions(self):
         self.phraseTextToIdMap['sdfsd']=0

@@ -34,7 +34,7 @@ class UtilityMethods:
             UtilityMethods.createOrAddNewPhraseObject(phrase, phraseTextToPhraseObjectMap, occuranceTime, **stream_settings)
         return Vector(vectorMap)
     @staticmethod
-    def updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, **stream_settings):
+    def updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentTime, **stream_settings):
         '''
         Update phraseTextToIdMap with new dimensions.
         '''
@@ -43,7 +43,12 @@ class UtilityMethods:
                 if phrase not in phraseTextToIdMap: yield phrase
         def getNextAvailableId(setOfIds): 
             for id in setOfIds: yield id
-        topPhrasesSet = set([p.text for p in Phrase.sort(phraseTextToPhraseObjectMap.itervalues(), reverse=True)[:stream_settings['max_dimensions']]])
+        def updatePhraseScore(phraseObject): 
+            phraseObject.updateScore(currentTime, 0, **stream_settings)
+            return phraseObject
+        topPhrasesList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in phraseTextToPhraseObjectMap.itervalues()), reverse=True)[:stream_settings['max_dimensions']]]
+        print topPhrasesList[:10]
+        topPhrasesSet = set(topPhrasesList)
         newPhraseIterator = getNextNewPhrase(topPhrasesSet)
         availableIds = set(list(range(stream_settings['max_dimensions'])))
         for phrase in phraseTextToIdMap.keys()[:]:
