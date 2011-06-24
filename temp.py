@@ -8,7 +8,7 @@ Created on Jun 12, 2011
 #
 #DistributedMongoMap().add()
 #import multiprocessing
-#from multiprocessing import Pool
+from multiprocessing import Pool
 #
 #print multiprocessing.cpu_count()
 #
@@ -32,21 +32,29 @@ Created on Jun 12, 2011
 #    result = pool.apply_async(time.sleep, (10,))
 #    print result.get(timeout=1)           # raises TimeoutError
 
-
-#def iterator():
-#    for i in range(100): yield i
+#d = dict((i,1) for i in range(10))
 #
-#def f(x):
-#    print x, x**2
+#class ob:
+#    def __init__(self,i): self.val=i
+#
+#def iterator():
+#    for i in range(10): yield (d, ob(i))
+#
+#def f((d, ob)): 
+#    if ob.val<5: 
+#        print 'comes here', ob.val
+#        del d[ob.val] 
 #
 #pool = Pool()
+#print d
 #print pool.map(f, iterator())
+#print d
 
-from library.twitter import TweetFiles
-from library.nlp import StopWords, getWordsFromRawEnglishMessage, getPhrases
-
-StopWords.load()
-min_phrase_length = 2
-max_phrase_length = 8
-for tweets in TweetFiles.iterateTweetsFromGzip('data/sample.gz'):
-    print tweets['user']['screen_name'], getPhrases(getWordsFromRawEnglishMessage(tweets['text']), min_phrase_length, max_phrase_length)
+#from library.twitter import TweetFiles
+#from library.nlp import StopWords, getWordsFromRawEnglishMessage, getPhrases
+#
+#StopWords.load()
+#min_phrase_length = 2
+#max_phrase_length = 8
+#for tweets in TweetFiles.iterateTweetsFromGzip('data/sample.gz'):
+#    print tweets['user']['screen_name'], getPhrases(getWordsFromRawEnglishMessage(tweets['text']), min_phrase_length, max_phrase_length)

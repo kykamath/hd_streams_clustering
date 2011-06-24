@@ -8,6 +8,8 @@ from library.math_modified import exponentialDecay, DateTimeAirthematic
 from collections import defaultdict
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
+from datetime import timedelta
+import random
 
 class UtilityMethods:
     @staticmethod
@@ -46,8 +48,8 @@ class UtilityMethods:
         def updatePhraseScore(phraseObject): 
             phraseObject.updateScore(currentTime, 0, **stream_settings)
             return phraseObject
+        UtilityMethods.pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, currentTime, UtilityMethods.pruningConditionDeterministic, **stream_settings)
         topPhrasesList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in phraseTextToPhraseObjectMap.itervalues()), reverse=True)[:stream_settings['max_dimensions']]]
-        print topPhrasesList[:10]
         topPhrasesSet = set(topPhrasesList)
         newPhraseIterator = getNextNewPhrase(topPhrasesSet)
         availableIds = set(list(range(stream_settings['max_dimensions'])))
@@ -68,6 +70,23 @@ class UtilityMethods:
     def checkCriticalErrorsInPhraseTextToIdMap(phraseTextToIdMap, **stream_settings):
         if len(phraseTextToIdMap)>stream_settings['max_dimensions']: print 'Illegal number of dimensions.', exit()
         if len(phraseTextToIdMap.values())!=len(set(phraseTextToIdMap.values())): print 'Multiple phrases with same id.', exit()
+    @staticmethod
+    def pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, currentTime, pruningMethod, **stream_settings):
+        def prune(phraseText): 
+            if pruningMethod(phraseTextToPhraseObjectMap[phraseText], currentTime, **stream_settings): del phraseTextToPhraseObjectMap[phraseText]
+        map(prune, phraseTextToPhraseObjectMap.keys()[:])
+    @staticmethod
+    def pruningConditionDeterministic(phraseObject, currentTime, **stream_settings):
+        if currentTime-phraseObject.latestOccuranceTime>stream_settings['max_phrase_inactivity_time_in_seconds']: return True
+        else: return False
+    @staticmethod
+    def pruningConditionRandom(phraseObject, currentTime, **stream_settings):
+        def flip(p): return True if random.random() < p else False
+        timeDifference = currentTime-phraseObject.latestOccuranceTime
+        if timeDifference<stream_settings['max_phrase_inactivity_time_in_seconds']: return False
+        elif timeDifference>2*stream_settings['max_phrase_inactivity_time_in_seconds']: return True
+        else: return flip(float(timeDifference.seconds)/(2*stream_settings['max_phrase_inactivity_time_in_seconds']).seconds)
+    
 
 class VectorUpdateMethods:
     @staticmethod
@@ -88,7 +107,7 @@ class Stream(Document):
         self.lastMessageTime = message.timeStamp
     def updateForMessage(self, message, updateMethod, **stream_settings): 
         timeDifference = None
-        if stream_settings['time_unit_in_seconds']!=None: timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, self.lastMessageTime, stream_settings['time_unit_in_seconds'])
+        if stream_settings['time_unit_in_seconds']!=None: timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, self.lastMessageTime, stream_settings['time_unit_in_seconds'].seconds)
         updateMethod(self, message.vector, decayCoefficient=stream_settings['stream_decay_coefficient'], timeDifference=timeDifference)
 
 class Message(object):
@@ -98,8 +117,9 @@ class Message(object):
 class Phrase:
     def __init__(self, text, latestOccuranceTime, score=1): self.text, self.latestOccuranceTime, self.score = text, latestOccuranceTime, score
     def updateScore(self, currentOccuranceTime, scoreToUpdate, **stream_settings):
-        timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.latestOccuranceTime, stream_settings['time_unit_in_seconds'])
+        timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.latestOccuranceTime, stream_settings['time_unit_in_seconds'].seconds)
         self.score=exponentialDecay(self.score, stream_settings['phrase_decay_coefficient'], timeDifference)+scoreToUpdate
         self.latestOccuranceTime=currentOccuranceTime
     @staticmethod
     def sort(phraseIterator, reverse=False): return sorted(phraseIterator, key=lambda phrase:phrase.score, reverse=reverse)
+    

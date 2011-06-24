@@ -11,7 +11,7 @@ from datetime import timedelta
 
 class TwitterStreamVariables:
     phraseTextToIdMap, phraseTextToPhraseObjectMap, streamIdToStreamObjectMap = {}, {}, {}
-    dimensionUpdatingFrequency = timedelta(twitter_stream_settings['time_unit_in_seconds'])
+    dimensionUpdatingFrequency = timedelta(seconds=twitter_stream_settings['time_unit_in_seconds'])
 #    dimensionUpdatingFrequency = timedelta(seconds=60)
 
 class TwitterCrowdsSpecificMethods:
@@ -27,29 +27,23 @@ class TwitterCrowdsSpecificMethods:
         message.vector = UtilityMethods.getVectorForText(tweet['text'], tweetTime, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
         return message
     @staticmethod
-    def printParam(phraseTextToIdMap, phraseTextToPhraseObjectMap): 
-        print 'comes here'
-#        UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentTime, **twitter_stream_settings)
-#        print len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
+    def updateDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime): 
+        print 'comes here', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
+        UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, **twitter_stream_settings)
 
 def tweetsFromFile():
 #    for tweet in TweetFiles.iterateTweetsFromGzip('data/sample.gz'):
-    i = 0
     for tweet in TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
         message = TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, TwitterStreamVariables.phraseTextToIdMap, TwitterStreamVariables.phraseTextToPhraseObjectMap, **twitter_stream_settings)
-#        if message.streamId not in TwitterStreamVariables.streamIdToStreamObjectMap: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
-#        else: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
-#        streamObject=TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId]
-#        print streamObject.lastMessageTime
-#        GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.printParam, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, 
-#                                               phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, 
-#                                               phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap)
-##                                               currentMessageTime=message.timeStamp)
         if TwitterCrowdsSpecificMethods.messageInOrder(message.timeStamp):
-            i+=1
-            if i%1000==0: print i
-    print i
-        
-        
+            if message.streamId not in TwitterStreamVariables.streamIdToStreamObjectMap: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
+            else: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
+#            streamObject=TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId]
+#            print streamObject.lastMessageTime
+            GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.updateDimensions, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, 
+                                                   phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, 
+                                                   phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap,
+                                                   currentMessageTime=message.timeStamp)
+            
 if __name__ == '__main__':
     tweetsFromFile()
