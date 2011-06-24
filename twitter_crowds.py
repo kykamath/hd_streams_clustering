@@ -34,7 +34,7 @@ def tweetsFromFile():
         if message.streamId not in TwitterStreamVariables.streamIdToStreamObjectMap: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
         else: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
         streamObject=TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId]
-#        print streamObject.lastMessageTime
+        print streamObject.lastMessageTime
         GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.printParam, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, 
                                                phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, 
                                                phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap)
