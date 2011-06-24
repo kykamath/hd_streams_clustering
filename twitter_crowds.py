@@ -46,7 +46,7 @@ def tweetsFromFile():
 #                                               phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap)
 ##                                               currentMessageTime=message.timeStamp)
         i+=1
-        if i%1000: print i
+        if i%1000==0: print i
     print i
         
         
