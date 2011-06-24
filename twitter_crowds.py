@@ -22,8 +22,8 @@ class TwitterCrowdsSpecificMethods:
         message.vector = UtilityMethods.getVectorForText(tweet['text'], tweetTime, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
         return message
     @staticmethod
-    def printParam(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentTime): 
-        print 'comes here', currentTime
+    def printParam(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime): 
+        print 'comes here', currentMessageTime
 #        UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentTime, **twitter_stream_settings)
 #        print len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
 
@@ -38,7 +38,7 @@ def tweetsFromFile():
         GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.printParam, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, 
                                                phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, 
                                                phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap,
-                                               currentTime=message.timeStamp)
+                                               currentMessageTime=message.timeStamp)
         
 if __name__ == '__main__':
     tweetsFromFile()
