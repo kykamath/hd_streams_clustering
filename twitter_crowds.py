@@ -28,9 +28,10 @@ class TwitterCrowdsSpecificMethods:
         return message
     @staticmethod
     def updateDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime): 
-        print 'comes here', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
+        print 'Entering:', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
         UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, **twitter_stream_settings)
-
+        print 'Leaving: ', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
+        
 def tweetsFromFile():
 #    for tweet in TweetFiles.iterateTweetsFromGzip('data/sample.gz'):
     for tweet in TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
@@ -38,7 +39,7 @@ def tweetsFromFile():
         if TwitterCrowdsSpecificMethods.messageInOrder(message.timeStamp):
             if message.streamId not in TwitterStreamVariables.streamIdToStreamObjectMap: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
             else: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
-#            streamObject=TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId]
+            streamObject=TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId]
 #            print streamObject.lastMessageTime
             GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.updateDimensions, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, 
                                                    phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, 
