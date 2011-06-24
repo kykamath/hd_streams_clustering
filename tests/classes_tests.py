@@ -13,6 +13,8 @@ from settings import twitter_stream_settings as stream_settings
 test_time = datetime.now()
 
 # Settings for unittests
+stream_settings['min_phrase_length']=1
+stream_settings['max_phrase_length']=1
 stream_settings['phrase_decay_coefficient'] = 0.5
 stream_settings['time_unit_in_seconds'] = timedelta(seconds=60)
 stream_settings['stream_decay_coefficient'] = 0.5
