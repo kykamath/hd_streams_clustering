@@ -87,8 +87,7 @@ class Stream(Document):
         updateMethod(self, message.vector, decayCoefficient=stream_settings['stream_decay_coefficient'], timeDifference=timeDifference)
 
 class Message(object):
-    def __init__(self, streamId, messageId, text, timeStamp): 
-        self.streamId, self.messageId, self.text, self.timeStamp, self.vector = streamId, messageId, text, timeStamp, None
+    def __init__(self, streamId, messageId, text, timeStamp): self.streamId, self.messageId, self.text, self.timeStamp, self.vector = streamId, messageId, text, timeStamp, None
     def __str__(self): return str(self.messageId)
 
 class Phrase:
