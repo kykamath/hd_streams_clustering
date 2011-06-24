@@ -5,7 +5,7 @@ Created on Jun 22, 2011
 '''
 from settings import twitter_stream_settings
 from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
-from classes import Message, UtilityMethods, Phrase
+from classes import Message, UtilityMethods, Stream, VectorUpdateMethods
 import pprint
 
 class TwitterCrowdsSpecificMethods:
@@ -17,12 +17,19 @@ class TwitterCrowdsSpecificMethods:
         return message
 
 phraseTextToIdMap, phraseTextToPhraseObjectMap = {}, {}
+streamIdToStreamObjectMap = {}
 
 def tweetsFromFile():
     for tweet in TweetFiles.iterateTweetsFromGzip('data/sample.gz'):
-        print TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings).vector
+        message = TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        if message.streamId not in streamIdToStreamObjectMap: streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
+        else: streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
+        streamObject=streamIdToStreamObjectMap[message.streamId]
+        print streamObject
+        
     print len(phraseTextToIdMap)
-    print pprint.pprint(phraseTextToIdMap)
+    print len(phraseTextToPhraseObjectMap)
+#    print pprint.pprint(phraseTextToIdMap)
     
 if __name__ == '__main__':
     tweetsFromFile()

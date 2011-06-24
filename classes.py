@@ -3,7 +3,6 @@ Created on Jun 22, 2011
 
 @author: kykamath
 '''
-
 from streaming_lsh.classes import Document
 from library.math_modified import exponentialDecay, DateTimeAirthematic
 from collections import defaultdict
@@ -11,13 +10,10 @@ from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 
 class UtilityMethods:
-    '''
-    Only the methods in this class have access to settings.
-    '''
     @staticmethod
     def createOrAddNewPhraseObject(phrase, phraseTextToPhraseObjectMap, occuranceTime, **stream_settings):
         if phrase not in phraseTextToPhraseObjectMap: phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, occuranceTime, score=1)
-        else: phraseTextToPhraseObjectMap[phrase].updateScore(occuranceTime, stream_settings['phrase_decay_coefficient'], stream_settings['time_unit_in_seconds'], scoreToUpdate=1)
+        else: phraseTextToPhraseObjectMap[phrase].updateScore(occuranceTime, scoreToUpdate=1, **stream_settings)
     @staticmethod
     def getVectorForText(text, occuranceTime, phraseTextToIdMap, phraseTextToPhraseObjectMap, **stream_settings):
         '''
@@ -68,15 +64,6 @@ class UtilityMethods:
         if len(phraseTextToIdMap)>stream_settings['max_dimensions']: print 'Illegal number of dimensions.', exit()
         if len(phraseTextToIdMap.values())!=len(set(phraseTextToIdMap.values())): print 'Multiple phrases with same id.', exit()
 
-class Phrase:
-    def __init__(self, text, latestOccuranceTime, score=1): self.text, self.latestOccuranceTime, self.score = text, latestOccuranceTime, score
-    def updateScore(self, currentOccuranceTime, decayCoefficient, timeUnitInSeconds, scoreToUpdate):
-        timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.latestOccuranceTime, timeUnitInSeconds)
-        self.score=exponentialDecay(self.score, decayCoefficient, timeDifference)+scoreToUpdate
-        self.latestOccuranceTime=currentOccuranceTime
-    @staticmethod
-    def sort(phraseIterator, reverse=False): return sorted(phraseIterator, key=lambda phrase:phrase.score, reverse=reverse)
-    
 class VectorUpdateMethods:
     @staticmethod
     def addWithoutDecay(stream, vector, **kwargs): 
@@ -84,7 +71,7 @@ class VectorUpdateMethods:
             if k in stream: stream[k]+=v
             else: stream[k]=v
     @staticmethod
-    def exponentialDecay(stream, vector, decayCoefficient, timeDifference):
+    def exponentialDecay(stream, vector, decayCoefficient, timeDifference, **kwargs):
         for k in stream: stream[k]=exponentialDecay(stream[k], decayCoefficient, timeDifference)
         for k in vector: 
             if k in stream: stream[k]+=vector[k]
@@ -94,12 +81,21 @@ class Stream(Document):
     def __init__(self, streamId, message): 
         super(Stream, self).__init__(streamId, message.vector)
         self.lastMessageTime = message.timeStamp
-    def updateForMessage(self, message, updateMethod, decayCoefficient, timeUnitInSeconds): 
+    def updateForMessage(self, message, updateMethod, **stream_settings): 
         timeDifference = None
-        if timeUnitInSeconds!=None: timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, self.lastMessageTime, timeUnitInSeconds)
-        updateMethod(self, message.vector, decayCoefficient=decayCoefficient, timeDifference=timeDifference)
+        if stream_settings['time_unit_in_seconds']!=None: timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, self.lastMessageTime, stream_settings['time_unit_in_seconds'])
+        updateMethod(self, message.vector, decayCoefficient=stream_settings['stream_decay_coefficient'], timeDifference=timeDifference)
 
 class Message(object):
     def __init__(self, streamId, messageId, text, timeStamp): 
         self.streamId, self.messageId, self.text, self.timeStamp, self.vector = streamId, messageId, text, timeStamp, None
     def __str__(self): return str(self.messageId)
+
+class Phrase:
+    def __init__(self, text, latestOccuranceTime, score=1): self.text, self.latestOccuranceTime, self.score = text, latestOccuranceTime, score
+    def updateScore(self, currentOccuranceTime, scoreToUpdate, **stream_settings):
+        timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.latestOccuranceTime, stream_settings['time_unit_in_seconds'])
+        self.score=exponentialDecay(self.score, stream_settings['phrase_decay_coefficient'], timeDifference)+scoreToUpdate
+        self.latestOccuranceTime=currentOccuranceTime
+    @staticmethod
+    def sort(phraseIterator, reverse=False): return sorted(phraseIterator, key=lambda phrase:phrase.score, reverse=reverse)
