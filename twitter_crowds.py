@@ -22,9 +22,9 @@ class TwitterCrowdsSpecificMethods:
         message.vector = UtilityMethods.getVectorForText(tweet['text'], tweetTime, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
         return message
     @staticmethod
-    def printParam(phraseTextToIdMap, phraseTextToPhraseObjectMap): 
-#        print 'comes here'
-        UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
+    def printParam(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentTime): 
+        print 'comes here', currentTime
+#        UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentTime, **twitter_stream_settings)
 #        print len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
 
 def tweetsFromFile():
@@ -34,8 +34,11 @@ def tweetsFromFile():
         if message.streamId not in TwitterStreamVariables.streamIdToStreamObjectMap: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
         else: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
         streamObject=TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId]
-        print streamObject.lastMessageTime
-        GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.printParam, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap)
+#        print streamObject.lastMessageTime
+        GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.printParam, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, 
+                                               phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, 
+                                               phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap,
+                                               currentTime=message.timeStamp)
         
 if __name__ == '__main__':
     tweetsFromFile()
