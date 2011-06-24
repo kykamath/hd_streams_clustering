@@ -10,7 +10,7 @@ from classes import Message, UtilityMethods, Stream, VectorUpdateMethods
 from datetime import timedelta
 
 phraseTextToIdMap, phraseTextToPhraseObjectMap, streamIdToStreamObjectMap = {}, {}, {}
-dimensionUpdatingFrequency = timedelta(twitter_stream_settings['time_unit_in_seconds'])
+#dimensionUpdatingFrequency = timedelta(twitter_stream_settings['time_unit_in_seconds'])
 
 class TwitterCrowdsSpecificMethods:
     @staticmethod
@@ -20,7 +20,10 @@ class TwitterCrowdsSpecificMethods:
         message.vector = UtilityMethods.getVectorForText(tweet['text'], tweetTime, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
         return message
     @staticmethod
-    def printParam(param): print param
+    def printParam(phraseTextToIdMap, phraseTextToPhraseObjectMap): 
+        print 'comes here'
+        UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        print len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
 
 def tweetsFromFile():
 #    for tweet in TweetFiles.iterateTweetsFromGzip('data/sample.gz'):
@@ -29,12 +32,7 @@ def tweetsFromFile():
         if message.streamId not in streamIdToStreamObjectMap: streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
         else: streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
         streamObject=streamIdToStreamObjectMap[message.streamId]
-#        print streamObject
-        GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.printParam, timedelta(minutes=15), message.timeStamp, param=message.timeStamp)
+        GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.printParam, timedelta(twitter_stream_settings['time_unit_in_seconds']), message.timeStamp, phraseTextToIdMap=phraseTextToIdMap, phraseTextToPhraseObjectMap=phraseTextToPhraseObjectMap)
         
-    print len(phraseTextToIdMap)
-    print len(phraseTextToPhraseObjectMap)
-#    print pprint.pprint(phraseTextToIdMap)
-    
 if __name__ == '__main__':
     tweetsFromFile()
