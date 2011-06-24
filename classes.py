@@ -50,6 +50,7 @@ class UtilityMethods:
             return phraseObject
         UtilityMethods.pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, currentTime, UtilityMethods.pruningConditionDeterministic, **stream_settings)
         topPhrasesList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in phraseTextToPhraseObjectMap.itervalues()), reverse=True)[:stream_settings['max_dimensions']]]
+        print topPhrasesList[:10]
         topPhrasesSet = set(topPhrasesList)
         newPhraseIterator = getNextNewPhrase(topPhrasesSet)
         availableIds = set(list(range(stream_settings['max_dimensions'])))
