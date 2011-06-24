@@ -119,7 +119,6 @@ class UtilityMethodsTests(unittest.TestCase):
     def test_pruneUnnecessaryPhrases(self):
         phraseTextToPhraseObjectMap = {'dsf': Phrase('dsf', test_time-3*stream_settings['max_phrase_inactivity_time_in_seconds'], 1), 'abc': Phrase('abc', test_time, 1)}
         UtilityMethods.pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, test_time, UtilityMethods.pruningConditionRandom, **stream_settings)
-        print phraseTextToPhraseObjectMap
         self.assertTrue('dsf' not in phraseTextToPhraseObjectMap)
         self.assertTrue('abc' in phraseTextToPhraseObjectMap)
         
