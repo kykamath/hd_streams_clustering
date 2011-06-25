@@ -87,7 +87,6 @@ class UtilityMethods:
         if timeDifference<stream_settings['max_phrase_inactivity_time_in_seconds']: return False
         elif timeDifference>2*stream_settings['max_phrase_inactivity_time_in_seconds']: return True
         else: return flip(float(timeDifference.seconds)/(2*stream_settings['max_phrase_inactivity_time_in_seconds']).seconds)
-    
 
 class VectorUpdateMethods:
     @staticmethod

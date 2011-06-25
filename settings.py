@@ -19,3 +19,12 @@ twitter_stream_settings = Settings(
                                    dimension_update_frequency_in_seconds=timedelta(seconds=15*60), # Every these many seconds, old phrases are pruned and new dimensions are created.
                                    max_phrase_inactivity_time_in_seconds=timedelta(seconds=30*60), # Time after which a phrase can be considered old and need not be tracked.
                                    )
+
+# Streaming LSH clustering specific settings.
+twitter_stream_settings.update(Settings(
+                                dimensions=twitter_stream_settings.max_dimensions,
+                                signature_length=67,
+                                number_of_permutations=13,
+                                threshold_for_document_to_be_in_cluster=0.2
+                                ))
+    
