@@ -11,10 +11,11 @@ twitter_stream_settings = Settings(
                                    min_phrase_length=1, # Minumum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=1 will result in only unigrams as features.
                                    max_phrase_length=2, # Maximum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=2 will result in both unigrams and bigrams as features.
                                    
-                                   phrase_decay_coefficient=0.5, # The rate at which phrases decays.
-                                   stream_decay_coefficient=0.5, # The rate at which stream decays
+                                   phrase_decay_coefficient=0.75, # The rate at which phrases decays.
+                                   stream_decay_coefficient=0.75, # The rate at which stream decays
                                    
-                                   time_unit_in_seconds=timedelta(seconds=15*60), # This value will be used to determine the length of unit time intervals. At the start of every interval the phrases are reset.
+                                   time_unit_in_seconds=timedelta(seconds=5*60), # This value will be used to determine the length of unit time intervals.
+                                   
+                                   dimension_update_frequency_in_seconds=timedelta(seconds=15*60), # Every these many seconds, old phrases are pruned and new dimensions are created.
                                    max_phrase_inactivity_time_in_seconds=timedelta(seconds=30*60), # Time after which a phrase can be considered old and need not be tracked.
-
                                    )
