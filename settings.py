@@ -5,9 +5,10 @@ Created on Jun 22, 2011
 '''
 from library.classes import Settings
 from datetime import timedelta
+from library.math_modified import getLargestPrimeLesserThan
 
 twitter_stream_settings = Settings(
-                                   max_dimensions=100000, # Number of maximum dimensions to consider at a time. This is also equal to the number of top phrases that will be considered for crowd discovery.
+                                   max_dimensions=99991, # Number of maximum dimensions to consider at a time. Make sue this is prime. This is also equal to the number of top phrases that will be considered for crowd discovery.
                                    min_phrase_length=1, # Minumum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=1 will result in only unigrams as features.
                                    max_phrase_length=2, # Maximum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=2 will result in both unigrams and bigrams as features.
                                    
@@ -27,4 +28,6 @@ twitter_stream_settings.update(Settings(
                                 number_of_permutations=13,
                                 threshold_for_document_to_be_in_cluster=0.2
                                 ))
-    
+
+if __name__ == '__main__':
+    print getLargestPrimeLesserThan(100000)

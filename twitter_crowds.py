@@ -8,6 +8,7 @@ from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
 from library.classes import GeneralMethods
 from classes import Message, UtilityMethods, Stream, VectorUpdateMethods
 from HDStreamClustering import HDStreaminClustering
+import pprint
 
 class TwitterStreamVariables:
     phraseTextToIdMap, phraseTextToPhraseObjectMap, streamIdToStreamObjectMap = {}, {}, {}
@@ -44,7 +45,7 @@ class TwitterCrowdsSpecificMethods:
 
         
 def clusterTwitterStreams():
-    hdStreamClusteringObject = HDStreaminClustering()
+    hdStreamClusteringObject = HDStreaminClustering(**twitter_stream_settings)
 #    for tweet in TwitterIterator.iterateFromFile('data/sample.gz'):
     for tweet in TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
         message = TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, TwitterStreamVariables.phraseTextToIdMap, TwitterStreamVariables.phraseTextToPhraseObjectMap, **twitter_stream_settings)
