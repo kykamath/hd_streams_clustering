@@ -137,6 +137,11 @@ class StreamTests(unittest.TestCase):
     def test_updateForMessage_exponentialDecay(self):
         self.stream.updateForMessage(self.m2, VectorUpdateMethods.exponentialDecay, **stream_settings)
         self.assertEqual(self.stream, Vector({1:0.5,2:4.5}))
+    def test_check_lastMessageTime_is_updated(self):
+        self.assertEqual(test_time-timedelta(seconds=60), self.stream.lastMessageTime)
+        self.stream.updateForMessage(self.m2, VectorUpdateMethods.addWithoutDecay, **stream_settings)
+        self.assertNotEqual(test_time-timedelta(seconds=60), self.stream.lastMessageTime)
+        self.assertEqual(test_time, self.stream.lastMessageTime)
         
 class VectorUpdateMethodTests(unittest.TestCase):
     def setUp(self): 
