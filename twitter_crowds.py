@@ -46,8 +46,8 @@ class TwitterCrowdsSpecificMethods:
         
 def clusterTwitterStreams():
     hdStreamClusteringObject = HDStreaminClustering(**twitter_stream_settings)
-#    for tweet in TwitterIterator.iterateFromFile('data/sample.gz'):
-    for tweet in TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
+    for tweet in TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/temp_data/sample.gz'):
+#    for tweet in TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
         message = TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, TwitterStreamVariables.phraseTextToIdMap, TwitterStreamVariables.phraseTextToPhraseObjectMap, **twitter_stream_settings)
         if TwitterCrowdsSpecificMethods.messageInOrder(message.timeStamp):
             if message.streamId not in TwitterStreamVariables.streamIdToStreamObjectMap: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
@@ -59,6 +59,6 @@ def clusterTwitterStreams():
                                                    currentMessageTime=message.timeStamp,
                                                    hdStreamClusteringObject=hdStreamClusteringObject)
             print streamObject.lastMessageTime
-#            hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject) 
+            hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject)
 if __name__ == '__main__':
     clusterTwitterStreams()
