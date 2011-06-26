@@ -9,26 +9,22 @@ from library.classes import GeneralMethods
 from classes import Message, UtilityMethods, Stream, VectorUpdateMethods
 from HDStreamClustering import HDStreaminClustering
 from collections import defaultdict
+from datetime import datetime, timedelta
+from collections import defaultdict
 import pprint
+from streaming_lsh.library.file_io import FileIO
 
-class TwitterExpertUsers:
-    typeTop = 1
-    typeBottom = -1
-    usersToCrawl = '/mnt/chevron/kykamath/data/twitter/users/crawl/users_to_crawl'
-    def __init__(self, number=1250, type=typeTop):
-        self.number, self.list, self.type = number, defaultdict(dict), type
-        usersData = defaultdict(list)
-        for l in open(TwitterExpertUsers.usersToCrawl): data = l.strip().split(); usersData[data[0]].append(data[1:])
-        for k, v in usersData.iteritems(): 
-            if self.type == TwitterExpertUsers.typeTop:
-                for user in v[:self.number]: self.list[user[1]] = {'screen_name': user[0], 'class':k}
-            else:
-                for user in v[-self.number:]: self.list[user[1]] = {'screen_name': user[0], 'class':k}
+def getExperts():
+    usersList, usersData = {}, defaultdict(list)
+    for l in open(twitter_stream_settings.usersToCrawl): data = l.strip().split(); usersData[data[0]].append(data[1:])
+    for k, v in usersData.iteritems(): 
+        for user in v: usersList[user[1]] = {'screen_name': user[0], 'class':k}
+    return usersList
 
 class TwitterStreamVariables:
     phraseTextToIdMap, phraseTextToPhraseObjectMap, streamIdToStreamObjectMap = {}, {}, {}
     dimensionUpdatingFrequency = twitter_stream_settings['dimension_update_frequency_in_seconds']
-
+    
 class TwitterIterator:
     '''
     Returns a tweet on every iteration. This iterator will be used to cluster streams.
@@ -38,7 +34,14 @@ class TwitterIterator:
     @staticmethod
     def iterateFromFile(file):
         for tweet in TweetFiles.iterateTweetsFromGzip(file): yield tweet
-        
+    @staticmethod
+    def iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,4,12)):
+        experts = getExperts()
+        currentTime = expertsDataStartTime
+        while currentTime <= expertsDataEndTime:
+            for tweet in TwitterIterator.iterateFromFile(twitter_stream_settings.twitterUsersTweetsFolder+'%s.gz'%FileIO.getFileByDay(currentTime)):
+                if tweet['user']['id_str'] in experts: yield tweet
+            currentTime+=timedelta(days=1)
 
 class TwitterCrowdsSpecificMethods:
     messageInOrderVariable = None
@@ -57,7 +60,6 @@ class TwitterCrowdsSpecificMethods:
         print 'Entering:', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, **twitter_stream_settings)
         print 'Leaving: ', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
-
         
 def clusterTwitterStreams():
     hdStreamClusteringObject = HDStreaminClustering(**twitter_stream_settings)
@@ -77,8 +79,12 @@ def clusterTwitterStreams():
             print i, streamObject.lastMessageTime, len(hdStreamClusteringObject.clusters)
             i+=1
             hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject)
+            
 if __name__ == '__main__':
+    experts = getExperts()
 #    clusterTwitterStreams()
-    tw = TwitterExpertUsers()
-    for k, v in tw.list.iteritems():
-        print k,v
+    i = 1
+    for tweet in TwitterIterator.iterateTweetsFromExperts(): 
+        print i, tweet['created_at'], experts[tweet['user']['id_str']]['class']
+        i+=1
+#    for l, v in getExperts().iteritems(): print l, v

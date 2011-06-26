@@ -7,6 +7,7 @@ from library.classes import Settings
 from datetime import timedelta
 from library.math_modified import getLargestPrimeLesserThan
 
+twitterDataFolder='/mnt/chevron/kykamath/data/twitter/'
 twitter_stream_settings = Settings(
                                    max_dimensions=99991, # Number of maximum dimensions to consider at a time. Make sue this is prime. This is also equal to the number of top phrases that will be considered for crowd discovery.
                                    min_phrase_length=1, # Minumum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=1 will result in only unigrams as features.
@@ -19,6 +20,10 @@ twitter_stream_settings = Settings(
                                    
                                    dimension_update_frequency_in_seconds=timedelta(seconds=15*60), # Every these many seconds, old phrases are pruned and new dimensions are created.
                                    max_phrase_inactivity_time_in_seconds=timedelta(seconds=30*60), # Time after which a phrase can be considered old and need not be tracked.
+                                   
+                                   # Expert users data
+                                   twitterUsersTweetsFolder='%susers/tweets/'%twitterDataFolder,
+                                   usersToCrawl='%susers/crawl/users_to_crawl'%twitterDataFolder,
                                    )
 
 # Streaming LSH clustering specific settings.
