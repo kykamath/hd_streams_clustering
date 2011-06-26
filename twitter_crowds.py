@@ -8,7 +8,22 @@ from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
 from library.classes import GeneralMethods
 from classes import Message, UtilityMethods, Stream, VectorUpdateMethods
 from HDStreamClustering import HDStreaminClustering
+from collections import defaultdict
 import pprint
+
+class TwitterExpertUsers:
+    typeTop = 1
+    typeBottom = -1
+    usersToCrawl = '/mnt/chevron/kykamath/data/twitter/users/crawl/users_to_crawl'
+    def __init__(self, number=1250, type=typeTop):
+        self.number, self.list, self.type = number, defaultdict(dict), type
+        usersData = defaultdict(list)
+        for l in open(TwitterExpertUsers.usersToCrawl): data = l.strip().split(); usersData[data[0]].append(data[1:])
+        for k, v in usersData.iteritems(): 
+            if self.type == TwitterExpertUsers.typeTop:
+                for user in v[:self.number]: self.list[user[1]] = {'screen_name': user[0], 'class':k}
+            else:
+                for user in v[-self.number:]: self.list[user[1]] = {'screen_name': user[0], 'class':k}
 
 class TwitterStreamVariables:
     phraseTextToIdMap, phraseTextToPhraseObjectMap, streamIdToStreamObjectMap = {}, {}, {}
@@ -63,4 +78,7 @@ def clusterTwitterStreams():
             i+=1
             hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject)
 if __name__ == '__main__':
-    clusterTwitterStreams()
+#    clusterTwitterStreams()
+    tw = TwitterExpertUsers()
+    for k, v in tw.list.iteritems():
+        print k,v
