@@ -59,6 +59,6 @@ def clusterTwitterStreams():
                                                    currentMessageTime=message.timeStamp,
                                                    hdStreamClusteringObject=hdStreamClusteringObject)
             print streamObject.lastMessageTime
-            hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject) 
+#            hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject) 
 if __name__ == '__main__':
     clusterTwitterStreams()
