@@ -38,10 +38,10 @@ class TwitterCrowdsSpecificMethods:
         message.vector = UtilityMethods.getVectorForText(tweet['text'], tweetTime, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
         return message
     @staticmethod
-    def updateDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime): 
-        print 'Entering:', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
+    def updateDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject): 
+        print 'Entering:', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, **twitter_stream_settings)
-        print 'Leaving: ', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap)
+        print 'Leaving: ', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
 
         
 def clusterTwitterStreams():
@@ -56,7 +56,8 @@ def clusterTwitterStreams():
             GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.updateDimensions, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, 
                                                    phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, 
                                                    phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap,
-                                                   currentMessageTime=message.timeStamp)
-            print streamObject.lastMessageTime 
+                                                   currentMessageTime=message.timeStamp,
+                                                   hdStreamClusteringObject=hdStreamClusteringObject)
+            hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject) 
 if __name__ == '__main__':
     clusterTwitterStreams()
