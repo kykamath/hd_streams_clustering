@@ -58,7 +58,7 @@ def clusterTwitterStreams():
                                                    phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap,
                                                    currentMessageTime=message.timeStamp,
                                                    hdStreamClusteringObject=hdStreamClusteringObject)
-            print streamObject.lastMessageTime
+            print streamObject.lastMessageTime, len(hdStreamClusteringObject.clusters)
             hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject)
 if __name__ == '__main__':
     clusterTwitterStreams()
