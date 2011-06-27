@@ -3,14 +3,18 @@ Created on Jun 23, 2011
 
 @author: kykamath
 '''
-import unittest
+import unittest, sys
+sys.path.append('../')
 from twitter_crowds import TwitterCrowdsSpecificMethods
 from library.vector import Vector
 from settings import twitter_stream_settings
 from classes import Phrase
-from datetime import datetime, timedelta
+from datetime import datetime
 
 test_time = datetime.now()
+# Settings for unittests
+twitter_stream_settings['min_phrase_length']=1
+twitter_stream_settings['max_phrase_length']=1
 
 class TwitterCrowdsSpecificMethodsTests(unittest.TestCase):
     def setUp(self):
@@ -21,12 +25,8 @@ class TwitterCrowdsSpecificMethodsTests(unittest.TestCase):
         self.tweet = {'user':{'screen_name': 'abc'}, 'id':10, 'text':self.text, 'created_at': 'Tue Mar 01 05:59:59 +0000 2011'}
         self.vector = Vector({0:1, 1:1, 2:1, 3:1})
     def test_getMessageObjectForTweet(self):
-        message = TwitterCrowdsSpecificMethods.getMessageObjectForTweet(self.tweet, self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        message = TwitterCrowdsSpecificMethods.tweetJSONToMessageConverter(self.tweet, self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **twitter_stream_settings)
         self.assertEqual(self.vector, message.vector)
-    def test_messageInOrder(self):
-        messageSequence = [test_time+timedelta(minutes=i) for i in range(5)]
-        messageSequence[2]=messageSequence[4]=test_time
-        self.assertEqual([True, True, False, True, False], [TwitterCrowdsSpecificMethods.messageInOrder(t) for t in messageSequence])
         
 if __name__ == '__main__':
     unittest.main()

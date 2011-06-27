@@ -7,12 +7,12 @@ from settings import twitter_stream_settings
 from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
 from library.classes import GeneralMethods
 from classes import Message, UtilityMethods, Stream, VectorUpdateMethods
-from HDStreamClustering import HDStreaminClustering
 from collections import defaultdict
 from datetime import datetime, timedelta
 from collections import defaultdict
 import pprint
 from streaming_lsh.library.file_io import FileIO
+from hd_streams_clustering import HDStreaminClustering
 
 def getExperts():
     usersList, usersData = {}, defaultdict(list)
@@ -44,41 +44,55 @@ class TwitterIterator:
             currentTime+=timedelta(days=1)
 
 class TwitterCrowdsSpecificMethods:
-    messageInOrderVariable = None
+#    messageInOrderVariable = None
+#    @staticmethod
+#    def messageInOrder(messageTime):
+#        if TwitterCrowdsSpecificMethods.messageInOrderVariable==None or TwitterCrowdsSpecificMethods.messageInOrderVariable <= messageTime: TwitterCrowdsSpecificMethods.messageInOrderVariable = messageTime; return True
+#        else: return False
     @staticmethod
-    def messageInOrder(messageTime):
-        if TwitterCrowdsSpecificMethods.messageInOrderVariable==None or TwitterCrowdsSpecificMethods.messageInOrderVariable <= messageTime: TwitterCrowdsSpecificMethods.messageInOrderVariable = messageTime; return True
-        else: return False
-    @staticmethod
-    def getMessageObjectForTweet(tweet, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings):
+    def tweetJSONToMessageConverter(tweet, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings):
         tweetTime = getDateTimeObjectFromTweetTimestamp(tweet['created_at'])
         message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
         message.vector = UtilityMethods.getVectorForText(tweet['text'], tweetTime, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
         return message
-    @staticmethod
-    def updateDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject): 
-        print 'Entering:', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
-        UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, **twitter_stream_settings)
-        print 'Leaving: ', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
+#    @staticmethod
+#    def updateDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject): 
+#        print 'Entering:', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
+#        UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, **twitter_stream_settings)
+#        print 'Leaving: ', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         
+#class TwitterStreamClustering:
+#    def __init__(self, **twitter_stream_settings):
+#        self.hdStreamClusteringObject = HDStreaminClustering(**twitter_stream_settings)
+#        self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, self.streamIdToStreamObjectMap = {}, {}, {}
+#        self.dimensionUpdatingFrequency = twitter_stream_settings['dimension_update_frequency_in_seconds']
+#    def cluster(self, tweetIterator):
+#        
+
+        
+#def clusterTwitterStreams():
+#    hdStreamClusteringObject = HDStreaminClustering(**twitter_stream_settings)
+##    for tweet in TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/temp_data/sample.gz'):
+#    i = 0
+#    for tweet in TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
+#        message = TwitterCrowdsSpecificMethods.tweetJSONToMessageConverter(tweet, TwitterStreamVariables.phraseTextToIdMap, TwitterStreamVariables.phraseTextToPhraseObjectMap, **twitter_stream_settings)
+#        if TwitterCrowdsSpecificMethods.messageInOrder(message.timeStamp):
+#            if message.streamId not in TwitterStreamVariables.streamIdToStreamObjectMap: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
+#            else: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
+#            streamObject=TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId]
+#            GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.updateDimensions, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, 
+#                                                   phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, 
+#                                                   phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap,
+#                                                   currentMessageTime=message.timeStamp,
+#                                                   hdStreamClusteringObject=hdStreamClusteringObject)
+#            print i, streamObject.lastMessageTime, len(hdStreamClusteringObject.clusters)
+#            i+=1
+#            hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject)
+
 def clusterTwitterStreams():
-    hdStreamClusteringObject = HDStreaminClustering(**twitter_stream_settings)
-#    for tweet in TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/temp_data/sample.gz'):
-    i = 0
-    for tweet in TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
-        message = TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, TwitterStreamVariables.phraseTextToIdMap, TwitterStreamVariables.phraseTextToPhraseObjectMap, **twitter_stream_settings)
-        if TwitterCrowdsSpecificMethods.messageInOrder(message.timeStamp):
-            if message.streamId not in TwitterStreamVariables.streamIdToStreamObjectMap: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
-            else: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
-            streamObject=TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId]
-            GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.updateDimensions, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, 
-                                                   phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, 
-                                                   phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap,
-                                                   currentMessageTime=message.timeStamp,
-                                                   hdStreamClusteringObject=hdStreamClusteringObject)
-            print i, streamObject.lastMessageTime, len(hdStreamClusteringObject.clusters)
-            i+=1
-            hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject)
+    hdsClustering = HDStreaminClustering(**twitter_stream_settings)
+    hdsClustering.cluster(TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/temp_data/sample.gz'), TwitterCrowdsSpecificMethods.tweetJSONToMessageConverter)
+#    hdsClustering.cluster(TwitterIterator.iterateTweetsFromExperts(), TwitterCrowdsSpecificMethods.tweetJSONToMessageConverter)
             
 if __name__ == '__main__':
     clusterTwitterStreams()
