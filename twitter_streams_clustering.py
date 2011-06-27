@@ -18,11 +18,7 @@ def getExperts():
         for user in v: usersList[user[1]] = {'screen_name': user[0], 'class':k}
     return usersList
 
-class TwitterStreamVariables:
-    phraseTextToIdMap, phraseTextToPhraseObjectMap, streamIdToStreamObjectMap = {}, {}, {}
-    dimensionUpdatingFrequency = twitter_stream_settings['dimension_update_frequency_in_seconds']
-    
-class TwitterIterator:
+class TwitterIterators:
     '''
     Returns a tweet on every iteration. This iterator will be used to cluster streams.
     To use this with adifferent data soruce, ex. Twitter Streaming API, write a iterator for the
@@ -36,7 +32,7 @@ class TwitterIterator:
         experts = getExperts()
         currentTime = expertsDataStartTime
         while currentTime <= expertsDataEndTime:
-            for tweet in TwitterIterator.iterateFromFile(twitter_stream_settings.twitterUsersTweetsFolder+'%s.gz'%FileIO.getFileByDay(currentTime)):
+            for tweet in TwitterIterators.iterateFromFile(twitter_stream_settings.twitterUsersTweetsFolder+'%s.gz'%FileIO.getFileByDay(currentTime)):
                 if tweet['user']['id_str'] in experts: yield tweet
             currentTime+=timedelta(days=1)
 
@@ -50,8 +46,8 @@ class TwitterCrowdsSpecificMethods:
 
 def clusterTwitterStreams():
     hdsClustering = HDStreaminClustering(**twitter_stream_settings)
-#    hdsClustering.cluster(TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/temp_data/sample.gz'), TwitterCrowdsSpecificMethods.tweetJSONToMessageConverter)
-    hdsClustering.cluster(TwitterIterator.iterateTweetsFromExperts(), TwitterCrowdsSpecificMethods.tweetJSONToMessageConverter)
+#    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/temp_data/sample.gz'), TwitterCrowdsSpecificMethods.tweetJSONToMessageConverter)
+    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts(), TwitterCrowdsSpecificMethods.tweetJSONToMessageConverter)
             
 if __name__ == '__main__':
     clusterTwitterStreams()
