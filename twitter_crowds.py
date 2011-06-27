@@ -81,10 +81,4 @@ def clusterTwitterStreams():
             hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject)
             
 if __name__ == '__main__':
-    experts = getExperts()
-#    clusterTwitterStreams()
-    i = 1
-    for tweet in TwitterIterator.iterateTweetsFromExperts(): 
-        print i, tweet['created_at'], experts[tweet['user']['id_str']]['class']
-        i+=1
-#    for l, v in getExperts().iteritems(): print l, v
+    clusterTwitterStreams()
