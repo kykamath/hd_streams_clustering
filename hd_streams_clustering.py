@@ -3,9 +3,9 @@ Created on Jun 25, 2011
 
 @author: kykamath
 '''
-from streaming_lsh.StreamingLSHClustering import StreamingLSHClustering
-from classes import UtilityMethods, Stream, VectorUpdateMethods
+from classes import UtilityMethods, Stream, VectorUpdateMethods, StreamCluster
 from library.classes import GeneralMethods
+from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
 
 class DataStreamMethods:
     messageInOrderVariable = None
@@ -42,3 +42,12 @@ class HDStreaminClustering(StreamingLSHClustering):
                 print i, streamObject.lastMessageTime, len(self.clusters)
                 i+=1
                 self.getClusterAndUpdateExistingClusters(streamObject)
+    def getClusterAndUpdateExistingClusters(self, stream):
+        predictedCluster = self.getClusterForDocument(stream)
+        if predictedCluster!=None:
+            self.clusters[predictedCluster].addStream(stream)
+        else:
+            newCluster = StreamCluster(stream)
+            newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations)
+            for permutation in self.signaturePermutations: permutation.addStream(newCluster)
+            self.clusters[newCluster.clusterId] = newCluster
