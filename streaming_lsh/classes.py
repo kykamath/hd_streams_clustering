@@ -8,6 +8,18 @@ from bitarray import bitarray
 from Bio import trie
 from library.vector import VectorGenerator, Vector
 from library.math_modified import isPrime
+from collections import defaultdict
+from library.classes import TwoWayMap
+
+class UtilityMethods:
+    @staticmethod
+    def updatePhraseTextAndDimensionsMap(phraseVector,  phraseTextAndDimensionMap, **settings):
+        phraseIterator = phraseVector.iterkeys()
+        while len(phraseTextAndDimensionMap)<settings['dimensions']:
+            try:
+                phrase = phraseIterator.next()
+            except StopIteration: break
+            if not phraseTextAndDimensionMap.contains(TwoWayMap.MAP_FORWARD, phrase): phraseId=len(phraseTextAndDimensionMap); phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, phrase, phraseId)
 
 class SignatureTrie:
     @staticmethod
@@ -48,11 +60,20 @@ class Document(Vector):
     def __init__(self, docId, vector, clusterId = None):
         super(Document, self).__init__(vector)
         self.docId, self.clusterId = docId, clusterId
-    def setSignatureUsingVectors(self, vectors): self.signature = Signature(self.dot(v)>=0 for v in vectors)
-    def setSignatureUsingVectorPermutations(self, vector, vectorPermutations):
+    def _getVectorMappedToDimension(self, vector, phraseTextAndDimensionMap): 
+        mappedVector = Vector()
+        phraseToDimensionMap = phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD)
+        for phrase in self:
+            if phrase in phraseToDimensionMap: mappedVector[phraseToDimensionMap[phrase]] = self[phrase]
+        return mappedVector
+    def setSignatureUsingVectors(self, vectors, phraseTextAndDimensionMap): 
+        vectorMappedToDimension = self._getVectorMappedToDimension(vectors[0], phraseTextAndDimensionMap)
+        self.signature = Signature(v.dotWithSmallerVectorWithSubsetDimensions(vectorMappedToDimension)>=0 for v in vectors)
+    def setSignatureUsingVectorPermutations(self, vector, vectorPermutations, phraseTextAndDimensionMap):
+        vectorMappedToDimension = self._getVectorMappedToDimension(vector, phraseTextAndDimensionMap)
         self.signature = Signature('')
         for vp in vectorPermutations:
-            total = sum(self[dimension]*vector[vp.applyFunction(dimension)] for dimension in self)
+            total = sum(vectorMappedToDimension[dimension]*vector[vp.applyFunction(dimension)] for dimension in vectorMappedToDimension)
             self.signature.append(total>=0)
     def __str__(self): return str(self.__dict__) + ' ' + str([s for s in self.iteritems()])
 
