@@ -6,7 +6,7 @@ Created on Jun 23, 2011
 import unittest, sys
 sys.path.append('../')
 from datetime import datetime, timedelta
-from classes import GeneralMethods
+from classes import GeneralMethods, TwoWayMap, UNIQUE_LIBRARY_KEY
 
 test_time = datetime.now()
 
@@ -19,5 +19,38 @@ class GeneralMethodsTests(unittest.TestCase):
         while currentTime<=final_time:
             GeneralMethods.callMethodEveryInterval(method, timedelta(minutes=15), currentTime, arg1=15, arg2=currentTime)
             currentTime+=timedelta(minutes=1)
+
+#class PatternMapTests(unittest.TestCase):
+#    def test_basicOperation(self):
+#        pm = PatternMap()
+#        pm[UNIQUE_LIBRARY_KEY+str(10)]=12
+#        pm.setdefault(UNIQUE_LIBRARY_KEY+str(12),12)
+#        self.assertEqual({'12': 12, '10': 12}, pm)
+        
+class TwoWayDictTests(unittest.TestCase):
+    def setUp(self):
+        self.twoWayMap = TwoWayMap()
+        self.assertRaises(TypeError, self.twoWayMap.set, (5, 1, 2))
+        self.twoWayMap.set(TwoWayMap.MAP_FORWARD, 'a', 'A')
+        self.twoWayMap.set(TwoWayMap.MAP_REVERSE, 'B', 'b')
+    def test_basicOperation(self):
+        self.assertEqual('A', self.twoWayMap.get(TwoWayMap.MAP_FORWARD, 'a'))
+        self.assertEqual('a', self.twoWayMap.get(TwoWayMap.MAP_REVERSE, 'A'))
+        self.assertEqual('B', self.twoWayMap.get(TwoWayMap.MAP_FORWARD, 'b'))
+        self.assertEqual('b', self.twoWayMap.get(TwoWayMap.MAP_REVERSE, 'B'))
+        self.assertEqual({'b': 'B', 'a': 'A'}, self.twoWayMap.getMap(self.twoWayMap.MAP_FORWARD))
+        self.assertEqual({'B': 'b', 'A': 'a'}, self.twoWayMap.getMap(self.twoWayMap.MAP_REVERSE))
+    def test_delete(self):
+        self.twoWayMap.remove(TwoWayMap.MAP_FORWARD, 'a')
+        self.assertEqual({'b': 'B'}, self.twoWayMap.getMap(self.twoWayMap.MAP_FORWARD))
+        self.assertEqual({'B': 'b'}, self.twoWayMap.getMap(self.twoWayMap.MAP_REVERSE))
+    def test_length(self):
+        self.assertEqual(2, len(self.twoWayMap))
+        self.twoWayMap.set(TwoWayMap.MAP_REVERSE, 'C', 'c')
+        self.assertEqual(3, len(self.twoWayMap))
+    def test_contains(self):
+        self.assertTrue(self.twoWayMap.contains(TwoWayMap.MAP_FORWARD, 'a'))
+        self.assertFalse(self.twoWayMap.contains(TwoWayMap.MAP_FORWARD, 'A'))
+        self.assertTrue(self.twoWayMap.contains(TwoWayMap.MAP_REVERSE, 'B'))
 if __name__ == '__main__':
     unittest.main()
