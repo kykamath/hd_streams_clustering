@@ -41,25 +41,3 @@ class HDStreaminClustering(StreamingLSHClustering):
                 print i, streamObject.lastMessageTime, len(self.clusters)
                 i+=1
                 self.getClusterAndUpdateExistingClusters(streamObject)
-    
-        
-
-        
-#def clusterTwitterStreams():
-#    hdStreamClusteringObject = HDStreaminClustering(**twitter_stream_settings)
-##    for tweet in TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/temp_data/sample.gz'):
-#    i = 0
-#    for tweet in TwitterIterator.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
-#        message = TwitterCrowdsSpecificMethods.getMessageObjectForTweet(tweet, TwitterStreamVariables.phraseTextToIdMap, TwitterStreamVariables.phraseTextToPhraseObjectMap, **twitter_stream_settings)
-#        if TwitterCrowdsSpecificMethods.messageInOrder(message.timeStamp):
-#            if message.streamId not in TwitterStreamVariables.streamIdToStreamObjectMap: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
-#            else: TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **twitter_stream_settings )
-#            streamObject=TwitterStreamVariables.streamIdToStreamObjectMap[message.streamId]
-#            GeneralMethods.callMethodEveryInterval(TwitterCrowdsSpecificMethods.updateDimensions, TwitterStreamVariables.dimensionUpdatingFrequency, message.timeStamp, 
-#                                                   phraseTextToIdMap=TwitterStreamVariables.phraseTextToIdMap, 
-#                                                   phraseTextToPhraseObjectMap=TwitterStreamVariables.phraseTextToPhraseObjectMap,
-#                                                   currentMessageTime=message.timeStamp,
-#                                                   hdStreamClusteringObject=hdStreamClusteringObject)
-#            print i, streamObject.lastMessageTime, len(hdStreamClusteringObject.clusters)
-#            i+=1
-#            hdStreamClusteringObject.getClusterAndUpdateExistingClusters(streamObject)

@@ -5,7 +5,7 @@ Created on Jun 23, 2011
 '''
 import unittest, sys
 sys.path.append('../')
-from twitter_crowds import TwitterCrowdsSpecificMethods
+from twitter_streams_clustering import TwitterCrowdsSpecificMethods
 from library.vector import Vector
 from settings import twitter_stream_settings
 from classes import Phrase
