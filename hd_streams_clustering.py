@@ -14,7 +14,7 @@ class DataStreamMethods:
         if DataStreamMethods.messageInOrderVariable==None or DataStreamMethods.messageInOrderVariable <= messageTime: DataStreamMethods.messageInOrderVariable = messageTime; return True
         else: return False
     @staticmethod
-    def updateDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject, **stream_settings): 
+    def updateDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject, stream_settings): 
         print 'Entering:', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         UtilityMethods.updateForNewDimensions(phraseTextToIdMap, phraseTextToPhraseObjectMap, currentMessageTime, **stream_settings)
         print 'Leaving: ', currentMessageTime, len(phraseTextToIdMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
@@ -37,7 +37,8 @@ class HDStreaminClustering(StreamingLSHClustering):
                                                        phraseTextToIdMap=self.phraseTextToIdMap, 
                                                        phraseTextToPhraseObjectMap=self.phraseTextToPhraseObjectMap,
                                                        currentMessageTime=message.timeStamp,
-                                                       hdStreamClusteringObject=self)
+                                                       hdStreamClusteringObject=self,
+                                                       stream_settings=self.stream_settings)
                 print i, streamObject.lastMessageTime, len(self.clusters)
                 i+=1
                 self.getClusterAndUpdateExistingClusters(streamObject)
