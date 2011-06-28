@@ -32,7 +32,7 @@ twitter_stream_settings.update(Settings(
                                 dimensions=twitter_stream_settings.max_dimensions,
                                 signature_length=23,
                                 number_of_permutations=13,
-                                threshold_for_document_to_be_in_cluster=0.30
+                                threshold_for_document_to_be_in_cluster=0.0
                                 ))
 
 if __name__ == '__main__':
