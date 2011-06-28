@@ -118,6 +118,10 @@ class Cluster(Document):
     @staticmethod
     def getDistribution(clusters):
         clustersLengthDistribution = defaultdict(int)
+        print len(clusters)
+        for cluster in clusters:
+            print cluster.clusterId, len(cluster)
+        exit()
         for cluster in clusters: clustersLengthDistribution[len(cluster)]+=1
         return clustersLengthDistribution
 
