@@ -77,6 +77,6 @@ class HDStreaminClustering(StreamingLSHClustering):
             for permutation in self.signaturePermutations: permutation.addDocument(cluster)
     
     def printClusters(self):
-        for cluster, _ in sorted(Cluster.iterateByAttribute(self.clusters, 'length'), key=itemgetter(1), reverse=True)[:10]:
+        for cluster, _ in sorted(Cluster.iterateByAttribute(self.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:10]:
             print cluster.clusterId, cluster.getTopDimensions(numberOfFeatures=5)
         exit()
