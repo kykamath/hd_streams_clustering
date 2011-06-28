@@ -8,6 +8,7 @@ from library.classes import GeneralMethods
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
 from operator import itemgetter
 import time
+from streaming_lsh.classes import Cluster
 
 class DataStreamMethods:
     messageInOrderVariable = None
@@ -18,10 +19,8 @@ class DataStreamMethods:
     @staticmethod
     def updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject, stream_settings): 
         print 'Entering:', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
-        UtilityMethods.updateForNewDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, **stream_settings)
-#        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters.itervalues()).iteritems()], key=itemgetter(1), reverse=True)[:10]
-#        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters.itervalues()).iteritems()], key=itemgetter(1))[:10]
-        print StreamCluster.getDistribution(hdStreamClusteringObject.clusters.itervalues())
+        UtilityMethods.updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, **stream_settings)
+        hdStreamClusteringObject.resetDatastructures(currentMessageTime)
         print 'Leaving: ', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         time.sleep(5)
 
@@ -31,6 +30,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         self.stream_settings = stream_settings
         self.phraseTextToPhraseObjectMap, self.streamIdToStreamObjectMap = {}, {}
         self.dimensionUpdatingFrequency = stream_settings['dimension_update_frequency_in_seconds']
+        
     def cluster(self, dataIterator, convertDataToMessage):
         i=0
         for data in dataIterator:
@@ -49,6 +49,7 @@ class HDStreaminClustering(StreamingLSHClustering):
                 print i, streamObject.lastMessageTime, len(self.clusters)
                 i+=1
                 self.getClusterAndUpdateExistingClusters(streamObject)
+                
     def getClusterAndUpdateExistingClusters(self, stream):
         predictedCluster = self.getClusterForDocument(stream)
         if predictedCluster!=None: self.clusters[predictedCluster].addStream(stream, **self.stream_settings)
@@ -57,3 +58,19 @@ class HDStreaminClustering(StreamingLSHClustering):
             newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
             for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
             self.clusters[newCluster.clusterId] = newCluster
+            
+    def resetDatastructures(self, occuranceTime):
+        '''
+        1. Reset signature permutation trie.
+        2. Update cluster scores for all clusters.
+        3. Remove old clusters below a threshold.
+        4. Add every cluster to all the newly set signature permutation tries. 
+        '''
+        for permutation in self.signaturePermutations: permutation.resetSignatureTrie()
+        for cluster in self.clusters.itervalues(): cluster.updateScore(occuranceTime, 0, **self.stream_settings)
+        for cluster in Cluster.getClustersByAttributeAndThreshold(self.clusters.values(), 
+                                                                  self.stream_settings['cluster_filter_attribute'], 
+                                                                  self.stream_settings['cluster_filter_threshold'], Cluster.BELOW_THRESHOLD): del self.clusters[cluster.clusterId]
+        for cluster in self.clusters.itervalues(): 
+            cluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
+            for permutation in self.signaturePermutations: permutation.addDocument(cluster)

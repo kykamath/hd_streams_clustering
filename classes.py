@@ -7,8 +7,6 @@ import random
 from streaming_lsh.classes import Document, Cluster
 from library.math_modified import exponentialDecay, DateTimeAirthematic
 from library.classes import TwoWayMap
-from collections import defaultdict
-import numpy as np
 
 class UtilityMethods:
     @staticmethod
@@ -19,7 +17,7 @@ class UtilityMethods:
     def updatePhraseTextToPhraseObject(phraseVector, occuranceTime, phraseTextToPhraseObjectMap, **stream_settings): 
         [UtilityMethods.createOrAddNewPhraseObject(phrase, phraseTextToPhraseObjectMap, occuranceTime, **stream_settings) for phrase in phraseVector]
     @staticmethod
-    def updateForNewDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentTime, **stream_settings):
+    def updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentTime, **stream_settings):
         '''
         Update phraseTextAndDimensionMap with new dimensions.
         '''
@@ -99,16 +97,11 @@ class StreamCluster(Cluster):
         self.lastStreamAddedTime, self.score = stream.lastMessageTime, score
     def addStream(self, stream, **stream_settings):
         super(StreamCluster, self).addDocument(stream)
-        self._updateScore(stream.lastMessageTime, scoreToUpdate=1, **stream_settings)
-    def _updateScore(self, currentOccuranceTime, scoreToUpdate, **stream_settings):
+        self.updateScore(stream.lastMessageTime, scoreToUpdate=1, **stream_settings)
+    def updateScore(self, currentOccuranceTime, scoreToUpdate, **stream_settings):
         timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.lastStreamAddedTime, stream_settings['time_unit_in_seconds'].seconds)
         self.score=exponentialDecay(self.score, stream_settings['stream_cluster_decay_coefficient'], timeDifference)+scoreToUpdate
         self.lastStreamAddedTime=currentOccuranceTime
-#    @staticmethod
-#    def getDistribution(clusters):
-##        clustersLengthDistribution = defaultdict(int)
-##        for cluster in clusters: clustersLengthDistribution[len(cluster)]+=1
-#        return np.histogram([cluster.score for cluster in clusters])
         
 class Message(object):
     def __init__(self, streamId, messageId, text, timeStamp): self.streamId, self.messageId, self.text, self.timeStamp, self.vector = streamId, messageId, text, timeStamp, None

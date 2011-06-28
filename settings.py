@@ -22,6 +22,10 @@ twitter_stream_settings = Settings(
                                    dimension_update_frequency_in_seconds=timedelta(seconds=5*60), # Every these many seconds, old phrases are pruned and new dimensions are created.
                                    max_phrase_inactivity_time_in_seconds=timedelta(seconds=30*60), # Time after which a phrase can be considered old and need not be tracked.
                                    
+                                   # Cluster pruning properties.
+                                   cluster_filter_attribute = 'length', # The attribute based on which stream clusters will be pruned. 'length' => Size of clusters; score => streaming cluster score.
+                                   cluster_filter_threshold = 5, # Value for the cluster filter threshold. All clusters with attribute values below this will be pruned.
+                                   
                                    # Expert users data
                                    twitterUsersTweetsFolder='%susers/tweets/'%twitterDataFolder,
                                    usersToCrawl='%susers/crawl/users_to_crawl'%twitterDataFolder,
