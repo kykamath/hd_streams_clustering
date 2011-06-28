@@ -19,8 +19,8 @@ class DataStreamMethods:
     def updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject, stream_settings): 
         print 'Entering:', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         UtilityMethods.updateForNewDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, **stream_settings)
-        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters)], key=itemgetter(1), reverse=True)[:10]
-        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters)], key=itemgetter(1))[:10]
+        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters).iteritems()], key=itemgetter(1), reverse=True)[:10]
+        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters).iteritems()], key=itemgetter(1))[:10]
         print 'Leaving: ', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         time.sleep(5)
 
