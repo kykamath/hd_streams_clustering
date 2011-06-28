@@ -4,9 +4,9 @@ Created on Jun 14, 2011
 @author: kykamath
 '''
 import sys, unittest
-from library.classes import TwoWayMap
 sys.path.append('../')
 from Bio import trie
+from library.classes import TwoWayMap
 from classes import Signature, SignaturePermutation, SignatureTrie, Document,\
     RandomGaussianUnitVector, Permutation, VectorPermutation, Cluster,\
     UtilityMethods
@@ -199,6 +199,11 @@ class ClusterTests(unittest.TestCase):
         self.cluster1.addDocument(self.doc1)
         self.cluster2.addDocument(self.doc2)
         self.assertEqual([(self.cluster1, 'cluster_0'), (self.cluster2, 'cluster_1')], list(Cluster.iterateByAttribute([self.cluster1, self.cluster2], 'clusterId')))
+    def test_filterClustersByAttribute(self):
+        self.cluster1.addDocument(self.doc1)
+        self.cluster2.addDocument(self.doc2)
+        self.assertEqual([self.cluster1, self.cluster2], list(Cluster.filterClustersByAttribute([self.cluster1, self.cluster2], 'vectorWeights', 1)))
+        self.assertEqual([], list(Cluster.filterClustersByAttribute([self.cluster1, self.cluster2], 'vectorWeights', 3)))
         
 if __name__ == '__main__':
     unittest.main()
