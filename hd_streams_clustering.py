@@ -19,8 +19,9 @@ class DataStreamMethods:
     def updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject, stream_settings): 
         print 'Entering:', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         UtilityMethods.updateForNewDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, **stream_settings)
-        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters.itervalues()).iteritems()], key=itemgetter(1), reverse=True)[:10]
-        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters.itervalues()).iteritems()], key=itemgetter(1))[:10]
+#        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters.itervalues()).iteritems()], key=itemgetter(1), reverse=True)[:10]
+#        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters.itervalues()).iteritems()], key=itemgetter(1))[:10]
+        print StreamCluster.getDistribution(hdStreamClusteringObject.clusters.itervalues())
         print 'Leaving: ', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         time.sleep(5)
 
@@ -45,7 +46,7 @@ class HDStreaminClustering(StreamingLSHClustering):
                                                        currentMessageTime=message.timeStamp,
                                                        hdStreamClusteringObject=self,
                                                        stream_settings=self.stream_settings)
-                print i, streamObject.lastMessageTime
+                print i, streamObject.lastMessageTime, len(self.clusters)
                 i+=1
                 self.getClusterAndUpdateExistingClusters(streamObject)
     def getClusterAndUpdateExistingClusters(self, stream):

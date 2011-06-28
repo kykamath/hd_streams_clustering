@@ -8,14 +8,17 @@ Created on Jun 12, 2011
 #
 #DistributedMongoMap().add()
 #import multiprocessing
-from multiprocessing import Pool
+#from multiprocessing import Pool
+#
+#from Bio import trie
+#tr = trie.trie()
+#tr['10']=100
+#print tr['10']
+#del tr['10']
+#print tr['10']
 
-from Bio import trie
-tr = trie.trie()
-tr['10']=100
-print tr['10']
-del tr['10']
-print tr['10']
+import numpy as np
+print np.histogram([1, 2, 1,1,2,2,1,1], bins=2)
 
 #
 #print multiprocessing.cpu_count()
