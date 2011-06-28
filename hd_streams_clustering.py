@@ -23,12 +23,12 @@ class HDStreaminClustering(StreamingLSHClustering):
     def __init__(self, **stream_settings):
         super(HDStreaminClustering, self).__init__(**stream_settings)
         self.stream_settings = stream_settings
-        self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, self.streamIdToStreamObjectMap = {}, {}, {}
+        self.phraseTextToPhraseObjectMap, self.streamIdToStreamObjectMap = {}, {}
         self.dimensionUpdatingFrequency = stream_settings['dimension_update_frequency_in_seconds']
     def cluster(self, dataIterator, dataToMessageConverter):
         i=0
         for data in dataIterator:
-            message = dataToMessageConverter(data, self.phraseTextToIdMap, self.phraseTextToPhraseObjectMap, **self.stream_settings)
+            message = dataToMessageConverter(data, self.phraseTextToPhraseObjectMap, **self.stream_settings)
             if DataStreamMethods.messageInOrder(message.timeStamp):
                 if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
                 else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )

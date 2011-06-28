@@ -125,89 +125,89 @@ class UtilityMethodsTests(unittest.TestCase):
         self.assertTrue('dsf' not in phraseTextToPhraseObjectMap)
         self.assertTrue('abc' in phraseTextToPhraseObjectMap)
         
-class StreamTests(unittest.TestCase):
-    def setUp(self):
-        self.m1 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time-timedelta(seconds=60))
-        self.m1.vector=Vector({1:1.,2:3.})
-        self.stream = Stream(1, self.m1)
-        self.m2 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
-        self.m2.vector=Vector({2:3.})
-    def test_updateForMessage_addWithoutDecay(self):
-        self.stream.updateForMessage(self.m2, VectorUpdateMethods.addWithoutDecay, **stream_settings)
-        self.assertEqual(self.stream, Vector({1:1.,2:6.}))
-    def test_updateForMessage_exponentialDecay(self):
-        self.stream.updateForMessage(self.m2, VectorUpdateMethods.exponentialDecay, **stream_settings)
-        self.assertEqual(self.stream, Vector({1:0.5,2:4.5}))
-    def test_check_lastMessageTime_is_updated(self):
-        self.assertEqual(test_time-timedelta(seconds=60), self.stream.lastMessageTime)
-        self.stream.updateForMessage(self.m2, VectorUpdateMethods.addWithoutDecay, **stream_settings)
-        self.assertNotEqual(test_time-timedelta(seconds=60), self.stream.lastMessageTime)
-        self.assertEqual(test_time, self.stream.lastMessageTime)
-        
-class StreamClusterTests(unittest.TestCase):
-    def setUp(self): 
-        self.m1 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time-timedelta(seconds=60))
-        self.m1.vector=Vector({1:2,2:4})
-        self.stream1 = Stream(1, self.m1)
-        self.m2 = Message(2, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
-        self.m2.vector=Vector({2:4})
-        self.stream2 = Stream(2, self.m2)
-        self.cluster1 = StreamCluster(self.stream1)
-        self.cluster2 = StreamCluster(self.stream2)
-    def test_initialization(self):
-        self.assertEqual(test_time-timedelta(seconds=60), self.cluster1.lastStreamAddedTime)
-        self.assertEqual(test_time, self.cluster2.lastStreamAddedTime)
-        self.assertTrue(1==self.cluster1.score and 1==self.cluster2.score)
-    def test_addStream(self):
-        message1 = Message(3, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
-        message1.vector=Vector({3:4})
-        stream1 = Stream(3, message1)
-        message2 = Message(4, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
-        message2.vector=Vector({2:4})
-        stream2 = Stream(4, message2)
-        self.assertEqual(1, self.cluster1.score)
-        self.cluster1.addStream(stream1, **stream_settings)
-        self.assertEqual(1.5, self.cluster1.score)
-        # Test if cluster id is set.
-        self.assertEqual(self.cluster1.clusterId, stream1.clusterId)
-        # Test that cluster mean is updated.
-        self.assertEqual({1:2/2.,2:2.,3:2.}, self.cluster1)
-        # Test that cluster aggrefate is updated.
-        self.assertEqual({1:2,2:4,3:4}, self.cluster1.aggregateVector)
-        # Test that document is added to cluster documents.
-        self.assertEqual(stream1, self.cluster1.documentsInCluster[stream1.docId])
-        self.cluster1.addStream(stream2, **stream_settings)
-        self.assertEqual(2.5, self.cluster1.score)
-        self.assertEqual(3, self.cluster1.vectorWeights)
-        self.assertEqual({1:2/3.,2:8/3.,3:4/3.}, self.cluster1)
-        self.assertEqual({1:2,2:8,3:4}, self.cluster1.aggregateVector)
-        self.cluster2.addStream(stream2, **stream_settings)
-        self.assertEqual(2, self.cluster2.score)
-        
-class VectorUpdateMethodTests(unittest.TestCase):
-    def setUp(self): 
-        self.message = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', datetime.now())
-        self.message.vector = Vector({1:2., 2:3.})
-        self.s1 = Stream(1, self.message)
-        self.v1 = Vector({1:2., 3:3.})
-    def test_addWithoutDecay(self):
-        VectorUpdateMethods.addWithoutDecay(self.s1, self.v1)
-        self.assertEqual(Vector({1: 4, 2: 3, 3: 3}), self.s1)
-    def test_exponentialDecay(self):
-        VectorUpdateMethods.exponentialDecay(self.s1, self.v1, 0.5, 1)
-        self.assertEqual(Vector({1: 3, 2: 1.5, 3: 3}), self.s1)
-        
-class PhraseTests(unittest.TestCase):
-    def setUp(self):
-        self.phrase1 = Phrase('abc', test_time, score=8)
-        self.phrase2 = Phrase('xyz', test_time, score=7)
-    def test_updateScore(self):
-        self.phrase1.updateScore(test_time+timedelta(seconds=120), 0, **stream_settings)
-        self.assertEqual(2, self.phrase1.score)
-        self.assertEqual(test_time+timedelta(seconds=120), self.phrase1.latestOccuranceTime)
-    def test_sort(self):
-        self.assertEqual([self.phrase2, self.phrase1], Phrase.sort([self.phrase1, self.phrase2]))
-        self.assertEqual([self.phrase1, self.phrase2], Phrase.sort([self.phrase1, self.phrase2], reverse=True))
+#class StreamTests(unittest.TestCase):
+#    def setUp(self):
+#        self.m1 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time-timedelta(seconds=60))
+#        self.m1.vector=Vector({1:1.,2:3.})
+#        self.stream = Stream(1, self.m1)
+#        self.m2 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
+#        self.m2.vector=Vector({2:3.})
+#    def test_updateForMessage_addWithoutDecay(self):
+#        self.stream.updateForMessage(self.m2, VectorUpdateMethods.addWithoutDecay, **stream_settings)
+#        self.assertEqual(self.stream, Vector({1:1.,2:6.}))
+#    def test_updateForMessage_exponentialDecay(self):
+#        self.stream.updateForMessage(self.m2, VectorUpdateMethods.exponentialDecay, **stream_settings)
+#        self.assertEqual(self.stream, Vector({1:0.5,2:4.5}))
+#    def test_check_lastMessageTime_is_updated(self):
+#        self.assertEqual(test_time-timedelta(seconds=60), self.stream.lastMessageTime)
+#        self.stream.updateForMessage(self.m2, VectorUpdateMethods.addWithoutDecay, **stream_settings)
+#        self.assertNotEqual(test_time-timedelta(seconds=60), self.stream.lastMessageTime)
+#        self.assertEqual(test_time, self.stream.lastMessageTime)
+#        
+#class StreamClusterTests(unittest.TestCase):
+#    def setUp(self): 
+#        self.m1 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time-timedelta(seconds=60))
+#        self.m1.vector=Vector({1:2,2:4})
+#        self.stream1 = Stream(1, self.m1)
+#        self.m2 = Message(2, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
+#        self.m2.vector=Vector({2:4})
+#        self.stream2 = Stream(2, self.m2)
+#        self.cluster1 = StreamCluster(self.stream1)
+#        self.cluster2 = StreamCluster(self.stream2)
+#    def test_initialization(self):
+#        self.assertEqual(test_time-timedelta(seconds=60), self.cluster1.lastStreamAddedTime)
+#        self.assertEqual(test_time, self.cluster2.lastStreamAddedTime)
+#        self.assertTrue(1==self.cluster1.score and 1==self.cluster2.score)
+#    def test_addStream(self):
+#        message1 = Message(3, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
+#        message1.vector=Vector({3:4})
+#        stream1 = Stream(3, message1)
+#        message2 = Message(4, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
+#        message2.vector=Vector({2:4})
+#        stream2 = Stream(4, message2)
+#        self.assertEqual(1, self.cluster1.score)
+#        self.cluster1.addStream(stream1, **stream_settings)
+#        self.assertEqual(1.5, self.cluster1.score)
+#        # Test if cluster id is set.
+#        self.assertEqual(self.cluster1.clusterId, stream1.clusterId)
+#        # Test that cluster mean is updated.
+#        self.assertEqual({1:2/2.,2:2.,3:2.}, self.cluster1)
+#        # Test that cluster aggrefate is updated.
+#        self.assertEqual({1:2,2:4,3:4}, self.cluster1.aggregateVector)
+#        # Test that document is added to cluster documents.
+#        self.assertEqual(stream1, self.cluster1.documentsInCluster[stream1.docId])
+#        self.cluster1.addStream(stream2, **stream_settings)
+#        self.assertEqual(2.5, self.cluster1.score)
+#        self.assertEqual(3, self.cluster1.vectorWeights)
+#        self.assertEqual({1:2/3.,2:8/3.,3:4/3.}, self.cluster1)
+#        self.assertEqual({1:2,2:8,3:4}, self.cluster1.aggregateVector)
+#        self.cluster2.addStream(stream2, **stream_settings)
+#        self.assertEqual(2, self.cluster2.score)
+#        
+#class VectorUpdateMethodTests(unittest.TestCase):
+#    def setUp(self): 
+#        self.message = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', datetime.now())
+#        self.message.vector = Vector({1:2., 2:3.})
+#        self.s1 = Stream(1, self.message)
+#        self.v1 = Vector({1:2., 3:3.})
+#    def test_addWithoutDecay(self):
+#        VectorUpdateMethods.addWithoutDecay(self.s1, self.v1)
+#        self.assertEqual(Vector({1: 4, 2: 3, 3: 3}), self.s1)
+#    def test_exponentialDecay(self):
+#        VectorUpdateMethods.exponentialDecay(self.s1, self.v1, 0.5, 1)
+#        self.assertEqual(Vector({1: 3, 2: 1.5, 3: 3}), self.s1)
+#        
+#class PhraseTests(unittest.TestCase):
+#    def setUp(self):
+#        self.phrase1 = Phrase('abc', test_time, score=8)
+#        self.phrase2 = Phrase('xyz', test_time, score=7)
+#    def test_updateScore(self):
+#        self.phrase1.updateScore(test_time+timedelta(seconds=120), 0, **stream_settings)
+#        self.assertEqual(2, self.phrase1.score)
+#        self.assertEqual(test_time+timedelta(seconds=120), self.phrase1.latestOccuranceTime)
+#    def test_sort(self):
+#        self.assertEqual([self.phrase2, self.phrase1], Phrase.sort([self.phrase1, self.phrase2]))
+#        self.assertEqual([self.phrase1, self.phrase2], Phrase.sort([self.phrase1, self.phrase2], reverse=True))
         
 if __name__ == '__main__':
     unittest.main()
