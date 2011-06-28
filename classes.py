@@ -122,4 +122,10 @@ class Phrase:
         self.latestOccuranceTime=currentOccuranceTime
     @staticmethod
     def sort(phraseIterator, reverse=False): return sorted(phraseIterator, key=lambda phrase:phrase.score, reverse=reverse)
+
+if __name__ == '__main__':
+    class C:
+        def __init__(self): self.attr1, self.attr2 = 0, 0
+    c = C()
+    print c.__dict__
     
