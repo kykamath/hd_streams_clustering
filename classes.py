@@ -3,10 +3,11 @@ Created on Jun 22, 2011
 
 @author: kykamath
 '''
+import random
 from streaming_lsh.classes import Document, Cluster
 from library.math_modified import exponentialDecay, DateTimeAirthematic
-import random
 from library.classes import TwoWayMap
+from collections import defaultdict
 
 class UtilityMethods:
     @staticmethod

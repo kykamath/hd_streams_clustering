@@ -6,6 +6,7 @@ Created on Jun 25, 2011
 from classes import UtilityMethods, Stream, VectorUpdateMethods, StreamCluster
 from library.classes import GeneralMethods
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
+from operator import itemgetter
 
 class DataStreamMethods:
     messageInOrderVariable = None
@@ -17,6 +18,8 @@ class DataStreamMethods:
     def updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject, stream_settings): 
         print 'Entering:', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         UtilityMethods.updateForNewDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, **stream_settings)
+        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters)], key=itemgetter(1), reverse=True)[:10]
+        print sorted([(k,v) for k,v in StreamCluster.getDistribution(hdStreamClusteringObject.clusters)], key=itemgetter(1))[:10]
         print 'Leaving: ', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
 
 class HDStreaminClustering(StreamingLSHClustering):
@@ -40,7 +43,7 @@ class HDStreaminClustering(StreamingLSHClustering):
                                                        currentMessageTime=message.timeStamp,
                                                        hdStreamClusteringObject=self,
                                                        stream_settings=self.stream_settings)
-                print i, streamObject.lastMessageTime, len(self.clusters)
+#                print i, streamObject.lastMessageTime, len(self.clusters)
                 i+=1
                 self.getClusterAndUpdateExistingClusters(streamObject)
     def getClusterAndUpdateExistingClusters(self, stream):

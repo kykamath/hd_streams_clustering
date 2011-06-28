@@ -9,6 +9,14 @@ Created on Jun 12, 2011
 #DistributedMongoMap().add()
 #import multiprocessing
 from multiprocessing import Pool
+
+from Bio import trie
+tr = trie.trie()
+tr['10']=100
+print tr['10']
+del tr['10']
+print tr['10']
+
 #
 #print multiprocessing.cpu_count()
 #
