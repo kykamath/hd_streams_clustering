@@ -104,11 +104,11 @@ class StreamCluster(Cluster):
         timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.lastStreamAddedTime, stream_settings['time_unit_in_seconds'].seconds)
         self.score=exponentialDecay(self.score, stream_settings['stream_cluster_decay_coefficient'], timeDifference)+scoreToUpdate
         self.lastStreamAddedTime=currentOccuranceTime
-    @staticmethod
-    def getDistribution(clusters):
-#        clustersLengthDistribution = defaultdict(int)
-#        for cluster in clusters: clustersLengthDistribution[len(cluster)]+=1
-        return np.histogram([cluster.score for cluster in clusters])
+#    @staticmethod
+#    def getDistribution(clusters):
+##        clustersLengthDistribution = defaultdict(int)
+##        for cluster in clusters: clustersLengthDistribution[len(cluster)]+=1
+#        return np.histogram([cluster.score for cluster in clusters])
         
 class Message(object):
     def __init__(self, streamId, messageId, text, timeStamp): self.streamId, self.messageId, self.text, self.timeStamp, self.vector = streamId, messageId, text, timeStamp, None

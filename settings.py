@@ -17,9 +17,9 @@ twitter_stream_settings = Settings(
                                    stream_decay_coefficient=0.75, # The rate at which stream decays.
                                    stream_cluster_decay_coefficient=0.5, # The rate at which a cluster decays.
                                    
-                                   time_unit_in_seconds=timedelta(seconds=15*60), # This value will be used to determine the length of unit time intervals.
+                                   time_unit_in_seconds=timedelta(seconds=5*60), # This value will be used to determine the length of unit time intervals.
                                    
-                                   dimension_update_frequency_in_seconds=timedelta(seconds=10*60), # Every these many seconds, old phrases are pruned and new dimensions are created.
+                                   dimension_update_frequency_in_seconds=timedelta(seconds=5*60), # Every these many seconds, old phrases are pruned and new dimensions are created.
                                    max_phrase_inactivity_time_in_seconds=timedelta(seconds=30*60), # Time after which a phrase can be considered old and need not be tracked.
                                    
                                    # Expert users data
