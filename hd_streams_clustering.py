@@ -78,5 +78,5 @@ class HDStreaminClustering(StreamingLSHClustering):
     
     def printClusters(self):
         for cluster, _ in sorted(Cluster.iterateByAttribute(self.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:10]:
-            print cluster.clusterId, cluster.length, list(cluster.iterateDocumentsInCluster())[:5], cluster.getTopDimensions(numberOfFeatures=5)
+            print cluster.clusterId, cluster.length, [stream.streamId for stream in cluster.iterateDocumentsInCluster()][:5], cluster.getTopDimensions(numberOfFeatures=5)
         exit()
