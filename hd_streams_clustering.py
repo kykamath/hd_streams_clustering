@@ -46,8 +46,8 @@ class HDStreaminClustering(StreamingLSHClustering):
     def getClusterAndUpdateExistingClusters(self, stream):
         predictedCluster = self.getClusterForDocument(stream)
         if predictedCluster!=None: self.clusters[predictedCluster].addStream(stream, **self.stream_settings)
-#        else:
-#            newCluster = StreamCluster(stream)
-#            newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
+        else:
+            newCluster = StreamCluster(stream)
+            newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
 #            for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
 #            self.clusters[newCluster.clusterId] = newCluster
