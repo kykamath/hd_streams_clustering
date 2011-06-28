@@ -50,5 +50,5 @@ class HDStreaminClustering(StreamingLSHClustering):
         else:
             newCluster = StreamCluster(stream)
             newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
-            for permutation in self.signaturePermutations: permutation.addStream(newCluster)
+            for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
             self.clusters[newCluster.clusterId] = newCluster
