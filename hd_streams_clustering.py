@@ -30,7 +30,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         for data in dataIterator:
             message = convertDataToMessage(data, **self.stream_settings)
             if DataStreamMethods.messageInOrder(message.timeStamp):
-                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
+#                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
                 if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
                 else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
                 streamObject=self.streamIdToStreamObjectMap[message.streamId]
@@ -42,7 +42,7 @@ class HDStreaminClustering(StreamingLSHClustering):
                                                        stream_settings=self.stream_settings)
                 print i, streamObject.lastMessageTime, len(self.clusters)
                 i+=1
-                self.getClusterAndUpdateExistingClusters(streamObject)
+#                self.getClusterAndUpdateExistingClusters(streamObject)
     def getClusterAndUpdateExistingClusters(self, stream):
         predictedCluster = self.getClusterForDocument(stream)
         if predictedCluster!=None: self.clusters[predictedCluster].addStream(stream, **self.stream_settings)
