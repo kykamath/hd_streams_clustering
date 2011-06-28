@@ -5,10 +5,6 @@ Created on Jun 22, 2011
 '''
 from streaming_lsh.classes import Document, Cluster
 from library.math_modified import exponentialDecay, DateTimeAirthematic
-from collections import defaultdict
-from library.nlp import getPhrases, getWordsFromRawEnglishMessage
-from library.vector import Vector
-from datetime import timedelta
 import random
 from library.classes import TwoWayMap
 
@@ -18,8 +14,7 @@ class UtilityMethods:
         if phrase not in phraseTextToPhraseObjectMap: phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, occuranceTime, score=1)
         else: phraseTextToPhraseObjectMap[phrase].updateScore(occuranceTime, scoreToUpdate=1, **stream_settings)
     @staticmethod
-    def updatedPhraseObject(phraseVector, occuranceTime, phraseTextToPhraseObjectMap, **stream_settings):
-#        for phrase in getPhrases(getWordsFromRawEnglishMessage(text), stream_settings['min_phrase_length'], stream_settings['max_phrase_length']): 
+    def updatePhraseTextToPhraseObject(phraseVector, occuranceTime, phraseTextToPhraseObjectMap, **stream_settings): 
         [UtilityMethods.createOrAddNewPhraseObject(phrase, phraseTextToPhraseObjectMap, occuranceTime, **stream_settings) for phrase in phraseVector]
     @staticmethod
     def updateForNewDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentTime, **stream_settings):

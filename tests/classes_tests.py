@@ -34,7 +34,7 @@ class UtilityMethodsTests(unittest.TestCase):
         stream_settings['max_dimensions'] = 2
     def tearDown(self): stream_settings['max_dimensions'] = self.initial_max_dimensions
     def test_updatedPhraseObject_PhraseObjectScoresAreUpdatedCorrectly(self): 
-        UtilityMethods.updatedPhraseObject(self.phraseVector, test_time+timedelta(seconds=60), self.phraseTextToPhraseObjectMap, **stream_settings)
+        UtilityMethods.updatePhraseTextToPhraseObject(self.phraseVector, test_time+timedelta(seconds=60), self.phraseTextToPhraseObjectMap, **stream_settings)
         self.assertEqual(5, len(self.phraseTextToPhraseObjectMap))
         self.assertEqual(5, self.phraseTextToPhraseObjectMap['project'].score)
         self.assertEqual(1, self.phraseTextToPhraseObjectMap['streams'].score)
@@ -42,7 +42,7 @@ class UtilityMethodsTests(unittest.TestCase):
     def test_updatedPhraseObject_phrase_does_not_exist_in_phraseToIdMap_but_exists_in_phraseTextToPhraseObjectMap_with_dimensions_full(self): 
         stream_settings['max_dimensions'] = 1
         self.phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, 'cluster')
-        UtilityMethods.updatedPhraseObject(self.phraseVector, test_time+timedelta(seconds=60), self.phraseTextToPhraseObjectMap, **stream_settings)
+        UtilityMethods.updatePhraseTextToPhraseObject(self.phraseVector, test_time+timedelta(seconds=60), self.phraseTextToPhraseObjectMap, **stream_settings)
         self.assertEqual({'project':0}, self.phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD))
         self.assertEqual(5, len(self.phraseTextToPhraseObjectMap))
         self.assertEqual(5, self.phraseTextToPhraseObjectMap['project'].score)

@@ -10,6 +10,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from streaming_lsh.library.file_io import FileIO
 from hd_streams_clustering import HDStreaminClustering
+from library.nlp import getPhrases, getWordsFromRawEnglishMessage
+from library.vector import Vector
 
 def getExperts():
     usersList, usersData = {}, defaultdict(list)
@@ -38,16 +40,19 @@ class TwitterIterators:
 
 class TwitterCrowdsSpecificMethods:
     @staticmethod
-    def tweetJSONToMessageConverter(tweet, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings):
+    def convertTweetJSONToMessage(tweet, **twitter_stream_settings):
         tweetTime = getDateTimeObjectFromTweetTimestamp(tweet['created_at'])
         message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
-        message.vector = UtilityMethods.getVectorForText(tweet['text'], tweetTime, phraseTextToIdMap, phraseTextToPhraseObjectMap, **twitter_stream_settings)
+        message.vector = Vector()
+        for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), twitter_stream_settings['min_phrase_length'], twitter_stream_settings['max_phrase_length']):
+            if phrase not in message.vector: message.vector[phrase]=0
+            message.vector[phrase]+=1
         return message
 
 def clusterTwitterStreams():
     hdsClustering = HDStreaminClustering(**twitter_stream_settings)
-#    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/temp_data/sample.gz'), TwitterCrowdsSpecificMethods.tweetJSONToMessageConverter)
-    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts(), TwitterCrowdsSpecificMethods.tweetJSONToMessageConverter)
+    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/temp_data/sample.gz'), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
+#    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts(), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
             
 if __name__ == '__main__':
     clusterTwitterStreams()
