@@ -41,6 +41,7 @@ class TwitterIterators:
 class TwitterCrowdsSpecificMethods:
     @staticmethod
     def convertTweetJSONToMessage(tweet, **twitter_stream_settings):
+        print '*comes here'
         tweetTime = getDateTimeObjectFromTweetTimestamp(tweet['created_at'])
         message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
         message.vector = Vector()

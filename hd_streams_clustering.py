@@ -14,11 +14,7 @@ class DataStreamMethods:
     messageInOrderVariable = None
     @staticmethod
     def messageInOrder(messageTime):
-        print '*comes here'
-        if DataStreamMethods.messageInOrderVariable!=None: print DataStreamMethods.messageInOrderVariable, messageTime, DataStreamMethods.messageInOrderVariable <= messageTime
-        if DataStreamMethods.messageInOrderVariable==None or DataStreamMethods.messageInOrderVariable <= messageTime: 
-            DataStreamMethods.messageInOrderVariable = messageTime; 
-            return True
+        if DataStreamMethods.messageInOrderVariable==None or DataStreamMethods.messageInOrderVariable <= messageTime: DataStreamMethods.messageInOrderVariable = messageTime; return True
         else: return False
     @staticmethod
     def updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject, stream_settings): 
