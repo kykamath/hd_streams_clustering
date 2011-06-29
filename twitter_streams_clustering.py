@@ -51,7 +51,7 @@ class TwitterCrowdsSpecificMethods:
         return message
     @staticmethod
     def combineClusters(clusters):
-        for cluster1, cluster2 in combinations(clusters.values()):
+        for cluster1, cluster2 in combinations(clusters.values(), 2):
             print cluster1.docId, cluster2.docId
         exit()
 
