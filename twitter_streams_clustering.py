@@ -9,9 +9,10 @@ from classes import Message
 from collections import defaultdict
 from datetime import datetime, timedelta
 from streaming_lsh.library.file_io import FileIO
-from hd_streams_clustering import HDStreaminClustering, DataStreamMethods
+from hd_streams_clustering import HDStreaminClustering
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
+from itertools import combinations
 
 def getExperts():
     usersList, usersData = {}, defaultdict(list)
@@ -48,18 +49,23 @@ class TwitterCrowdsSpecificMethods:
             if phrase not in message.vector: message.vector[phrase]=0
             message.vector[phrase]+=1
         return message
+    @staticmethod
+    def combineClusters(clusters):
+        for cluster1, cluster2 in combinations(clusters.values()):
+            print cluster1.docId, cluster2.docId
+        exit()
 
 def clusterTwitterStreams():
     hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
-    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts(), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
+    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts(), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage, TwitterCrowdsSpecificMethods.combineClusters)
 #    hdsClustering = HDStreaminClustering(**trends_twitter_stream_settings)
 #    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
             
 if __name__ == '__main__':
-#    clusterTwitterStreams()
-    i=0
-    for tweet in TwitterIterators.iterateTweetsFromExperts():
-        message = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **experts_twitter_stream_settings)
-        if DataStreamMethods.messageInOrder(message.timeStamp):
-            print i, tweet['created_at']
-            i+=1
+    clusterTwitterStreams()
+#    i=0
+#    for tweet in TwitterIterators.iterateTweetsFromExperts():
+#        message = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **experts_twitter_stream_settings)
+#        if DataStreamMethods.messageInOrder(message.timeStamp):
+#            print i, tweet['created_at']
+#            i+=1

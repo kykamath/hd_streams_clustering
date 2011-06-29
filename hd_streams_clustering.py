@@ -17,12 +17,13 @@ class DataStreamMethods:
         if DataStreamMethods.messageInOrderVariable==None or DataStreamMethods.messageInOrderVariable <= messageTime: DataStreamMethods.messageInOrderVariable = messageTime; return True
         else: return False
     @staticmethod
-    def updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject, stream_settings): 
-        print '\n\n\nEntering:', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
-        UtilityMethods.updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, **stream_settings)
+    def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
+        print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
+        UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
         hdStreamClusteringObject.resetDatastructures(currentMessageTime)
+        if hdStreamClusteringObject.combineClustersMethod!=None: hdStreamClusteringObject.combineClustersMethod(hdStreamClusteringObject.clusters)
         hdStreamClusteringObject.printClusters()
-        print 'Leaving: ', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
+        print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         time.sleep(5)
 
 class HDStreaminClustering(StreamingLSHClustering):
@@ -32,25 +33,23 @@ class HDStreaminClustering(StreamingLSHClustering):
         self.phraseTextToPhraseObjectMap, self.streamIdToStreamObjectMap = {}, {}
         self.dimensionUpdatingFrequency = stream_settings['dimension_update_frequency_in_seconds']
         
-    def cluster(self, dataIterator, convertDataToMessage):
+    def cluster(self, dataIterator, convertDataToMessage, combineClustersMethod=None):
         i=0
+        self.combineClustersMethod=combineClustersMethod
         for data in dataIterator:
             message = convertDataToMessage(data, **self.stream_settings)
             if DataStreamMethods.messageInOrder(message.timeStamp):
-#                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
-#                if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
-#                else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
-#                streamObject=self.streamIdToStreamObjectMap[message.streamId]
-#                GeneralMethods.callMethodEveryInterval(DataStreamMethods.updateDimensions, self.dimensionUpdatingFrequency, message.timeStamp, 
-#                                                       phraseTextAndDimensionMap=self.phraseTextAndDimensionMap, 
-#                                                       phraseTextToPhraseObjectMap=self.phraseTextToPhraseObjectMap,
-#                                                       currentMessageTime=message.timeStamp,
-#                                                       hdStreamClusteringObject=self,
-#                                                       stream_settings=self.stream_settings)
-#                print i, streamObject.lastMessageTime, len(self.clusters)
-                print i, message.timeStamp
+                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
+                if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
+                else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
+                streamObject=self.streamIdToStreamObjectMap[message.streamId]
+                GeneralMethods.callMethodEveryInterval(DataStreamMethods.updateDimensions, self.dimensionUpdatingFrequency, message.timeStamp, 
+                                                       hdStreamClusteringObject=self,
+                                                       currentMessageTime=message.timeStamp)
+                print i, streamObject.lastMessageTime, len(self.clusters)
+#                print i, message.timeStamp
                 i+=1
-#                self.getClusterAndUpdateExistingClusters(streamObject)
+                self.getClusterAndUpdateExistingClusters(streamObject)
                 
     def getClusterAndUpdateExistingClusters(self, stream):
         predictedCluster = self.getClusterForDocument(stream)
