@@ -68,7 +68,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         4. Add every cluster to all the newly set signature permutation tries. 
         '''
         for permutation in self.signaturePermutations: permutation.resetSignatureTrie()
-        for cluster in self.clusters.itervalues(): cluster.updateScore(occuranceTime, 0, **self.stream_settings)
+#        for cluster in self.clusters.itervalues(): cluster.updateScore(occuranceTime, 0, **self.stream_settings)
         for cluster in Cluster.getClustersByAttributeAndThreshold(self.clusters.values(), 
                                                                   self.stream_settings['cluster_filter_attribute'], 
                                                                   self.stream_settings['cluster_filter_threshold'], Cluster.BELOW_THRESHOLD): del self.clusters[cluster.clusterId]
