@@ -24,7 +24,7 @@ twitter_stream_settings = Settings(
                                    
                                    # Cluster pruning properties.
                                    cluster_filter_attribute = 'length', # The attribute based on which stream clusters will be pruned. 'length' => Size of clusters; score => streaming cluster score.
-                                   cluster_filter_threshold = 5, # Value for the cluster filter threshold. All clusters with attribute values below this will be pruned.
+                                   cluster_filter_threshold = 2, # Value for the cluster filter threshold. All clusters with attribute values below this will be pruned.
                                    
                                    # Expert users data
                                    twitterUsersTweetsFolder='%susers/tweets/'%twitterDataFolder,
