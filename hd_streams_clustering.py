@@ -18,12 +18,11 @@ class DataStreamMethods:
         else: return False
     @staticmethod
     def updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, hdStreamClusteringObject, stream_settings): 
-        print 'Entering:', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
+        print '\n\n\nEntering:', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         UtilityMethods.updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentMessageTime, **stream_settings)
         hdStreamClusteringObject.resetDatastructures(currentMessageTime)
         hdStreamClusteringObject.printClusters()
         print 'Leaving: ', currentMessageTime, len(phraseTextAndDimensionMap), len(phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
-        exit()
         time.sleep(5)
 
 class HDStreaminClustering(StreamingLSHClustering):
@@ -48,7 +47,7 @@ class HDStreaminClustering(StreamingLSHClustering):
                                                        currentMessageTime=message.timeStamp,
                                                        hdStreamClusteringObject=self,
                                                        stream_settings=self.stream_settings)
-                print i, streamObject.lastMessageTime, len(self.clusters)
+#                print i, streamObject.lastMessageTime, len(self.clusters)
                 i+=1
                 self.getClusterAndUpdateExistingClusters(streamObject)
                 
