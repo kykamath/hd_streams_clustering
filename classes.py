@@ -21,8 +21,6 @@ class UtilityMethods:
         '''
         Update phraseTextAndDimensionMap with new dimensions.
         '''
-        print '****** Checking for our condition.'
-        if len(phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).values())!=len(set(phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).values())): print 'Multiple phrases with same id.', exit()
         def getNextNewPhrase(topPhrasesSet):
             for phrase in topPhrasesSet: 
                 if not phraseTextAndDimensionMap.contains(TwoWayMap.MAP_FORWARD, phrase): yield phrase
