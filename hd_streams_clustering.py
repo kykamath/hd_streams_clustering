@@ -46,7 +46,7 @@ class HDStreaminClustering(StreamingLSHClustering):
                 GeneralMethods.callMethodEveryInterval(DataStreamMethods.updateDimensions, self.dimensionUpdatingFrequency, message.timeStamp, 
                                                        hdStreamClusteringObject=self,
                                                        currentMessageTime=message.timeStamp)
-                print i, streamObject.lastMessageTime, len(self.clusters)
+#                print i, streamObject.lastMessageTime, len(self.clusters)
 #                print i, message.timeStamp
                 i+=1
                 self.getClusterAndUpdateExistingClusters(streamObject)
