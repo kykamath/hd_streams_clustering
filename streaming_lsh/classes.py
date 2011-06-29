@@ -18,7 +18,12 @@ class UtilityMethods:
             try:
                 phrase = phraseIterator.next()
             except StopIteration: break
-            if not phraseTextAndDimensionMap.contains(TwoWayMap.MAP_FORWARD, phrase): phraseId=len(phraseTextAndDimensionMap); phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, phrase, phraseId)
+            if not phraseTextAndDimensionMap.contains(TwoWayMap.MAP_FORWARD, phrase): 
+                phraseId=len(phraseTextAndDimensionMap)
+                while phraseId in phraseTextAndDimensionMap.contains(TwoWayMap.MAP_REVERSE, phraseId): 
+                    phraseId=(phraseId+1)%settings['dimensions'] 
+                    print '*', phraseId
+                phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, phrase, phraseId)
 
 class SignatureTrie:
     @staticmethod
