@@ -38,9 +38,11 @@ class UtilityMethods:
         for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
             availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
             if phrase not in topPhrasesSet:
-                newPhrase = newPhraseIterator.next()
-                phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
+                try:
+                    newPhrase = newPhraseIterator.next()
+                    phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+                except StopIteration: continue
+                finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
         availableIdsIterator = getNextAvailableId(availableIds)
         while True: 
             try:
