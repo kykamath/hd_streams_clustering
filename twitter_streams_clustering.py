@@ -45,7 +45,7 @@ class TwitterCrowdsSpecificMethods:
         message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
         message.vector = Vector()
         print tweet['text']
-        print 'returns', getWordsFromRawEnglishMessage(tweet['text']), twitter_stream_settings['min_phrase_length'], twitter_stream_settings['max_phrase_length']
+        getWordsFromRawEnglishMessage(tweet['text']), twitter_stream_settings['min_phrase_length'], twitter_stream_settings['max_phrase_length']
         for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), twitter_stream_settings['min_phrase_length'], twitter_stream_settings['max_phrase_length']):
             if phrase not in message.vector: message.vector[phrase]=0
             message.vector[phrase]+=1
