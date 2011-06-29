@@ -45,6 +45,8 @@ trends_twitter_stream_settings.update(twitter_stream_settings)
 # Settings for expert specific streams.
 experts_twitter_stream_settings = Settings()
 experts_twitter_stream_settings.update(twitter_stream_settings)
+experts_twitter_stream_settings.min_phrase_length=2
+experts_twitter_stream_settings.max_phrase_length=2
 experts_twitter_stream_settings.dimension_update_frequency_in_seconds=timedelta(seconds=30*60)
 experts_twitter_stream_settings.cluster_filter_threshold = 2
 experts_twitter_stream_settings.twitterUsersTweetsFolder='%susers/tweets/'%twitterDataFolder
