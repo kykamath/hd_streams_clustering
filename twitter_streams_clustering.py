@@ -13,6 +13,7 @@ from hd_streams_clustering import HDStreaminClustering
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 from itertools import combinations
+from nltk.metrics.distance import jaccard_distance
 
 def getExperts():
     usersList, usersData = {}, defaultdict(list)
@@ -50,12 +51,13 @@ class TwitterCrowdsSpecificMethods:
             message.vector[phrase]+=1
         return message
     @staticmethod
-    def combineClusters(clusters):
+    def combineClusters(clusters, **twitter_stream_settings):
         def getHashtagSet(vector): return set([d for d in vector if d.startswith('#')])
-        clusterIdToHashtagSetMap = dict([(clusterId, getHashtagSet(cluster)) for clusterId, cluster in clusters.iteritems()])
-        for k,v in clusterIdToHashtagSetMap.iteritems(): print k,v
-#        for cluster1, cluster2 in combinations(clusters.values(), 2):
-#            print cluster1.docId, cluster2.docId
+        clusterIdToHashtagSetMap, clusterIdToCurrentClusterMap = dict([(clusterId, getHashtagSet(cluster)) for clusterId, cluster in clusters.iteritems()]), {}
+        for cluster1, cluster2 in combinations(clusterIdToHashtagSetMap, 2):
+            if jaccard_distance(clusterIdToHashtagSetMap[cluster1], clusterIdToHashtagSetMap[cluster2]) <= twitter_stream_settings['cluster_merging_jaccard_distance_threshold']:
+#                mergeClusterId = 
+                pass
 
 def clusterTwitterStreams():
     hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
@@ -64,10 +66,6 @@ def clusterTwitterStreams():
 #    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
             
 if __name__ == '__main__':
-    clusterTwitterStreams()
-#    i=0
-#    for tweet in TwitterIterators.iterateTweetsFromExperts():
-#        message = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **experts_twitter_stream_settings)
-#        if DataStreamMethods.messageInOrder(message.timeStamp):
-#            print i, tweet['created_at']
-#            i+=1
+#    clusterTwitterStreams()
+    d = {1:2, 3:4}
+    print d.ge(1,None) or d.get()
