@@ -34,7 +34,7 @@ streaming_lsh_settings=Settings(
                                 dimensions=twitter_stream_settings.max_dimensions,
                                 signature_length=23,
                                 number_of_permutations=13,
-                                threshold_for_document_to_be_in_cluster=0.05
+                                threshold_for_document_to_be_in_cluster=0.005
                                 )
 twitter_stream_settings.update(streaming_lsh_settings)
 
