@@ -44,8 +44,9 @@ class TwitterCrowdsSpecificMethods:
         tweetTime = getDateTimeObjectFromTweetTimestamp(tweet['created_at'])
         message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
         message.vector = Vector()
-        print '*comes here', tweet['text']
+        print 'comes here'
         for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), twitter_stream_settings['min_phrase_length'], twitter_stream_settings['max_phrase_length']):
+            print phrase
             if phrase not in message.vector: message.vector[phrase]=0
             message.vector[phrase]+=1
         return message
