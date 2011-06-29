@@ -9,7 +9,7 @@ from classes import Message
 from collections import defaultdict
 from datetime import datetime, timedelta
 from streaming_lsh.library.file_io import FileIO
-from hd_streams_clustering import HDStreaminClustering
+from hd_streams_clustering import HDStreaminClustering, DataStreamMethods
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 
@@ -59,5 +59,7 @@ if __name__ == '__main__':
 #    clusterTwitterStreams()
     i=0
     for tweet in TwitterIterators.iterateTweetsFromExperts():
-        print i, tweet['created_at']
-        i+=1
+        message = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **experts_twitter_stream_settings)
+        if DataStreamMethods.messageInOrder(message.timeStamp):
+            print i, tweet['created_at']
+            i+=1
