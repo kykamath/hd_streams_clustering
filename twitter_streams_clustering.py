@@ -51,8 +51,11 @@ class TwitterCrowdsSpecificMethods:
         return message
     @staticmethod
     def combineClusters(clusters):
-        for cluster1, cluster2 in combinations(clusters.values(), 2):
-            print cluster1.docId, cluster2.docId
+        def getHashtagSet(vector): return set([d for d in vector if d.startswith('#')])
+        clusterIdToHashtagSetMap = dict([(clusterId, getHashtagSet(cluster)) for clusterId, cluster in clusters.iteritems()])
+        for k,v in clusterIdToHashtagSetMap.iteritems(): print k,v
+#        for cluster1, cluster2 in combinations(clusters.values(), 2):
+#            print cluster1.docId, cluster2.docId
 
 def clusterTwitterStreams():
     hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
