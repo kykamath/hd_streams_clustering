@@ -14,6 +14,7 @@ class DataStreamMethods:
     messageInOrderVariable = None
     @staticmethod
     def messageInOrder(messageTime):
+        print DataStreamMethods.messageInOrderVariable, messageTime, DataStreamMethods.messageInOrderVariable <= messageTime
         if DataStreamMethods.messageInOrderVariable==None or DataStreamMethods.messageInOrderVariable <= messageTime: DataStreamMethods.messageInOrderVariable = messageTime; return True
         else: return False
     @staticmethod
