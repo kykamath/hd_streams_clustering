@@ -56,4 +56,8 @@ def clusterTwitterStreams():
 #    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
             
 if __name__ == '__main__':
-    clusterTwitterStreams()
+#    clusterTwitterStreams()
+    i=0
+    for tweet in TwitterIterators.iterateTweetsFromExperts():
+        print i, tweet['created_at']
+        i+=1
