@@ -3,9 +3,9 @@ Created on Jun 22, 2011
 
 @author: kykamath
 '''
-from settings import twitter_stream_settings
+from settings import experts_twitter_stream_settings, trends_twitter_stream_settings
 from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
-from classes import Message, UtilityMethods
+from classes import Message
 from collections import defaultdict
 from datetime import datetime, timedelta
 from streaming_lsh.library.file_io import FileIO
@@ -15,7 +15,7 @@ from library.vector import Vector
 
 def getExperts():
     usersList, usersData = {}, defaultdict(list)
-    for l in open(twitter_stream_settings.usersToCrawl): data = l.strip().split(); usersData[data[0]].append(data[1:])
+    for l in open(experts_twitter_stream_settings.usersToCrawl): data = l.strip().split(); usersData[data[0]].append(data[1:])
     for k, v in usersData.iteritems(): 
         for user in v: usersList[user[1]] = {'screen_name': user[0], 'class':k}
     return usersList
@@ -34,7 +34,7 @@ class TwitterIterators:
         experts = getExperts()
         currentTime = expertsDataStartTime
         while currentTime <= expertsDataEndTime:
-            for tweet in TwitterIterators.iterateFromFile(twitter_stream_settings.twitterUsersTweetsFolder+'%s.gz'%FileIO.getFileByDay(currentTime)):
+            for tweet in TwitterIterators.iterateFromFile(experts_twitter_stream_settings.twitterUsersTweetsFolder+'%s.gz'%FileIO.getFileByDay(currentTime)):
                 if tweet['user']['id_str'] in experts: yield tweet
             currentTime+=timedelta(days=1)
 
@@ -50,9 +50,9 @@ class TwitterCrowdsSpecificMethods:
         return message
 
 def clusterTwitterStreams():
-    hdsClustering = HDStreaminClustering(**twitter_stream_settings)
-#    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/temp_data/sample.gz'), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
+    hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
     hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts(), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
+#    hdsClustering = HDStreaminClustering(**trends_twitter_stream_settings)
 #    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
             
 if __name__ == '__main__':
