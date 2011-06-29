@@ -93,12 +93,12 @@ class Stream(Document):
         updateMethod(self, message.vector, decayCoefficient=stream_settings['stream_decay_coefficient'], timeDifference=timeDifference)
         self.lastMessageTime = message.timeStamp
 
-class StreamCluster(Cluster):
-    def __init__(self, stream, score=1):
-        super(StreamCluster, self).__init__(stream)
+#class StreamCluster(Cluster):
+#    def __init__(self, stream, score=1):
+#        super(StreamCluster, self).__init__(stream)
 #        self.lastStreamAddedTime, self.score = stream.lastMessageTime, score
-    def addStream(self, stream, **stream_settings):
-        super(StreamCluster, self).addDocument(stream)
+#    def addStream(self, stream, **stream_settings):
+#        super(StreamCluster, self).addDocument(stream)
 #        self.updateScore(stream.lastMessageTime, scoreToUpdate=1, **stream_settings)
 #    def updateScore(self, currentOccuranceTime, scoreToUpdate, **stream_settings):
 #        timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.lastStreamAddedTime, stream_settings['time_unit_in_seconds'].seconds)

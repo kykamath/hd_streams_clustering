@@ -3,7 +3,7 @@ Created on Jun 25, 2011
 
 @author: kykamath
 '''
-from classes import UtilityMethods, Stream, VectorUpdateMethods, StreamCluster
+from classes import UtilityMethods, Stream, VectorUpdateMethods
 from library.classes import GeneralMethods
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
 from operator import itemgetter
@@ -55,7 +55,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         predictedCluster = self.getClusterForDocument(stream)
         if predictedCluster!=None: self.clusters[predictedCluster].addStream(stream, **self.stream_settings)
         else:
-            newCluster = StreamCluster(stream)
+            newCluster = Cluster(stream)
             newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
             for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
             self.clusters[newCluster.clusterId] = newCluster
