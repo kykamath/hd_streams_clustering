@@ -12,7 +12,7 @@ from library.classes import TwoWayMap
 
 class UtilityMethods:
     @staticmethod
-    def updatePhraseTextAndDimensionsMap(phraseVector,  phraseTextAndDimensionMap, **settings):
+        def updatePhraseTextAndDimensionsMap(phraseVector,  phraseTextAndDimensionMap, **settings):
         phraseIterator = phraseVector.iterkeys()
         while len(phraseTextAndDimensionMap)<settings['dimensions']:
             try:
@@ -22,9 +22,7 @@ class UtilityMethods:
                 phraseId=len(phraseTextAndDimensionMap)
                 while phraseTextAndDimensionMap.contains(TwoWayMap.MAP_REVERSE, phraseId): 
                     phraseId=(phraseId+1)%settings['dimensions'] 
-                print '*', phraseId, len(phraseTextAndDimensionMap)
                 phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, phrase, phraseId)
-
 class SignatureTrie:
     @staticmethod
     def getNearestSignatureKey(trie, signature):
