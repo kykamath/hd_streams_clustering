@@ -22,7 +22,7 @@ class UtilityMethods:
                 phraseId=len(phraseTextAndDimensionMap)
                 while phraseTextAndDimensionMap.contains(TwoWayMap.MAP_REVERSE, phraseId): 
                     phraseId=(phraseId+1)%settings['dimensions'] 
-                    print '*', phraseId
+                    print '*', phraseId, len(phraseTextAndDimensionMap)
                 phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, phrase, phraseId)
 
 class SignatureTrie:
