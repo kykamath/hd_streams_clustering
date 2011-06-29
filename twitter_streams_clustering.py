@@ -41,10 +41,10 @@ class TwitterIterators:
 class TwitterCrowdsSpecificMethods:
     @staticmethod
     def convertTweetJSONToMessage(tweet, **twitter_stream_settings):
-        print '*comes here'
         tweetTime = getDateTimeObjectFromTweetTimestamp(tweet['created_at'])
         message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
         message.vector = Vector()
+        print '*comes here', tweet['text']
         for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), twitter_stream_settings['min_phrase_length'], twitter_stream_settings['max_phrase_length']):
             if phrase not in message.vector: message.vector[phrase]=0
             message.vector[phrase]+=1
