@@ -21,7 +21,7 @@ class GenerateData:
             print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
             iterationData = {'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                              'clusters': map(TwitterCrowdsSpecificMethods.getClusterInMapFormat, [cluster for cluster, _ in sorted(Cluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)]),
-                             'settings': experts_twitter_stream_settings
+                             'settings': experts_twitter_stream_settings.convertToSerializableObject()
                              }
             FileIO.writeToFileAsJson(iterationData, experts_twitter_stream_settings.lsh_crowds_folder+FileIO.getFileByDay(currentMessageTime))
             print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
