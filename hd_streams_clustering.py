@@ -45,8 +45,6 @@ class HDStreaminClustering(StreamingLSHClustering):
                 GeneralMethods.callMethodEveryInterval(DataStreamMethods.updateDimensions, self.dimensionUpdatingFrequency, message.timeStamp, 
                                                        hdStreamClusteringObject=self,
                                                        currentMessageTime=message.timeStamp)
-#                print i, streamObject.lastMessageTime, len(self.clusters)
-#                print i, message.timeStamp
                 i+=1
                 self.getClusterAndUpdateExistingClusters(streamObject)
                 
@@ -78,14 +76,13 @@ class HDStreaminClustering(StreamingLSHClustering):
         for cluster in Cluster.getClustersByAttributeAndThreshold(self.clusters.values(), 
                                                                   self.stream_settings['cluster_filter_attribute'], 
                                                                   self.stream_settings['cluster_filter_threshold'], Cluster.BELOW_THRESHOLD): del self.clusters[cluster.clusterId]
-        print 'Before merge:', len(self.clusters)
         if self.combineClustersMethod!=None: self.clusters=self.combineClustersMethod(self.clusters, **self.stream_settings)
-        print 'After merge:', len(self.clusters)
         
         for cluster in self.clusters.itervalues(): 
             cluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
             for permutation in self.signaturePermutations: permutation.addDocument(cluster)
     
     def printClusters(self):
-        for cluster, _ in sorted(Cluster.iterateByAttribute(self.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:10]:
-            print cluster.clusterId, cluster.length, [stream.docId for stream in cluster.iterateDocumentsInCluster()][:5], cluster.getTopDimensions(numberOfFeatures=5)
+        for cluster, _ in sorted(Cluster.iterateByAttribute(self.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:1]:
+#            print cluster.clusterId, cluster.length, [stream.docId for stream in cluster.iterateDocumentsInCluster()][:5], cluster.getTopDimensions(numberOfFeatures=5)
+            print cluster
