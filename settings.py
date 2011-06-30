@@ -6,6 +6,7 @@ Created on Jun 22, 2011
 from library.classes import Settings
 from datetime import timedelta
 from library.math_modified import getLargestPrimeLesserThan
+from library.file_io import FileIO
 
 twitterDataFolder='/mnt/chevron/kykamath/data/twitter/'
 
