@@ -20,9 +20,6 @@ class DataStreamMethods:
     def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
         print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
-        print 'Before merge:', len(hdStreamClusteringObject.clusters)
-        if hdStreamClusteringObject.combineClustersMethod!=None: hdStreamClusteringObject.clusters=hdStreamClusteringObject.combineClustersMethod(hdStreamClusteringObject.clusters, **hdStreamClusteringObject.stream_settings)
-        print 'After merge:', len(hdStreamClusteringObject.clusters)
         hdStreamClusteringObject.resetDatastructures(currentMessageTime)
         hdStreamClusteringObject.printClusters()
         print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
@@ -81,6 +78,10 @@ class HDStreaminClustering(StreamingLSHClustering):
         for cluster in Cluster.getClustersByAttributeAndThreshold(self.clusters.values(), 
                                                                   self.stream_settings['cluster_filter_attribute'], 
                                                                   self.stream_settings['cluster_filter_threshold'], Cluster.BELOW_THRESHOLD): del self.clusters[cluster.clusterId]
+        print 'Before merge:', len(self.clusters)
+        if self.combineClustersMethod!=None: self.clusters=self.combineClustersMethod(self.clusters, **self.stream_settings)
+        print 'After merge:', len(self.clusters)
+        
         for cluster in self.clusters.itervalues(): 
             cluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
             for permutation in self.signaturePermutations: permutation.addDocument(cluster)
