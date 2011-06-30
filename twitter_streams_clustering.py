@@ -59,7 +59,7 @@ class TwitterCrowdsSpecificMethods:
             mergedClusterId = None
             for mergedCluster in mergedClustersMap.itervalues():
                 clusterHashtags, mergedClusterHashtags = getHashtagSet(cluster), getHashtagSet(mergedCluster)
-                print len(clusterHashtags.union(mergedClusterHashtags)), jaccard_distance(clusterHashtags, mergedClusterHashtags)
+                print len(clusterHashtags.union(mergedClusterHashtags))
                 if len(clusterHashtags.union(mergedClusterHashtags)) and jaccard_distance(clusterHashtags, mergedClusterHashtags) <= twitter_stream_settings['cluster_merging_jaccard_distance_threshold']: 
                     mergedCluster.mergeCluster(cluster)
                     mergedClusterId = mergedCluster.clusterId
