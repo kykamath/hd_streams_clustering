@@ -31,9 +31,6 @@ class TwitterCrowdsSpecificMethodsTests(unittest.TestCase):
         meanVectorForAllDocuments = Vector.getMeanVector([cluster1, cluster2, doc1, doc2])
         cluster1.addDocument(doc1)
         cluster2.addDocument(doc2)
-        mergedCluster = Cluster.getClusterObjectToMergeFrom(cluster1)
-        mergedCluster.mergeCluster(cluster2)
-        
         clustersMap = {cluster1.clusterId: cluster1, cluster2.clusterId: cluster2}
         clustersMap = TwitterCrowdsSpecificMethods.combineClusters(clustersMap, **twitter_stream_settings)
         self.assertEqual(1, len(clustersMap))
