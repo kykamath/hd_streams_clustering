@@ -14,6 +14,7 @@ from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 from itertools import combinations
 from nltk.metrics.distance import jaccard_distance
+from streaming_lsh.classes import Cluster
 
 def getExperts():
     usersList, usersData = {}, defaultdict(list)
@@ -53,11 +54,18 @@ class TwitterCrowdsSpecificMethods:
     @staticmethod
     def combineClusters(clusters, **twitter_stream_settings):
         def getHashtagSet(vector): return set([d for d in vector if d.startswith('#')])
-        clusterIdToHashtagSetMap, clusterIdToCurrentClusterMap = dict([(clusterId, getHashtagSet(cluster)) for clusterId, cluster in clusters.iteritems()]), {}
-        for cluster1, cluster2 in combinations(clusterIdToHashtagSetMap, 2):
-            if jaccard_distance(clusterIdToHashtagSetMap[cluster1], clusterIdToHashtagSetMap[cluster2]) <= twitter_stream_settings['cluster_merging_jaccard_distance_threshold']:
-#                mergeClusterId = 
-                pass
+        mergedClustersMap = {}
+        for cluster in clusters.itervalues():
+            mergedClusterId = None
+            for mergedCluster in mergedClustersMap.itervalues():
+                if jaccard_distance(getHashtagSet(cluster), getHashtagSet(mergedCluster)) <= twitter_stream_settings['cluster_merging_jaccard_distance_threshold']: 
+                    mergedCluster.mergeCluster(cluster)
+                    mergedClusterId = mergedCluster.clusterId
+                    break
+            if mergedClusterId==None:
+                mergedCluster = Cluster.getClusterObjectToMergeFrom(cluster)
+                mergedClustersMap[mergedCluster.clusterId]=mergedCluster
+        return mergedClustersMap
 
 def clusterTwitterStreams():
     hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
@@ -68,4 +76,4 @@ def clusterTwitterStreams():
 if __name__ == '__main__':
 #    clusterTwitterStreams()
     d = {1:2, 3:4}
-    print d.ge(1,None) or d.get()
+    print d.setdefault(1,6) and d.setdefault(7,None)
