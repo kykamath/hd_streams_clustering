@@ -74,6 +74,4 @@ def clusterTwitterStreams():
 #    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
             
 if __name__ == '__main__':
-#    clusterTwitterStreams()
-    d = {1:2, 3:4}
-    print d.setdefault(1,6) and d.setdefault(7,None)
+    clusterTwitterStreams()
