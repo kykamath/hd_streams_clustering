@@ -32,12 +32,12 @@ class UtilityMethods:
         UtilityMethods.pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, currentTime, UtilityMethods.pruningConditionDeterministic, **stream_settings)
         topPhrasesList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in phraseTextToPhraseObjectMap.itervalues()), reverse=True)[:stream_settings['max_dimensions']]]
 #        print topPhrasesList[:10]
-        topPhrasesSet = set(topPhrasesList)
-        newPhraseIterator = getNextNewPhrase(topPhrasesSet)
+#        topPhrasesSet = set(topPhrasesList)
+        newPhraseIterator = getNextNewPhrase(topPhrasesList)
         availableIds = set(list(range(stream_settings['max_dimensions'])))
         for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
             availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-            if phrase not in topPhrasesSet:
+            if phrase not in topPhrasesList:
                 try:
                     newPhrase = newPhraseIterator.next()
                     phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
@@ -46,13 +46,14 @@ class UtilityMethods:
         availableIdsIterator = getNextAvailableId(availableIds)
         while True: 
             try:
-                phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhraseIterator.next(), availableIdsIterator.next())
+                p = newPhraseIterator.next()
+                i = availableIdsIterator.next()
+                phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, p, i)
             except StopIteration: break
         UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap(phraseTextAndDimensionMap, **stream_settings)
     @staticmethod
     def checkCriticalErrorsInPhraseTextToIdMap(phraseTextAndDimensionMap, **stream_settings):
         if len(phraseTextAndDimensionMap)>stream_settings['max_dimensions']: print 'Illegal number of dimensions.', exit()
-        if len(phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).values())!=len(set(phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).values())): print 'Multiple phrases with same id.', exit()
     @staticmethod
     def pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, currentTime, pruningMethod, **stream_settings):
         def prune(phraseText): 

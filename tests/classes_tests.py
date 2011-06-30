@@ -63,7 +63,7 @@ class UtilityMethodsTests(unittest.TestCase):
     def test_updateDimensions_when_phraseTextToIdMap_is_filled_to_max_dimensions_and_entire_map_is_changed(self):
         for phrase, score in zip(['added', 'are'], range(10,12)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
         UtilityMethods.updateDimensions(self.phraseTextAndDimensionMap, self.phraseTextToPhraseObjectMap, test_time, **stream_settings)
-        self.assertEqual({'added':0, 'are': 1}, self.phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD))
+        self.assertEqual({'added':1, 'are': 0}, self.phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD))
     
     def test_updateDimensions_when_phraseTextToIdMap_has_lesser_than_max_dimensions(self):
         stream_settings['max_dimensions'] = 4
@@ -100,12 +100,7 @@ class UtilityMethodsTests(unittest.TestCase):
         self.assertEqual(set({'project':0, 'new_text': 1}), set(self.phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD)))
     
     def test_checkCriticalErrorsInPhraseTextToIdMap_larger_than_expected_dimensions(self):
-        self.phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, 'sdfsd', 0)
-        print 'Ignore this message: ',
-        self.assertRaises(SystemExit, UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap, self.phraseTextAndDimensionMap, **stream_settings)
-    
-    def test_checkCriticalErrorsInPhraseTextToIdMap_repeating_values(self):
-        self.phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, 'cluster', 0)
+        self.phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, 'sdfsd', 3)
         print 'Ignore this message: ',
         self.assertRaises(SystemExit, UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap, self.phraseTextAndDimensionMap, **stream_settings)
     
