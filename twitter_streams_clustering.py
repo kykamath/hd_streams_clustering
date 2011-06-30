@@ -76,10 +76,10 @@ class TwitterCrowdsSpecificMethods:
         return mergedClustersMap
 
 def clusterTwitterStreams():
-    hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
-    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts(), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage, TwitterCrowdsSpecificMethods.combineClusters)
-#    hdsClustering = HDStreaminClustering(**trends_twitter_stream_settings)
-#    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage)
+#    hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
+#    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts(), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage, TwitterCrowdsSpecificMethods.combineClusters)
+    hdsClustering = HDStreaminClustering(**trends_twitter_stream_settings)
+    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'), TwitterCrowdsSpecificMethods.convertTweetJSONToMessage, TwitterCrowdsSpecificMethods.combineClusters)
             
 if __name__ == '__main__':
     clusterTwitterStreams()
