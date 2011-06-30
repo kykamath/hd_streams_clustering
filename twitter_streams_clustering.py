@@ -53,12 +53,14 @@ class TwitterCrowdsSpecificMethods:
         return message
     @staticmethod
     def combineClusters(clusters, **twitter_stream_settings):
-        def getHashtagSet(vector): return set([d for d in vector if d.startswith('#')])
+        def getHashtagSet(vector): return set([word for dimension in vector for word in dimension.split() if word.startswith('#')])
         mergedClustersMap = {}
         for cluster in clusters.itervalues():
             mergedClusterId = None
             for mergedCluster in mergedClustersMap.itervalues():
-                if jaccard_distance(getHashtagSet(cluster), getHashtagSet(mergedCluster)) <= twitter_stream_settings['cluster_merging_jaccard_distance_threshold']: 
+                clusterHashtags, mergedClusterHashtags = getHashtagSet(cluster), getHashtagSet(mergedCluster)
+                print len(clusterHashtags.union(mergedClusterHashtags)), jaccard_distance(clusterHashtags, mergedClusterHashtags)
+                if len(clusterHashtags.union(mergedClusterHashtags)) and jaccard_distance(clusterHashtags, mergedClusterHashtags) <= twitter_stream_settings['cluster_merging_jaccard_distance_threshold']: 
                     mergedCluster.mergeCluster(cluster)
                     mergedClusterId = mergedCluster.clusterId
                     break
