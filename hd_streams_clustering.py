@@ -7,7 +7,7 @@ from classes import UtilityMethods, Stream, VectorUpdateMethods
 from library.classes import GeneralMethods
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
 from operator import itemgetter
-import time
+import time, cjson
 from streaming_lsh.classes import Cluster
 
 class DataStreamMethods:
@@ -85,4 +85,4 @@ class HDStreaminClustering(StreamingLSHClustering):
     def printClusters(self):
         for cluster, _ in sorted(Cluster.iterateByAttribute(self.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:1]:
 #            print cluster.clusterId, cluster.length, [stream.docId for stream in cluster.iterateDocumentsInCluster()][:5], cluster.getTopDimensions(numberOfFeatures=5)
-            print cluster
+            print cjson.encode(cluster)
