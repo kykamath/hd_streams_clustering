@@ -18,7 +18,7 @@ from operator import itemgetter
 
 def getExperts():
     usersList, usersData = {}, defaultdict(list)
-    for l in open(experts_twitter_stream_settings.usersToCrawl): data = l.strip().split(); usersData[data[0]].append(data[1:])
+    for l in open(experts_twitter_stream_settings.users_to_crawl_file): data = l.strip().split(); usersData[data[0]].append(data[1:])
     for k, v in usersData.iteritems(): 
         for user in v: usersList[user[1]] = {'screen_name': user[0], 'class':k}
     return usersList
@@ -37,7 +37,7 @@ class TwitterIterators:
         experts = getExperts()
         currentTime = expertsDataStartTime
         while currentTime <= expertsDataEndTime:
-            for tweet in TwitterIterators.iterateFromFile(experts_twitter_stream_settings.twitterUsersTweetsFolder+'%s.gz'%FileIO.getFileByDay(currentTime)):
+            for tweet in TwitterIterators.iterateFromFile(experts_twitter_stream_settings.twitter_users_tweets_folder+'%s.gz'%FileIO.getFileByDay(currentTime)):
                 if tweet['user']['id_str'] in experts: yield tweet
             currentTime+=timedelta(days=1)
 

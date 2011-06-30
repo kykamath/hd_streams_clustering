@@ -3,13 +3,14 @@ Created on Jun 30, 2011
 
 @author: kykamath
 '''
-import sys, cjson
+import sys
 sys.path.append('../')
 from settings import experts_twitter_stream_settings
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods,\
     TwitterIterators
 from hd_streams_clustering import HDStreaminClustering
 from streaming_lsh.classes import Cluster
+from library.file_io import FileIO
 from library.twitter import getStringRepresentationForTweetTimestamp
 from operator import itemgetter
 
@@ -21,7 +22,7 @@ class GenerateData:
             iterationData = {'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                              'clusters': map(TwitterCrowdsSpecificMethods.getClusterInMapFormat, [cluster for cluster, _ in sorted(Cluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)]),
                              }
-            print cjson.encode(iterationData)
+            FileIO.writeToFileAsJson(iterationData, experts_twitter_stream_settings.lsh_crowds_folder+FileIO.getFileByDay(currentMessageTime))
             print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         
         experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage

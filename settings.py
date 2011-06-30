@@ -50,8 +50,9 @@ experts_twitter_stream_settings.min_phrase_length=2
 experts_twitter_stream_settings.max_phrase_length=2
 experts_twitter_stream_settings.dimension_update_frequency_in_seconds=timedelta(seconds=30*60)
 experts_twitter_stream_settings.cluster_filter_threshold = 2
-experts_twitter_stream_settings.twitterUsersTweetsFolder='%susers/tweets/'%twitterDataFolder
-experts_twitter_stream_settings.usersToCrawl='%susers/crawl/users_to_crawl'%twitterDataFolder
+experts_twitter_stream_settings.twitter_users_tweets_folder='%susers/tweets/'%twitterDataFolder
+experts_twitter_stream_settings.users_to_crawl_file='%susers/crawl/users_to_crawl'%twitterDataFolder
+experts_twitter_stream_settings.lsh_crowds_folder='%slsh_crowds/experts_stream/'%twitterDataFolder
 
 if __name__ == '__main__':
     print getLargestPrimeLesserThan(23)
