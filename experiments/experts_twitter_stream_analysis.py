@@ -18,7 +18,7 @@ class GenerateData:
         def analyzeIterationData(hdStreamClusteringObject, currentMessageTime):
             print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
             for cluster, _ in sorted(Cluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:1]:
-                print cluster.clusterId, cluster.length, [stream.docId for stream in cluster.iterateDocumentsInCluster()][:5], cluster.getTopDimensions(numberOfFeatures=5)
+                print TwitterCrowdsSpecificMethods.getClusterInMapFormat(cluster)
             print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         
         experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage

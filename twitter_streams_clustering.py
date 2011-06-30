@@ -12,7 +12,6 @@ from streaming_lsh.library.file_io import FileIO
 from hd_streams_clustering import HDStreaminClustering
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
-from itertools import combinations
 from nltk.metrics.distance import jaccard_distance
 from streaming_lsh.classes import Cluster
 from operator import itemgetter
@@ -61,13 +60,19 @@ class TwitterCrowdsSpecificMethods:
             for mergedCluster in mergedClustersMap.itervalues():
                 clusterHashtags, mergedClusterHashtags = getHashtagSet(cluster), getHashtagSet(mergedCluster)
                 if len(clusterHashtags.union(mergedClusterHashtags)) and jaccard_distance(clusterHashtags, mergedClusterHashtags) <= 1-twitter_stream_settings['cluster_merging_jaccard_distance_threshold']: 
-                    mergedCluster.mergeCluster(cluster)
+                    mergedCluster.mergeCluster(cluster), mergedCluster.mergedClustersList.append(cluster.clusterId)
                     mergedClusterId = mergedCluster.clusterId
                     break
             if mergedClusterId==None:
                 mergedCluster = Cluster.getClusterObjectToMergeFrom(cluster)
+                mergedCluster.mergedClustersList = [cluster.clusterId]
                 mergedClustersMap[mergedCluster.clusterId]=mergedCluster
         return mergedClustersMap
+    @staticmethod
+    def getClusterInMapFormat(cluster, numberOfMaxDimensionsToRepresent=20): 
+        return {'clusterId': cluster.clusterId, 'mergedClustersList': cluster.mergedClustersList, 
+               'streams': [stream.docId for stream in cluster.iterateDocumentsInCluster()],
+               'dimensions': cluster.getTopDimensions(numberOfFeatures=numberOfMaxDimensionsToRepresent)}
     @staticmethod
     def analyzeIterationData(hdStreamClusteringObject, currentMessageTime):
         print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
