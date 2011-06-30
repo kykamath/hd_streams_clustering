@@ -22,7 +22,7 @@ class DataStreamMethods:
         UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
         hdStreamClusteringObject.resetDatastructures(currentMessageTime)
         print 'Before merge:', len(hdStreamClusteringObject.clusters)
-        if hdStreamClusteringObject.combineClustersMethod!=None: hdStreamClusteringObject.combineClustersMethod(hdStreamClusteringObject.clusters)
+        if hdStreamClusteringObject.combineClustersMethod!=None: hdStreamClusteringObject.combineClustersMethod(hdStreamClusteringObject.clusters, **hdStreamClusteringObject.stream_settings)
         print 'After merge:', len(hdStreamClusteringObject.clusters)
         hdStreamClusteringObject.printClusters()
         print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
