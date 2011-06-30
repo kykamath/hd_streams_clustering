@@ -3,13 +3,14 @@ Created on Jun 30, 2011
 
 @author: kykamath
 '''
-import sys
+import sys, cjson
 sys.path.append('../')
 from settings import experts_twitter_stream_settings
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods,\
     TwitterIterators
 from hd_streams_clustering import HDStreaminClustering
 from streaming_lsh.classes import Cluster
+from library.twitter import getStringRepresentationForTweetTimestamp
 from operator import itemgetter
 
 class GenerateData:
@@ -17,8 +18,10 @@ class GenerateData:
     def expertClusters():
         def analyzeIterationData(hdStreamClusteringObject, currentMessageTime):
             print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
-            for cluster, _ in sorted(Cluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:1]:
-                print TwitterCrowdsSpecificMethods.getClusterInMapFormat(cluster)
+            iterationData = {'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
+                             'clusters': map(TwitterCrowdsSpecificMethods.getClusterInMapFormat, [cluster for cluster, _ in sorted(Cluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)]),
+                             }
+            print cjson.encode(iterationData)
             print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         
         experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
