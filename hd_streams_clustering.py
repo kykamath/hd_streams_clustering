@@ -20,10 +20,10 @@ class DataStreamMethods:
     def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
         print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
-        hdStreamClusteringObject.resetDatastructures(currentMessageTime)
         print 'Before merge:', len(hdStreamClusteringObject.clusters)
-        if hdStreamClusteringObject.combineClustersMethod!=None: hdStreamClusteringObject.combineClustersMethod(hdStreamClusteringObject.clusters, **hdStreamClusteringObject.stream_settings)
+        if hdStreamClusteringObject.combineClustersMethod!=None: hdStreamClusteringObject.clusters=hdStreamClusteringObject.combineClustersMethod(hdStreamClusteringObject.clusters, **hdStreamClusteringObject.stream_settings)
         print 'After merge:', len(hdStreamClusteringObject.clusters)
+        hdStreamClusteringObject.resetDatastructures(currentMessageTime)
         hdStreamClusteringObject.printClusters()
         print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         time.sleep(5)
