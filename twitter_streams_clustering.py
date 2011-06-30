@@ -64,6 +64,8 @@ class TwitterCrowdsSpecificMethods:
                     print clusterHashtags
                     print '---------------------'
                     print mergedClusterHashtags
+                    print '+++++++++++++++++++++'
+                    print clusterHashtags.intersection(mergedClusterHashtags)
                     print '*****************'
                     mergedCluster.mergeCluster(cluster)
                     mergedClusterId = mergedCluster.clusterId
