@@ -3,6 +3,8 @@ Created on Jun 30, 2011
 
 @author: kykamath
 '''
+import sys
+sys.path.append('../')
 from settings import experts_twitter_stream_settings
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods,\
     TwitterIterators
