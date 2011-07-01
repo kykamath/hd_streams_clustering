@@ -22,8 +22,9 @@ class GenerateData:
     def writeTweetsForDay(currentDay):
         for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, limit=1000, fields=['ca', 'tx', 'uid']):
             screenName = GenerateData.getScreenName(tweet['uid'])
-            if screenName!=None: print tweet['ca'], tweet['tx'], GenerateData.getScreenName(tweet['uid'])
-            
+            if screenName!=None: 
+#                print tweet['ca'], tweet['tx'], GenerateData.getScreenName(tweet['uid'])
+                print {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':tweet['ca'], 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
 #    @staticmethod
 #    def generateHoustonFiles():
 #        for tweet in tweets.find(limit=10, fields=['ca', 'tx', 'uid']):
