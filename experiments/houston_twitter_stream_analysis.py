@@ -17,20 +17,14 @@ class GenerateData:
             userObject = users.find_one({'_id': uid}, fields=['sn'])
             if userObject!=None: GenerateData.userIdToScreenNameMap[uid]=userObject['sn']
         return GenerateData.userIdToScreenNameMap.get(uid, None)
-#    @staticmethod
-#    def generateHoustonFiles():
-#        if tweet['uid'] not in userIdToScreenNameMap: 
-#            userObject = tweets.find_one({'_id': tweet['uid']})
-#            if userObject!=None: user
-#        userIdToScreenNameMap = {}
-#        for tweet in tweets.find(limit=10):
-#            print tweet['ca'], tweet['tx'], tweet['uid']
-#            if tweet['uid'] not in userIdToScreenNameMap: 
-#                userObject = tweets.find_one({'_id': tweet['uid']})
-#                if userObject!=None: user
+    @staticmethod
+    def generateHoustonFiles():
+        for tweet in tweets.find(limit=10, fields=['ca', 'tx', 'uid']):
+            screenName = GenerateData.getScreenName(tweet['uid'])
+            if screenName!=None: print tweet['ca'], tweet['tx'], GenerateData.getScreenName(tweet['uid'])
 
 if __name__ == '__main__':
-#    GenerateData.generateHoustonFiles()
-    print GenerateData.userIdToScreenNameMap
-    print GenerateData.getScreenName(5841)
-    print GenerateData.userIdToScreenNameMap
+    GenerateData.generateHoustonFiles()
+#    print GenerateData.userIdToScreenNameMap
+#    print GenerateData.getScreenName(5841)
+#    print GenerateData.userIdToScreenNameMap
