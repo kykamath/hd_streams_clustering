@@ -3,7 +3,7 @@ Created on Jun 30, 2011
 
 @author: kykamath
 '''
-import sys
+import sys, os
 sys.path.append('../')
 from pymongo import Connection
 from twitter_streams_clustering import TwitterIterators,\
@@ -35,8 +35,7 @@ class GenerateData:
             if screenName!=None: 
                 data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':getStringRepresentationForTweetTimestamp(tweet['ca']), 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
                 FileIO.writeToFileAsJson(data, fileName) 
+        os.system('gzip %s'%fileName)
 
 if __name__ == '__main__':
-#    GenerateData.writeTweetsForDay(datetime(2010,12,1))
-    for tw in TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/houston/2010_12_1.gz'):
-        print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tw, **twitter_stream_settings)
+    GenerateData.writeTweetsForDay(datetime(2010,12,1))
