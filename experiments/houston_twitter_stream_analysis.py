@@ -30,7 +30,7 @@ class GenerateData:
     @staticmethod
     def writeTweetsForDay(currentDay):
         fileName = houston_data_folder+FileIO.getFileByDay(currentDay)
-        for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, limit=1000, fields=['ca', 'tx', 'uid']):
+        for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, fields=['ca', 'tx', 'uid']):
             screenName = GenerateData.getScreenName(tweet['uid'])
             if screenName!=None: 
                 data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':getStringRepresentationForTweetTimestamp(tweet['ca']), 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
