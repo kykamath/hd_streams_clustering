@@ -14,7 +14,7 @@ class GenerateData:
     @staticmethod
     def getScreenName(uid):
         if uid not in GenerateData.userIdToScreenNameMap: 
-            userObject = tweets.find_one({'_id': uid}, fields=['sn'])
+            userObject = users.find_one({'_id': uid}, fields=['sn'])
             if userObject!=None: GenerateData.userIdToScreenNameMap[uid]=userObject['sn']
         return GenerateData.userIdToScreenNameMap.get(uid, None)
 #    @staticmethod
@@ -32,5 +32,5 @@ class GenerateData:
 if __name__ == '__main__':
 #    GenerateData.generateHoustonFiles()
     print GenerateData.userIdToScreenNameMap
-    GenerateData.getScreenName(5841)
+    print GenerateData.getScreenName(5841)
     print GenerateData.userIdToScreenNameMap
