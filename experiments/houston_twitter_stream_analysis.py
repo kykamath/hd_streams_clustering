@@ -6,9 +6,12 @@ Created on Jun 30, 2011
 import sys
 sys.path.append('../')
 from pymongo import Connection
+from twitter_streams_clustering import TwitterIterators,\
+    TwitterCrowdsSpecificMethods
 from datetime import datetime, timedelta
 from library.file_io import FileIO
 from library.twitter import getStringRepresentationForTweetTimestamp
+from settings import twitter_stream_settings
 
 mongodb_connection = Connection('sarge', 27017)
 tweets = mongodb_connection.old_hou.Tweet
@@ -34,4 +37,6 @@ class GenerateData:
                 FileIO.writeToFileAsJson(data, fileName) 
 
 if __name__ == '__main__':
-    GenerateData.writeTweetsForDay(datetime(2010,12,1))
+#    GenerateData.writeTweetsForDay(datetime(2010,12,1))
+    for tw in TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
+        print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tw, **twitter_stream_settings)
