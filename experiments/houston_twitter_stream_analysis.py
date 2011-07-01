@@ -4,6 +4,7 @@ Created on Jun 30, 2011
 @author: kykamath
 '''
 from pymongo import Connection
+from datetime import datetime
 
 mongodb_connection = Connection('sarge', 27017)
 tweets = mongodb_connection.old_hou.Tweet
@@ -18,13 +19,19 @@ class GenerateData:
             if userObject!=None: GenerateData.userIdToScreenNameMap[uid]=userObject['sn']
         return GenerateData.userIdToScreenNameMap.get(uid, None)
     @staticmethod
-    def generateHoustonFiles():
-        for tweet in tweets.find(limit=10, fields=['ca', 'tx', 'uid']):
+    def writeTweetsForDay(currentDay):
+        for tweet in tweets.find({'ca': currentDay}, limit=10, fields=['ca', 'tx', 'uid']):
             screenName = GenerateData.getScreenName(tweet['uid'])
             if screenName!=None: print tweet['ca'], tweet['tx'], GenerateData.getScreenName(tweet['uid'])
+            
+#    @staticmethod
+#    def generateHoustonFiles():
+#        for tweet in tweets.find(limit=10, fields=['ca', 'tx', 'uid']):
+#            screenName = GenerateData.getScreenName(tweet['uid'])
+#            if screenName!=None: print tweet['ca'], tweet['tx'], GenerateData.getScreenName(tweet['uid'])
 
 if __name__ == '__main__':
-    GenerateData.generateHoustonFiles()
+    GenerateData.writeTweetsForDay(datetime(2010,12,1))
 #    print GenerateData.userIdToScreenNameMap
 #    print GenerateData.getScreenName(5841)
 #    print GenerateData.userIdToScreenNameMap
