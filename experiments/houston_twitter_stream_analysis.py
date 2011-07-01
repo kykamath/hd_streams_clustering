@@ -3,12 +3,17 @@ Created on Jun 30, 2011
 
 @author: kykamath
 '''
+import sys
+sys.path.append('../')
 from pymongo import Connection
 from datetime import datetime, timedelta
+from library.file_io import FileIO
 
 mongodb_connection = Connection('sarge', 27017)
 tweets = mongodb_connection.old_hou.Tweet
 users = mongodb_connection.old_hou.User
+
+houston_data_folder = '/mnt/chevron/kykamath/data/twitter/houston/'
         
 class GenerateData:
     userIdToScreenNameMap = {}
@@ -20,19 +25,12 @@ class GenerateData:
         return GenerateData.userIdToScreenNameMap.get(uid, None)
     @staticmethod
     def writeTweetsForDay(currentDay):
+        fileName = houston_data_folder+FileIO.getFileByDay(currentDay)
         for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, limit=1000, fields=['ca', 'tx', 'uid']):
             screenName = GenerateData.getScreenName(tweet['uid'])
             if screenName!=None: 
-#                print tweet['ca'], tweet['tx'], GenerateData.getScreenName(tweet['uid'])
-                print {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':tweet['ca'], 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
-#    @staticmethod
-#    def generateHoustonFiles():
-#        for tweet in tweets.find(limit=10, fields=['ca', 'tx', 'uid']):
-#            screenName = GenerateData.getScreenName(tweet['uid'])
-#            if screenName!=None: print tweet['ca'], tweet['tx'], GenerateData.getScreenName(tweet['uid'])
+                data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':tweet['ca'], 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
+                FileIO.writeToFileAsJson(data, fileName) 
 
 if __name__ == '__main__':
     GenerateData.writeTweetsForDay(datetime(2010,12,1))
-#    print GenerateData.userIdToScreenNameMap
-#    print GenerateData.getScreenName(5841)
-#    print GenerateData.userIdToScreenNameMap
