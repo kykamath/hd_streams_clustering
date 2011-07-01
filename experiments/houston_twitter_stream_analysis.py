@@ -4,7 +4,7 @@ Created on Jun 30, 2011
 @author: kykamath
 '''
 from pymongo import Connection
-from datetime import datetime
+from datetime import datetime, timedelta
 
 mongodb_connection = Connection('sarge', 27017)
 tweets = mongodb_connection.old_hou.Tweet
@@ -20,7 +20,7 @@ class GenerateData:
         return GenerateData.userIdToScreenNameMap.get(uid, None)
     @staticmethod
     def writeTweetsForDay(currentDay):
-        for tweet in tweets.find({'ca': currentDay}, limit=10, fields=['ca', 'tx', 'uid']):
+        for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, limit=10, fields=['ca', 'tx', 'uid']):
             screenName = GenerateData.getScreenName(tweet['uid'])
             if screenName!=None: print tweet['ca'], tweet['tx'], GenerateData.getScreenName(tweet['uid'])
             
