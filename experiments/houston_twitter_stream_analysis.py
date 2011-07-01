@@ -38,5 +38,5 @@ class GenerateData:
 
 if __name__ == '__main__':
 #    GenerateData.writeTweetsForDay(datetime(2010,12,1))
-    for tw in TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'):
+    for tw in TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/houston/2010_12_1'):
         print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tw, **twitter_stream_settings)
