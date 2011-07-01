@@ -39,8 +39,8 @@ class GenerateData:
     @staticmethod
     def generateHoustonData():
         currentDay = datetime(2010,11,1)
-        endingDay = datetime(2010,11,3)
-        while currentDay<endingDay:
+        endingDay = datetime(2011,5,31)
+        while currentDay<=endingDay:
             print 'Generating data for: ', currentDay
             GenerateData.writeTweetsForDay(currentDay)
             currentDay+=timedelta(days=1)
