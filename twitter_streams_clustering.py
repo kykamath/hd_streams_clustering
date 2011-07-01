@@ -74,6 +74,15 @@ class TwitterCrowdsSpecificMethods:
                'streams': [stream.docId for stream in cluster.iterateDocumentsInCluster()],
                'dimensions': cluster.getTopDimensions(numberOfFeatures=numberOfMaxDimensionsToRepresent)}
     @staticmethod
+    def getClusterFromMapFormat(clusterMap):
+        cluster = Cluster({})
+        print clusterMap
+        cluster.clusterId = clusterMap['clusterId']
+        cluster.mergedClustersList = clusterMap['mergedClustersList']
+        cluster.documentsInCluster = clusterMap['streams']
+        for k,v in clusterMap['dimensions'].iteritems(): cluster[k]=v
+        return cluster
+    @staticmethod
     def analyzeIterationData(hdStreamClusteringObject, currentMessageTime):
         print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         for cluster, _ in sorted(Cluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:1]:

@@ -6,7 +6,7 @@ Created on Jun 22, 2011
 import random
 from streaming_lsh.classes import Document, Cluster
 from library.math_modified import exponentialDecay, DateTimeAirthematic
-from library.classes import TwoWayMap
+from library.classes import TwoWayMap, GeneralMethods
 
 class UtilityMethods:
     @staticmethod
@@ -108,7 +108,20 @@ class StreamCluster(Cluster):
         timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.lastStreamAddedTime, stream_settings['time_unit_in_seconds'].seconds)
         self.score=exponentialDecay(self.score, stream_settings['stream_cluster_decay_coefficient'], timeDifference)+scoreToUpdate
         self.lastStreamAddedTime=currentOccuranceTime
-        
+
+class Crowd:
+    '''
+    Clusters combined over time.
+    '''
+    def __init__(self, cluster, clusterFormationTime):
+        self.crowdId = cluster.clusterId
+        self.clusters = {GeneralMethods.getEpochFromDateTimeObject(clusterFormationTime): cluster}
+        self.ends, self.mergesInto = False, None
+    @property
+    def lifespan(self): return len(self.clusters)
+    def append(self, cluster, clusterFormationTime): self.clusters[GeneralMethods.getEpochFromDateTimeObject(clusterFormationTime)]=cluster
+    def updatedMergesInto(self, crowdId): self.ends, self.mergesInto = True, crowdId
+    
 class Message(object):
     def __init__(self, streamId, messageId, text, timeStamp): self.streamId, self.messageId, self.text, self.timeStamp, self.vector = streamId, messageId, text, timeStamp, None
     def __str__(self): return str(self.messageId)

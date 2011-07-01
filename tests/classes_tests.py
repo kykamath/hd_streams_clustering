@@ -6,10 +6,12 @@ Created on Jun 22, 2011
 import unittest
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
-from classes import Stream, Message, VectorUpdateMethods, UtilityMethods, Phrase
+from classes import Stream, Message, VectorUpdateMethods, UtilityMethods, Phrase,\
+    Crowd
 from datetime import datetime, timedelta
 from settings import twitter_stream_settings as stream_settings
-from library.classes import TwoWayMap
+from library.classes import TwoWayMap, GeneralMethods
+from streaming_lsh.classes import Cluster
 
 test_time = datetime.now()
 
@@ -180,6 +182,19 @@ class StreamTests(unittest.TestCase):
 #        self.assertEqual({1:2,2:8,3:4}, self.cluster1.aggregateVector)
 #        self.cluster2.addStream(stream2, **stream_settings)
 #        self.assertEqual(2, self.cluster2.score)
+
+class CrowdTests(unittest.TestCase):
+    def setUp(self):
+        self.cluster = Cluster({})
+        self.crowd = Crowd(self.cluster, test_time)
+    def test_intitialization(self):
+        self.assertEqual(self.cluster.clusterId, self.crowd.crowdId)
+    def test_append(self):
+        cluster2 = Cluster({})
+        self.crowd.append(cluster2, test_time+timedelta(days=1))
+        self.assertEqual([GeneralMethods.getEpochFromDateTimeObject(test_time), GeneralMethods.getEpochFromDateTimeObject(test_time+timedelta(days=1))], sorted(self.crowd.clusters.keys()))
+        self.assertEqual(Cluster, type(self.crowd.clusters[GeneralMethods.getEpochFromDateTimeObject(test_time)]))
+        self.assertEqual(2, self.crowd.lifespan)
         
 class VectorUpdateMethodTests(unittest.TestCase):
     def setUp(self): 

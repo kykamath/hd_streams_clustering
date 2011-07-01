@@ -44,6 +44,12 @@ class TwitterCrowdsSpecificMethodsTests(unittest.TestCase):
         mergedCluster.mergedClustersList = [self.cluster1.clusterId]
         mapReresentation = {'clusterId': mergedCluster.clusterId, 'mergedClustersList': [self.cluster1.clusterId], 'streams': [self.doc1.docId], 'dimensions': {'#tcot':2, 'dsf':2}}
         self.assertEqual(mapReresentation, TwitterCrowdsSpecificMethods.getClusterInMapFormat(mergedCluster))
-        
+    def test_getClusterFromMapFormat(self):
+        mapReresentation = {'clusterId': 1, 'mergedClustersList': [self.cluster1.clusterId], 'streams': [self.doc1.docId], 'dimensions': {'#tcot':2, 'dsf':2}}
+        cluster = TwitterCrowdsSpecificMethods.getClusterFromMapFormat(mapReresentation)
+        self.assertEqual(1, cluster.clusterId)
+        self.assertEqual([self.cluster1.clusterId], cluster.mergedClustersList)
+        self.assertEqual([self.doc1.docId], cluster.documentsInCluster)
+        self.assertEqual({'#tcot':2, 'dsf':2}, cluster)
 if __name__ == '__main__':
     unittest.main()
