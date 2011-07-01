@@ -20,7 +20,7 @@ class GenerateData:
         return GenerateData.userIdToScreenNameMap.get(uid, None)
     @staticmethod
     def writeTweetsForDay(currentDay):
-        for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, limit=10, fields=['ca', 'tx', 'uid']):
+        for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, limit=1000, fields=['ca', 'tx', 'uid']):
             screenName = GenerateData.getScreenName(tweet['uid'])
             if screenName!=None: print tweet['ca'], tweet['tx'], GenerateData.getScreenName(tweet['uid'])
             
