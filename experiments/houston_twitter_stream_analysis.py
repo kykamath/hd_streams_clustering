@@ -8,6 +8,7 @@ sys.path.append('../')
 from pymongo import Connection
 from datetime import datetime, timedelta
 from library.file_io import FileIO
+from library.twitter import getStringRepresentationForTweetTimestamp
 
 mongodb_connection = Connection('sarge', 27017)
 tweets = mongodb_connection.old_hou.Tweet
@@ -29,7 +30,7 @@ class GenerateData:
         for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, limit=1000, fields=['ca', 'tx', 'uid']):
             screenName = GenerateData.getScreenName(tweet['uid'])
             if screenName!=None: 
-                data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':tweet['ca'], 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
+                data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':getStringRepresentationForTweetTimestamp(tweet['ca']), 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
                 FileIO.writeToFileAsJson(data, fileName) 
 
 if __name__ == '__main__':
