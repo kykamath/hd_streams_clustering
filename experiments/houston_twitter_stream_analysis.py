@@ -36,6 +36,14 @@ class GenerateData:
                 data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':getStringRepresentationForTweetTimestamp(tweet['ca']), 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
                 FileIO.writeToFileAsJson(data, fileName) 
         os.system('gzip %s'%fileName)
-
+    @staticmethod
+    def generateHoustonData():
+        currentDay = datetime(2010,11,1)
+        endingDay = datetime(2010,11,3)
+        while currentDay<endingDay:
+            print 'Generating data for: ', currentDay
+            GenerateData.writeTweetsForDay(currentDay)
+            currentDay+=timedelta(days=1)
+        
 if __name__ == '__main__':
-    GenerateData.writeTweetsForDay(datetime(2010,12,1))
+    GenerateData.generateHoustonData()
