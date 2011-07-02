@@ -20,6 +20,9 @@ Created on Jun 12, 2011
 import numpy as np
 print np.histogram([1, 2, 1,1,2,2,1,1], bins=2)
 
+import random
+print '#'+''.join(random.choice('0123456789abcdef') for i in range(6))
+
 #
 #print multiprocessing.cpu_count()
 #

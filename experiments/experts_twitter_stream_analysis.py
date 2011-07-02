@@ -4,7 +4,7 @@ Created on Jun 30, 2011
 @author: kykamath
 '''
 import sys
-from library.classes import PlottingMethods
+from library.classes import PlottingMethods, GeneralMethods
 from library.clustering import EvaluationMetrics
 sys.path.append('../')
 from settings import experts_twitter_stream_settings
@@ -51,6 +51,10 @@ class GenerateData:
 class AnalyzeData:
     crowdMap = {}
     @staticmethod
+    def getCrowdsPurity():
+        expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
+        print np.mean(map(lambda crowd: crowd.getCrowdQuality(EvaluationMetrics.purity, expertsToClassMap), AnalyzeData.crowdMap.itervalues()))
+    @staticmethod
     def loadCrowds():
         clusterToCrowdMap = {}
         for currentTime, cluster in iterateExpertClusters():
@@ -75,14 +79,33 @@ class AnalyzeData:
         plt.title(PlottingMethods.getLatexForString('Crowd lifespan distribution'))
         plt.show()
     @staticmethod
-    def getCrowdsPurity():
-        expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
-        print np.mean(map(lambda crowd: crowd.getCrowdQuality(EvaluationMetrics.purity, expertsToClassMap), AnalyzeData.crowdMap.itervalues()))
+    def plotSampleCrowds():
+#        filteredCrowds = [crowd for crowd in AnalyzeData.crowdMap.itervalues() if crowd.lifespan>1and crowd.lifespan<50 and crowd.hashtagDimensions][:10]
+        filteredCrowds = [crowd for crowd in AnalyzeData.crowdMap.itervalues()
+                            if crowd.lifespan>10 and crowd.lifespan<50 and
+                              crowd.startTime>datetime(2011,3,19) and crowd.endTime<datetime(2011,3,22) and
+                                crowd.hashtagDimensions][:10]
+        for crowd in filteredCrowds:
+            x, y = zip(*[(clusterGenerationTime, len(crowd.clusters[clusterGenerationTime].documentsInCluster)) for clusterGenerationTime in sorted(crowd.clusters)])
+            if max(y)<30 and min(y)<5:
+                print crowd.crowdId, crowd.ends, crowd.mergesInto, crowd.startTime, crowd.crowdId, crowd.lifespan, GeneralMethods.getRandomColor(), x, y, list(crowd.hashtagDimensions)[:3]
+                plt.plot(x, y, color=GeneralMethods.getRandomColor(), lw=2, label=' '.join(list(crowd.hashtagDimensions)[:1]))
+        plt.legend()
+        plt.show()
         
 if __name__ == '__main__':
 #    GenerateData.expertClusters()
-    
+
+
     AnalyzeData.loadCrowds()
+#    AnalyzeData.getCrowdsPurity()
 #    AnalyzeData.plotLifeSpanDistribution()
-    AnalyzeData.getCrowdsPurity()
-        
+#    AnalyzeData.plotSampleCrowds()
+
+#    for crowdId in ['cluster_8532', 'cluster_7287']:
+#        crowd = AnalyzeData.crowdMap[crowdId]
+#        print crowd.crowdId, crowd.ends, crowd.mergesInto
+
+    for crowd in AnalyzeData.crowdMap:
+        print crowd
+

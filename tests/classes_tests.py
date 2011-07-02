@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from settings import twitter_stream_settings as stream_settings
 from library.classes import TwoWayMap, GeneralMethods
 from streaming_lsh.classes import Cluster
+from library.twitter import getStringRepresentationForTweetTimestamp
 
 test_time = datetime.now()
 
@@ -195,6 +196,8 @@ class CrowdTests(unittest.TestCase):
         self.assertEqual([GeneralMethods.getEpochFromDateTimeObject(test_time), GeneralMethods.getEpochFromDateTimeObject(test_time+timedelta(days=1))], sorted(self.crowd.clusters.keys()))
         self.assertEqual(Cluster, type(self.crowd.clusters[GeneralMethods.getEpochFromDateTimeObject(test_time)]))
         self.assertEqual(2, self.crowd.lifespan)
+        self.assertEqual(getStringRepresentationForTweetTimestamp(test_time), getStringRepresentationForTweetTimestamp(self.crowd.startTime))
+        self.assertEqual(getStringRepresentationForTweetTimestamp(test_time+timedelta(days=1)), getStringRepresentationForTweetTimestamp(self.crowd.endTime))
         
 class VectorUpdateMethodTests(unittest.TestCase):
     def setUp(self): 

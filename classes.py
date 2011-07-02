@@ -9,6 +9,7 @@ from library.math_modified import exponentialDecay, DateTimeAirthematic
 from library.classes import TwoWayMap, GeneralMethods
 from library.vector import Vector
 from library.clustering import EvaluationMetrics
+from datetime import datetime
 
 class UtilityMethods:
     @staticmethod
@@ -124,14 +125,18 @@ class Crowd:
     @property
     def topDimensions(self, numberOfDimensions=10):return Vector.getMeanVector(self.clusters.itervalues()).getTopDimensions(numberOfFeatures=numberOfDimensions)
     @property
-    def hashtagDimensions(self): 
-        def getHashtags(cluster): return set([w for d in cluster for w in d.split() if w.startswith('#')])
-        return reduce(lambda x,y: x.union(getHashtags(y)), self.clusters.itervalues(), set())
+    def hashtagDimensions(self): return reduce(lambda x,y: x.union(Crowd.getHashtags(y)), self.clusters.itervalues(), set())
+    @property
+    def startTime(self): return datetime.fromtimestamp(sorted(self.clusters)[0])
+    @property
+    def endTime(self): return datetime.fromtimestamp(sorted(self.clusters)[-1])
     def append(self, cluster, clusterFormationTime): self.clusters[GeneralMethods.getEpochFromDateTimeObject(clusterFormationTime)]=cluster
     def updatedMergesInto(self, crowdId): self.ends, self.mergesInto = True, crowdId
     def getCrowdQuality(self, evaluationMetric, expertsToClassMap):
         def getExpertClasses(cluster): return [expertsToClassMap[user.lower()] for user in cluster.documentsInCluster if user.lower() in expertsToClassMap]
         return EvaluationMetrics.getValueForClusters([getExpertClasses(cluster) for cluster in self.clusters.itervalues()], evaluationMetric)
+    @staticmethod
+    def getHashtags(cluster): return set([w for d in cluster for w in d.split() if w.startswith('#')])
 
 class Message(object):
     def __init__(self, streamId, messageId, text, timeStamp): self.streamId, self.messageId, self.text, self.timeStamp, self.vector = streamId, messageId, text, timeStamp, None
