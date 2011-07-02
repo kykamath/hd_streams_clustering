@@ -71,6 +71,7 @@ class AnalyzeData:
             else: mergedClustersList = cluster.mergedClustersList[1:][:]
             for clusterId in mergedClustersList: 
                 if clusterId in AnalyzeData.clusterIdToCrowdIdMap:  AnalyzeData.crowdMap[AnalyzeData.clusterIdToCrowdIdMap[clusterId]].updateOutGoingCrowd(crowdId), AnalyzeData.crowdMap[crowdId].updateInComingCrowd(AnalyzeData.clusterIdToCrowdIdMap[clusterId])
+        AnalyzeData.constructCrowdIdToClusterIdMap()
     @staticmethod
     def constructCrowdIdToClusterIdMap():
         for k, v in AnalyzeData.clusterIdToCrowdIdMap.iteritems(): 
@@ -82,21 +83,25 @@ class AnalyzeData:
         print np.mean(map(lambda crowd: crowd.getCrowdQuality(EvaluationMetrics.purity, expertsToClassMap), AnalyzeData.crowdMap.itervalues()))
     @staticmethod
     def getCrowdHierarchy(clusterId): 
-        AnalyzeData.constructCrowdIdToClusterIdMap()
+#        AnalyzeData.constructCrowdIdToClusterIdMap()
+        hierarchy, crowdIdQueue = {}, Queue()
         def getMainBranch(clusterId): 
             def getClusterInt(id): return int(id.split('_')[1])
             sortedMainBranchList = sorted([AnalyzeData.clusterIdToCrowdIdMap[clusterId]]+AnalyzeData.crowdIdToClusterIdMap[AnalyzeData.clusterIdToCrowdIdMap[clusterId]], key=getClusterInt)
             return (sortedMainBranchList[0], dict([(sortedMainBranchList[i], sortedMainBranchList[i+1]) for i in range(len(sortedMainBranchList)-1)]))
-        hierarchy, crowdIdQueue = {}, Queue()
+        def addClustersNotInHierachyToQueue(crowdId):
+                clusters = AnalyzeData.crowdMap[crowdId].clusters
+                for id, mergedClustersList in [(cluster.clusterId, cluster.mergedClustersList) for cluster in clusters.itervalues()]:
+                    for clusterIdNotInHierarchy in filter(lambda x: x not in hierarchy, mergedClustersList): crowdIdQueue.put((id, clusterIdNotInHierarchy))
         crowdIdQueue.put((None, clusterId))
         while not crowdIdQueue.empty():
             childId, clusterId = crowdIdQueue.get()
-            crowdId, mainBranch = getMainBranch(clusterId)
-            if childId: mainBranch[clusterId]=childId
-            hierarchy.update(mainBranch)
-            clusters = AnalyzeData.crowdMap[crowdId].clusters
-            for id, mergedClustersList in [(cluster.clusterId, cluster.mergedClustersList) for cluster in clusters.itervalues()]:
-                for clusterIdNotInHierarchy in filter(lambda x: x not in hierarchy, mergedClustersList): crowdIdQueue.put((id, clusterIdNotInHierarchy))
+            if clusterId in AnalyzeData.clusterIdToCrowdIdMap:
+                crowdId, mainBranch = getMainBranch(clusterId)
+                if childId: mainBranch[clusterId]=childId
+                hierarchy.update(mainBranch)
+                addClustersNotInHierachyToQueue(crowdId)
+                if AnalyzeData.crowdMap[crowdId].outGoingCrowd!=None: addClustersNotInHierachyToQueue(AnalyzeData.crowdMap[crowdId].outGoingCrowd)
         return hierarchy
         
 class Plot:
@@ -123,21 +128,31 @@ class Plot:
         plt.show()
     @staticmethod
     def crowdHierachy():
-        hierarchy = {'cluster_6': 'cluster_8', 'cluster_5': 'cluster_8', 'cluster_2': 'cluster_5', 'cluster_3': 'cluster_6', 'cluster_8': 'cluster_10'}
-        graph = nx.DiGraph()
-        for u,v in hierarchy.iteritems(): graph.add_edge(u, v)
-        pos=nx.graphviz_layout(graph, prog='dot',args='')
-        nx.draw(graph, pos, alpha=0.3, node_size=1, with_labels=True, font_size=8, arrows=True, node_color='r')
-        plt.show()
+        observedClusters = set()
+        for clusterId in AnalyzeData.clusterIdToCrowdIdMap:
+#        for clusterId in ['cluster_9235','cluster_38873','cluster_63568','cluster_76865']:
+            if clusterId not in observedClusters:
+                hierarchy = AnalyzeData.getCrowdHierarchy(clusterId)
+                observedClusters=observedClusters.union(set(hierarchy.iterkeys()))
+                graph, labels = nx.DiGraph(), {}
+                for u,v in hierarchy.iteritems(): 
+                    if u in AnalyzeData.crowdMap: labels[u]=' '.join(list(AnalyzeData.crowdMap[u].hashtagDimensions))
+                    else: labels[u]=''
+                    labels[v]=''
+                    graph.add_edge(u, v)
+                pos=nx.graphviz_layout(graph, prog='dot',args='')
+                nx.draw(graph, pos, alpha=0.3, node_size=1, with_labels=True, labels=labels, font_size=8, arrows=True, node_color='r')
+                plt.show()
         
 if __name__ == '__main__':
 #    GenerateData.expertClusters()
 
-#    AnalyzeData.constructCrowdDataStructures(iterateExpertClusters)
-#    AnalyzeData.getCrowdsPurity()
+    AnalyzeData.constructCrowdDataStructures(iterateExpertClusters)
+    AnalyzeData.getCrowdsPurity()
 
-#    Plot.lifeSpanDistribution()
+    Plot.lifeSpanDistribution()
 #    Plot.sampleCrowds()
-    Plot.crowdHierachy()
+#    Plot.crowdHierachy()
+    
     pass
 
