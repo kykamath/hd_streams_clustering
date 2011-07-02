@@ -7,6 +7,8 @@ import random
 from streaming_lsh.classes import Document, Cluster
 from library.math_modified import exponentialDecay, DateTimeAirthematic
 from library.classes import TwoWayMap, GeneralMethods
+from library.vector import Vector
+from library.clustering import EvaluationMetrics
 
 class UtilityMethods:
     @staticmethod
@@ -119,9 +121,18 @@ class Crowd:
         self.ends, self.mergesInto = False, None
     @property
     def lifespan(self): return len(self.clusters)
+    @property
+    def topDimensions(self, numberOfDimensions=10):return Vector.getMeanVector(self.clusters.itervalues()).getTopDimensions(numberOfFeatures=numberOfDimensions)
+    @property
+    def hashtagDimensions(self): 
+        def getHashtags(cluster): return set([w for d in cluster for w in d.split() if w.startswith('#')])
+        return reduce(lambda x,y: x.union(getHashtags(y)), self.clusters.itervalues(), set())
     def append(self, cluster, clusterFormationTime): self.clusters[GeneralMethods.getEpochFromDateTimeObject(clusterFormationTime)]=cluster
     def updatedMergesInto(self, crowdId): self.ends, self.mergesInto = True, crowdId
-    
+    def getCrowdQuality(self, evaluationMetric, expertsToClassMap):
+        def getExpertClasses(cluster): return [expertsToClassMap[user.lower()] for user in cluster.documentsInCluster if user.lower() in expertsToClassMap]
+        return EvaluationMetrics.getValueForClusters([getExpertClasses(cluster) for cluster in self.clusters.itervalues()], evaluationMetric)
+
 class Message(object):
     def __init__(self, streamId, messageId, text, timeStamp): self.streamId, self.messageId, self.text, self.timeStamp, self.vector = streamId, messageId, text, timeStamp, None
     def __str__(self): return str(self.messageId)

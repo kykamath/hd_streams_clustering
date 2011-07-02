@@ -16,11 +16,13 @@ from nltk.metrics.distance import jaccard_distance
 from streaming_lsh.classes import Cluster
 from operator import itemgetter
 
-def getExperts():
+def getExperts(byScreenName=False):
     usersList, usersData = {}, defaultdict(list)
     for l in open(experts_twitter_stream_settings.users_to_crawl_file): data = l.strip().split(); usersData[data[0]].append(data[1:])
     for k, v in usersData.iteritems(): 
-        for user in v: usersList[user[1]] = {'screen_name': user[0], 'class':k}
+        for user in v: 
+            if byScreenName: usersList[user[0]] = {'id': user[1], 'class':k}
+            else: usersList[user[1]] = {'screen_name': user[0], 'class':k} 
     return usersList
 
 class TwitterIterators:
@@ -76,7 +78,6 @@ class TwitterCrowdsSpecificMethods:
     @staticmethod
     def getClusterFromMapFormat(clusterMap):
         cluster = Cluster({})
-        print clusterMap
         cluster.clusterId = clusterMap['clusterId']
         cluster.mergedClustersList = clusterMap['mergedClustersList']
         cluster.documentsInCluster = clusterMap['streams']
