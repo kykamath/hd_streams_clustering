@@ -119,7 +119,7 @@ class Crowd:
     def __init__(self, cluster, clusterFormationTime):
         self.crowdId = cluster.clusterId
         self.clusters = {GeneralMethods.getEpochFromDateTimeObject(clusterFormationTime): cluster}
-        self.ends, self.mergesInto = False, None
+        self.ends, self.inComingCrowds, self.outGoingCrowd = False, [], None
     @property
     def lifespan(self): return len(self.clusters)
     @property
@@ -131,7 +131,8 @@ class Crowd:
     @property
     def endTime(self): return datetime.fromtimestamp(sorted(self.clusters)[-1])
     def append(self, cluster, clusterFormationTime): self.clusters[GeneralMethods.getEpochFromDateTimeObject(clusterFormationTime)]=cluster
-    def updatedMergesInto(self, crowdId): self.ends, self.mergesInto = True, crowdId
+    def updateOutGoingCrowd(self, crowdId): self.ends, self.outGoingCrowd = True, crowdId
+    def updateInComingCrowd(self, crowdId): self.inComingCrowds.append(crowdId)
     def getCrowdQuality(self, evaluationMetric, expertsToClassMap):
         def getExpertClasses(cluster): return [expertsToClassMap[user.lower()] for user in cluster.documentsInCluster if user.lower() in expertsToClassMap]
         return EvaluationMetrics.getValueForClusters([getExpertClasses(cluster) for cluster in self.clusters.itervalues()], evaluationMetric)

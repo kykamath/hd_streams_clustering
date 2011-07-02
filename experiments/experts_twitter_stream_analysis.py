@@ -3,10 +3,9 @@ Created on Jun 30, 2011
 
 @author: kykamath
 '''
-import sys
-from library.classes import PlottingMethods, GeneralMethods
-from library.clustering import EvaluationMetrics
+import sys, os
 sys.path.append('../')
+os.environ["PATH"] = os.environ["PATH"]+os.pathsep+'/opt/local/bin'
 from settings import experts_twitter_stream_settings
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods,\
     TwitterIterators, getExperts
@@ -15,10 +14,14 @@ from datetime import datetime, timedelta
 from streaming_lsh.classes import Cluster
 from library.file_io import FileIO
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
+from library.classes import PlottingMethods, GeneralMethods
+from library.clustering import EvaluationMetrics
 from operator import itemgetter
 from classes import Crowd
 import numpy as np
+import networkx as nx
 from matplotlib import pyplot as plt
+from Queue import Queue
 
 startingDay=datetime(2011,3,19)
 endingDay=datetime(2011,3,22)
@@ -49,29 +52,56 @@ class GenerateData:
         hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts())
 
 class AnalyzeData:
-    crowdMap = {}
+    crowdMap, clusterIdToCrowdIdMap, crowdIdToClusterIdMap = {}, {}, {}
+    @staticmethod
+    def constructCrowdDataStructures(dataIterator):
+        for currentTime, cluster in dataIterator():
+            crowdId, newCrowdAdded = None, False
+            for clusterId in cluster.mergedClustersList: 
+                if clusterId in AnalyzeData.clusterIdToCrowdIdMap: crowdId=AnalyzeData.clusterIdToCrowdIdMap[clusterId]; break
+            if crowdId==None:
+                crowdId=cluster.mergedClustersList[0]
+                AnalyzeData.crowdMap[crowdId]=Crowd(cluster, currentTime)
+#                cluster.mergedClustersList=cluster.mergedClustersList[1:]
+                newCrowdAdded = True
+            else: AnalyzeData.crowdMap[crowdId].append(cluster, currentTime)
+            if crowdId==None: raise Exception('Crowd id cannot be None.')
+            AnalyzeData.clusterIdToCrowdIdMap[cluster.clusterId]=crowdId
+            if not newCrowdAdded: mergedClustersList = cluster.mergedClustersList[:]
+            else: mergedClustersList = cluster.mergedClustersList[1:][:]
+            for clusterId in mergedClustersList: 
+                if clusterId in AnalyzeData.clusterIdToCrowdIdMap:  AnalyzeData.crowdMap[AnalyzeData.clusterIdToCrowdIdMap[clusterId]].updateOutGoingCrowd(crowdId), AnalyzeData.crowdMap[crowdId].updateInComingCrowd(AnalyzeData.clusterIdToCrowdIdMap[clusterId])
+    @staticmethod
+    def constructCrowdIdToClusterIdMap():
+        for k, v in AnalyzeData.clusterIdToCrowdIdMap.iteritems(): 
+            if v not in AnalyzeData.crowdIdToClusterIdMap: AnalyzeData.crowdIdToClusterIdMap[v]=[]
+            AnalyzeData.crowdIdToClusterIdMap[v].append(k)
     @staticmethod
     def getCrowdsPurity():
         expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
         print np.mean(map(lambda crowd: crowd.getCrowdQuality(EvaluationMetrics.purity, expertsToClassMap), AnalyzeData.crowdMap.itervalues()))
     @staticmethod
-    def loadCrowds():
-        clusterToCrowdMap = {}
-        for currentTime, cluster in iterateExpertClusters():
-            crowdId=None
-            for clusterId in cluster.mergedClustersList: 
-                if clusterId in clusterToCrowdMap: crowdId=clusterToCrowdMap[clusterId]; break
-            if crowdId==None:
-                crowdId=cluster.mergedClustersList[0]
-                AnalyzeData.crowdMap[crowdId]=Crowd(cluster, currentTime)
-                cluster.mergedClustersList=cluster.mergedClustersList[1:]
-            else: AnalyzeData.crowdMap[crowdId].append(cluster, currentTime)
-            if crowdId==None: raise Exception('Crowd id cannot be None.')
-            clusterToCrowdMap[cluster.clusterId]=crowdId
-            for clusterId in cluster.mergedClustersList: 
-                if clusterId in clusterToCrowdMap:  AnalyzeData.crowdMap[clusterToCrowdMap[clusterId]].updatedMergesInto(crowdId)
+    def getCrowdHierarchy(clusterId): 
+        AnalyzeData.constructCrowdIdToClusterIdMap()
+        def getMainBranch(clusterId): 
+            def getClusterInt(id): return int(id.split('_')[1])
+            sortedMainBranchList = sorted([AnalyzeData.clusterIdToCrowdIdMap[clusterId]]+AnalyzeData.crowdIdToClusterIdMap[AnalyzeData.clusterIdToCrowdIdMap[clusterId]], key=getClusterInt)
+            return (sortedMainBranchList[0], dict([(sortedMainBranchList[i], sortedMainBranchList[i+1]) for i in range(len(sortedMainBranchList)-1)]))
+        hierarchy, crowdIdQueue = {}, Queue()
+        crowdIdQueue.put((None, clusterId))
+        while not crowdIdQueue.empty():
+            childId, clusterId = crowdIdQueue.get()
+            crowdId, mainBranch = getMainBranch(clusterId)
+            if childId: mainBranch[clusterId]=childId
+            hierarchy.update(mainBranch)
+            clusters = AnalyzeData.crowdMap[crowdId].clusters
+            for id, mergedClustersList in [(cluster.clusterId, cluster.mergedClustersList) for cluster in clusters.itervalues()]:
+                for clusterIdNotInHierarchy in filter(lambda x: x not in hierarchy, mergedClustersList): crowdIdQueue.put((id, clusterIdNotInHierarchy))
+        return hierarchy
+        
+class Plot:
     @staticmethod
-    def plotLifeSpanDistribution():
+    def lifeSpanDistribution():
         y,x= np.histogram([AnalyzeData.crowdMap[crowd].lifespan for crowd in AnalyzeData.crowdMap], bins=15)
         plt.semilogy(x[:-1], y, color='#F7AA45', lw=2)
         plt.xlabel(PlottingMethods.getLatexForString('Lifespan'))
@@ -79,33 +109,35 @@ class AnalyzeData:
         plt.title(PlottingMethods.getLatexForString('Crowd lifespan distribution'))
         plt.show()
     @staticmethod
-    def plotSampleCrowds():
-#        filteredCrowds = [crowd for crowd in AnalyzeData.crowdMap.itervalues() if crowd.lifespan>1and crowd.lifespan<50 and crowd.hashtagDimensions][:10]
+    def sampleCrowds():
         filteredCrowds = [crowd for crowd in AnalyzeData.crowdMap.itervalues()
                             if crowd.lifespan>10 and crowd.lifespan<50 and
                               crowd.startTime>datetime(2011,3,19) and crowd.endTime<datetime(2011,3,22) and
-                                crowd.hashtagDimensions][:10]
+                                crowd.hashtagDimensions][5:10]
         for crowd in filteredCrowds:
             x, y = zip(*[(clusterGenerationTime, len(crowd.clusters[clusterGenerationTime].documentsInCluster)) for clusterGenerationTime in sorted(crowd.clusters)])
             if max(y)<30 and min(y)<5:
-                print crowd.crowdId, crowd.ends, crowd.mergesInto, crowd.startTime, crowd.crowdId, crowd.lifespan, GeneralMethods.getRandomColor(), x, y, list(crowd.hashtagDimensions)[:3]
-                plt.plot(x, y, color=GeneralMethods.getRandomColor(), lw=2, label=' '.join(list(crowd.hashtagDimensions)[:1]))
+                print crowd.crowdId, crowd.ends, crowd.outGoingCrowd, crowd.startTime, crowd.crowdId, crowd.lifespan, GeneralMethods.getRandomColor(), x, y, list(crowd.hashtagDimensions)[:3]
+                plt.plot(x, y, color=GeneralMethods.getRandomColor(), lw=2, label=' '.join([crowd.crowdId]+list(crowd.hashtagDimensions)[:1]))
         plt.legend()
+        plt.show()
+    @staticmethod
+    def crowdHierachy():
+        hierarchy = {'cluster_6': 'cluster_8', 'cluster_5': 'cluster_8', 'cluster_2': 'cluster_5', 'cluster_3': 'cluster_6', 'cluster_8': 'cluster_10'}
+        graph = nx.DiGraph()
+        for u,v in hierarchy.iteritems(): graph.add_edge(u, v)
+        pos=nx.graphviz_layout(graph, prog='dot',args='')
+        nx.draw(graph, pos, alpha=0.3, node_size=1, with_labels=True, font_size=8, arrows=True, node_color='r')
         plt.show()
         
 if __name__ == '__main__':
 #    GenerateData.expertClusters()
 
-
-    AnalyzeData.loadCrowds()
+#    AnalyzeData.constructCrowdDataStructures(iterateExpertClusters)
 #    AnalyzeData.getCrowdsPurity()
-#    AnalyzeData.plotLifeSpanDistribution()
-#    AnalyzeData.plotSampleCrowds()
 
-#    for crowdId in ['cluster_8532', 'cluster_7287']:
-#        crowd = AnalyzeData.crowdMap[crowdId]
-#        print crowd.crowdId, crowd.ends, crowd.mergesInto
-
-    for crowd in AnalyzeData.crowdMap:
-        print crowd
+#    Plot.lifeSpanDistribution()
+#    Plot.sampleCrowds()
+    Plot.crowdHierachy()
+    pass
 
