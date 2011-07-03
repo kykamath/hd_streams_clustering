@@ -93,15 +93,15 @@ class TwitterCrowdsSpecificMethods:
 def clusterTwitterStreams():
     experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
     experts_twitter_stream_settings['combine_clusters_method'] = TwitterCrowdsSpecificMethods.combineClusters
-    experts_twitter_stream_settings['analyze_iteration_data_method'] = TwitterCrowdsSpecificMethods.analyzeIterationData
+#    experts_twitter_stream_settings['analyze_iteration_data_method'] = TwitterCrowdsSpecificMethods.analyzeIterationData
     hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
     hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts())
-    
+
+#    trends_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+#    trends_twitter_stream_settings['combine_clusters_method'] = TwitterCrowdsSpecificMethods.combineClusters
+#    trends_twitter_stream_settings['analyze_iteration_data_method'] = TwitterCrowdsSpecificMethods.analyzeIterationData
 #    hdsClustering = HDStreaminClustering(**trends_twitter_stream_settings)
-#    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'), 
-#                            TwitterCrowdsSpecificMethods.convertTweetJSONToMessage, 
-#                            TwitterCrowdsSpecificMethods.combineClusters, 
-#                            TwitterCrowdsSpecificMethods.printClusterInfo)
+#    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'))
             
 if __name__ == '__main__':
     clusterTwitterStreams()
