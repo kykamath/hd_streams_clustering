@@ -69,7 +69,9 @@ class HDStreaminClustering(StreamingLSHClustering):
         Do not remove this comment. Might need this if StreamCluster is used again in future.
         for cluster in self.clusters.itervalues(): cluster.updateScore(occuranceTime, 0, **self.stream_settings)
         '''
-        for cluster in self.clusters.itervalues(): cluster.updateScore(occuranceTime, 0, **self.stream_settings)
+        for cluster in self.clusters.itervalues(): 
+            print type(cluster)
+            cluster.updateScore(occuranceTime, 0, **self.stream_settings)
         for cluster in StreamCluster.getClustersByAttributeAndThreshold(self.clusters.values(), 
                                                                   self.stream_settings['cluster_filter_attribute'], 
                                                                   self.stream_settings['cluster_filter_threshold'], StreamCluster.BELOW_THRESHOLD): del self.clusters[cluster.clusterId]
