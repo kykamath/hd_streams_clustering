@@ -47,3 +47,4 @@ class GenerateData:
         
 if __name__ == '__main__':
     GenerateData.generateHoustonData()
+    
