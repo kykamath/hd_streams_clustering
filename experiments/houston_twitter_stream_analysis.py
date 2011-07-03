@@ -38,7 +38,7 @@ class GenerateData:
         os.system('gzip %s'%fileName)
     @staticmethod
     def generateHoustonData():
-        currentDay = datetime(2010,11,1)
+        currentDay = datetime(2010,1,23)
         endingDay = datetime(2011,5,31)
         while currentDay<=endingDay:
             print 'Generating data for: ', currentDay
