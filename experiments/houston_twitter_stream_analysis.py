@@ -34,8 +34,10 @@ class GenerateData:
             screenName = GenerateData.getScreenName(tweet['uid'])
             if screenName!=None: 
                 data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':getStringRepresentationForTweetTimestamp(tweet['ca']), 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
-                FileIO.writeToFileAsJson(data, fileName) 
-        os.system('gzip %s'%fileName)
+                print data
+                #FileIO.writeToFileAsJson(data, fileName) 
+        
+        #os.system('gzip %s'%fileName)
     @staticmethod
     def generateHoustonData():
         currentDay = datetime(2010,1,23)
