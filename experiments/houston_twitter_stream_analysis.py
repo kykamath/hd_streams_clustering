@@ -32,8 +32,8 @@ class GenerateData:
         fileName = houston_data_folder+FileIO.getFileByDay(currentDay)
         for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, fields=['ca', 'tx', 'uid']):
             screenName = GenerateData.getScreenName(tweet['uid'])
+            print tweet['uid'], screenName
             if screenName!=None: 
-                print 'comes here'
                 data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':getStringRepresentationForTweetTimestamp(tweet['ca']), 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
                 print data
                 #FileIO.writeToFileAsJson(data, fileName) 
