@@ -42,10 +42,11 @@ class TwitterCrowdsSpecificMethodsTests(unittest.TestCase):
     def test_getClusterInMapFormat(self):
         mergedCluster = Cluster.getClusterObjectToMergeFrom(self.cluster1)
         mergedCluster.mergedClustersList = [self.cluster1.clusterId]
-        mapReresentation = {'clusterId': mergedCluster.clusterId, 'mergedClustersList': [self.cluster1.clusterId], 'streams': [self.doc1.docId], 'dimensions': {'#tcot':2, 'dsf':2}}
+        mergedCluster.lastStreamAddedTime = test_time
+        mapReresentation = {'clusterId': mergedCluster.clusterId, 'lastStreamAddedTime':mergedCluster.lastStreamAddedTime, 'mergedClustersList': [self.cluster1.clusterId], 'streams': [self.doc1.docId], 'dimensions': {'#tcot':2, 'dsf':2}}
         self.assertEqual(mapReresentation, TwitterCrowdsSpecificMethods.getClusterInMapFormat(mergedCluster))
     def test_getClusterFromMapFormat(self):
-        mapReresentation = {'clusterId': 1, 'mergedClustersList': [self.cluster1.clusterId], 'streams': [self.doc1.docId], 'dimensions': {'#tcot':2, 'dsf':2}}
+        mapReresentation = {'clusterId': 1, 'mergedClustersList': [self.cluster1.clusterId], 'lastStreamAddedTime': test_time, 'streams': [self.doc1.docId], 'dimensions': {'#tcot':2, 'dsf':2}}
         cluster = TwitterCrowdsSpecificMethods.getClusterFromMapFormat(mapReresentation)
         self.assertEqual(1, cluster.clusterId)
         self.assertEqual([self.cluster1.clusterId], cluster.mergedClustersList)

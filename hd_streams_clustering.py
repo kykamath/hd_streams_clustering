@@ -3,10 +3,9 @@ Created on Jun 25, 2011
 
 @author: kykamath
 '''
-from classes import UtilityMethods, Stream, VectorUpdateMethods
+from classes import UtilityMethods, Stream, VectorUpdateMethods, StreamCluster
 from library.classes import GeneralMethods
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
-from streaming_lsh.classes import Cluster
 
 class DataStreamMethods:
     messageInOrderVariable = None
@@ -54,7 +53,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         '''
         if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream)
         else:
-            newCluster = Cluster(stream)
+            newCluster = StreamCluster(stream)
             newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
             for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
             self.clusters[newCluster.clusterId] = newCluster
@@ -70,9 +69,9 @@ class HDStreaminClustering(StreamingLSHClustering):
         Do not remove this comment. Might need this if StreamCluster is used again in future.
         for cluster in self.clusters.itervalues(): cluster.updateScore(occuranceTime, 0, **self.stream_settings)
         '''
-        for cluster in Cluster.getClustersByAttributeAndThreshold(self.clusters.values(), 
+        for cluster in StreamCluster.getClustersByAttributeAndThreshold(self.clusters.values(), 
                                                                   self.stream_settings['cluster_filter_attribute'], 
-                                                                  self.stream_settings['cluster_filter_threshold'], Cluster.BELOW_THRESHOLD): del self.clusters[cluster.clusterId]
+                                                                  self.stream_settings['cluster_filter_threshold'], StreamCluster.BELOW_THRESHOLD): del self.clusters[cluster.clusterId]
         if self.combineClustersMethod!=None: self.clusters=self.combineClustersMethod(self.clusters, **self.stream_settings)
         for cluster in self.clusters.itervalues(): 
             cluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)

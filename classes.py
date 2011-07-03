@@ -98,13 +98,10 @@ class Stream(Document):
         self.lastMessageTime = message.timeStamp
 
 class StreamCluster(Cluster):
-    '''
-    This class is currently not in use. Might be used in the future.
-    '''
     def __init__(self, stream, score=1):
         super(StreamCluster, self).__init__(stream)
         self.lastStreamAddedTime, self.score = stream.lastMessageTime, score
-    def addStream(self, stream, **stream_settings):
+    def addDocument(self, stream, **stream_settings):
         super(StreamCluster, self).addDocument(stream)
         self.updateScore(stream.lastMessageTime, scoreToUpdate=1, **stream_settings)
     def updateScore(self, currentOccuranceTime, scoreToUpdate, **stream_settings):

@@ -3,9 +3,9 @@ Created on Jun 22, 2011
 
 @author: kykamath
 '''
-from settings import experts_twitter_stream_settings, trends_twitter_stream_settings
+from settings import experts_twitter_stream_settings
 from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
-from classes import Message
+from classes import Message, StreamCluster
 from collections import defaultdict
 from datetime import datetime, timedelta
 from streaming_lsh.library.file_io import FileIO
@@ -13,8 +13,8 @@ from hd_streams_clustering import HDStreaminClustering
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 from nltk.metrics.distance import jaccard_distance
-from streaming_lsh.classes import Cluster
 from operator import itemgetter
+from streaming_lsh.classes import Cluster
 
 def getExperts(byScreenName=False):
     usersList, usersData = {}, defaultdict(list)
@@ -66,19 +66,20 @@ class TwitterCrowdsSpecificMethods:
                     mergedClusterId = mergedCluster.clusterId
                     break
             if mergedClusterId==None:
-                mergedCluster = Cluster.getClusterObjectToMergeFrom(cluster)
+                mergedCluster = StreamCluster.getClusterObjectToMergeFrom(cluster)
                 mergedCluster.mergedClustersList = [cluster.clusterId]
                 mergedClustersMap[mergedCluster.clusterId]=mergedCluster
         return mergedClustersMap
     @staticmethod
     def getClusterInMapFormat(cluster, numberOfMaxDimensionsToRepresent=20): 
-        return {'clusterId': cluster.clusterId, 'mergedClustersList': cluster.mergedClustersList, 
+        return {'clusterId': cluster.clusterId, 'mergedClustersList': cluster.mergedClustersList, 'lastStreamAddedTime': cluster.lastStreamAddedTime,
                'streams': [stream.docId for stream in cluster.iterateDocumentsInCluster()],
                'dimensions': cluster.getTopDimensions(numberOfFeatures=numberOfMaxDimensionsToRepresent)}
     @staticmethod
     def getClusterFromMapFormat(clusterMap):
         cluster = Cluster({})
         cluster.clusterId = clusterMap['clusterId']
+        cluster.lastStreamAddedTime = clusterMap['lastStreamAddedTime']
         cluster.mergedClustersList = clusterMap['mergedClustersList']
         cluster.documentsInCluster = clusterMap['streams']
         for k,v in clusterMap['dimensions'].iteritems(): cluster[k]=v
@@ -86,7 +87,7 @@ class TwitterCrowdsSpecificMethods:
     @staticmethod
     def analyzeIterationData(hdStreamClusteringObject, currentMessageTime):
         print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
-        for cluster, _ in sorted(Cluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:1]:
+        for cluster, _ in sorted(StreamCluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:1]:
             print cluster.clusterId, cluster.length, [stream.docId for stream in cluster.iterateDocumentsInCluster()][:5], cluster.getTopDimensions(numberOfFeatures=5)
         print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         

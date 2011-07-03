@@ -4,10 +4,9 @@ Created on Jun 22, 2011
 @author: kykamath
 '''
 import unittest
-from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 from classes import Stream, Message, VectorUpdateMethods, UtilityMethods, Phrase,\
-    Crowd
+    Crowd, StreamCluster
 from datetime import datetime, timedelta
 from settings import twitter_stream_settings as stream_settings
 from library.classes import TwoWayMap, GeneralMethods
@@ -144,45 +143,45 @@ class StreamTests(unittest.TestCase):
         self.assertNotEqual(test_time-timedelta(seconds=60), self.stream.lastMessageTime)
         self.assertEqual(test_time, self.stream.lastMessageTime)
         
-#class StreamClusterTests(unittest.TestCase):
-#    def setUp(self): 
-#        self.m1 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time-timedelta(seconds=60))
-#        self.m1.vector=Vector({1:2,2:4})
-#        self.stream1 = Stream(1, self.m1)
-#        self.m2 = Message(2, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
-#        self.m2.vector=Vector({2:4})
-#        self.stream2 = Stream(2, self.m2)
-#        self.cluster1 = StreamCluster(self.stream1)
-#        self.cluster2 = StreamCluster(self.stream2)
-#    def test_initialization(self):
-#        self.assertEqual(test_time-timedelta(seconds=60), self.cluster1.lastStreamAddedTime)
-#        self.assertEqual(test_time, self.cluster2.lastStreamAddedTime)
-#        self.assertTrue(1==self.cluster1.score and 1==self.cluster2.score)
-#    def test_addStream(self):
-#        message1 = Message(3, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
-#        message1.vector=Vector({3:4})
-#        stream1 = Stream(3, message1)
-#        message2 = Message(4, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
-#        message2.vector=Vector({2:4})
-#        stream2 = Stream(4, message2)
-#        self.assertEqual(1, self.cluster1.score)
-#        self.cluster1.addStream(stream1, **stream_settings)
-#        self.assertEqual(1.5, self.cluster1.score)
-#        # Test if cluster id is set.
-#        self.assertEqual(self.cluster1.clusterId, stream1.clusterId)
-#        # Test that cluster mean is updated.
-#        self.assertEqual({1:2/2.,2:2.,3:2.}, self.cluster1)
-#        # Test that cluster aggrefate is updated.
-#        self.assertEqual({1:2,2:4,3:4}, self.cluster1.aggregateVector)
-#        # Test that document is added to cluster documents.
-#        self.assertEqual(stream1, self.cluster1.documentsInCluster[stream1.docId])
-#        self.cluster1.addStream(stream2, **stream_settings)
-#        self.assertEqual(2.5, self.cluster1.score)
-#        self.assertEqual(3, self.cluster1.vectorWeights)
-#        self.assertEqual({1:2/3.,2:8/3.,3:4/3.}, self.cluster1)
-#        self.assertEqual({1:2,2:8,3:4}, self.cluster1.aggregateVector)
-#        self.cluster2.addStream(stream2, **stream_settings)
-#        self.assertEqual(2, self.cluster2.score)
+class StreamClusterTests(unittest.TestCase):
+    def setUp(self): 
+        self.m1 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time-timedelta(seconds=60))
+        self.m1.vector=Vector({1:2,2:4})
+        self.stream1 = Stream(1, self.m1)
+        self.m2 = Message(2, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
+        self.m2.vector=Vector({2:4})
+        self.stream2 = Stream(2, self.m2)
+        self.cluster1 = StreamCluster(self.stream1)
+        self.cluster2 = StreamCluster(self.stream2)
+    def test_initialization(self):
+        self.assertEqual(test_time-timedelta(seconds=60), self.cluster1.lastStreamAddedTime)
+        self.assertEqual(test_time, self.cluster2.lastStreamAddedTime)
+        self.assertTrue(1==self.cluster1.score and 1==self.cluster2.score)
+    def test_addDocument(self):
+        message1 = Message(3, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
+        message1.vector=Vector({3:4})
+        stream1 = Stream(3, message1)
+        message2 = Message(4, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
+        message2.vector=Vector({2:4})
+        stream2 = Stream(4, message2)
+        self.assertEqual(1, self.cluster1.score)
+        self.cluster1.addDocument(stream1, **stream_settings)
+        self.assertEqual(1.5, self.cluster1.score)
+        # Test if cluster id is set.
+        self.assertEqual(self.cluster1.clusterId, stream1.clusterId)
+        # Test that cluster mean is updated.
+        self.assertEqual({1:2/2.,2:2.,3:2.}, self.cluster1)
+        # Test that cluster aggrefate is updated.
+        self.assertEqual({1:2,2:4,3:4}, self.cluster1.aggregateVector)
+        # Test that document is added to cluster documents.
+        self.assertEqual(stream1, self.cluster1.documentsInCluster[stream1.docId])
+        self.cluster1.addDocument(stream2, **stream_settings)
+        self.assertEqual(2.5, self.cluster1.score)
+        self.assertEqual(3, self.cluster1.vectorWeights)
+        self.assertEqual({1:2/3.,2:8/3.,3:4/3.}, self.cluster1)
+        self.assertEqual({1:2,2:8,3:4}, self.cluster1.aggregateVector)
+        self.cluster2.addDocument(stream2, **stream_settings)
+        self.assertEqual(2, self.cluster2.score)
 
 class CrowdTests(unittest.TestCase):
     def setUp(self):

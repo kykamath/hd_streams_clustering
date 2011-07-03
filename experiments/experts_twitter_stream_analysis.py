@@ -11,13 +11,12 @@ from twitter_streams_clustering import TwitterCrowdsSpecificMethods,\
     TwitterIterators, getExperts
 from hd_streams_clustering import HDStreaminClustering
 from datetime import datetime, timedelta
-from streaming_lsh.classes import Cluster
 from library.file_io import FileIO
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
 from library.classes import PlottingMethods, GeneralMethods
 from library.clustering import EvaluationMetrics
 from operator import itemgetter
-from classes import Crowd
+from classes import Crowd, StreamCluster
 import numpy as np
 import networkx as nx
 from matplotlib import pyplot as plt
@@ -39,7 +38,7 @@ class GenerateData:
         def analyzeIterationData(hdStreamClusteringObject, currentMessageTime):
             print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
             iterationData = {'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
-                             'clusters': map(TwitterCrowdsSpecificMethods.getClusterInMapFormat, [cluster for cluster, _ in sorted(Cluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)]),
+                             'clusters': map(TwitterCrowdsSpecificMethods.getClusterInMapFormat, [cluster for cluster, _ in sorted(StreamCluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)]),
                              'settings': experts_twitter_stream_settings.convertToSerializableObject()
                              }
             FileIO.writeToFileAsJson(iterationData, experts_twitter_stream_settings.lsh_crowds_folder+FileIO.getFileByDay(currentMessageTime))
