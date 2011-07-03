@@ -6,12 +6,9 @@ Created on Jun 30, 2011
 import sys, os
 sys.path.append('../')
 from pymongo import Connection
-from twitter_streams_clustering import TwitterIterators,\
-    TwitterCrowdsSpecificMethods
 from datetime import datetime, timedelta
 from library.file_io import FileIO
 from library.twitter import getStringRepresentationForTweetTimestamp
-from settings import twitter_stream_settings
 
 mongodb_connection = Connection('sarge', 27017)
 tweets = mongodb_connection.old_hou.Tweet
@@ -34,10 +31,8 @@ class GenerateData:
             screenName = GenerateData.getScreenName(tweet['uid'])
             if screenName!=None: 
                 data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':getStringRepresentationForTweetTimestamp(tweet['ca']), 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
-                print data
-                #FileIO.writeToFileAsJson(data, fileName) 
-        
-        #os.system('gzip %s'%fileName)
+                FileIO.writeToFileAsJson(data, fileName) 
+        os.system('gzip %s'%fileName)
     @staticmethod
     def generateHoustonData():
         currentDay = datetime(2011,1,23)
