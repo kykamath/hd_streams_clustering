@@ -32,7 +32,6 @@ class GenerateData:
         fileName = houston_data_folder+FileIO.getFileByDay(currentDay)
         for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, fields=['ca', 'tx', 'uid']):
             screenName = GenerateData.getScreenName(tweet['uid'])
-            print tweet['uid'], screenName
             if screenName!=None: 
                 data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':getStringRepresentationForTweetTimestamp(tweet['ca']), 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
                 print data
@@ -41,7 +40,7 @@ class GenerateData:
         #os.system('gzip %s'%fileName)
     @staticmethod
     def generateHoustonData():
-        currentDay = datetime(2010,1,23)
+        currentDay = datetime(2011,1,23)
         endingDay = datetime(2011,5,31)
         while currentDay<=endingDay:
             print 'Generating data for: ', currentDay
