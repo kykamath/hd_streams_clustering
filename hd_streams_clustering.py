@@ -51,7 +51,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         Do not remove this comment. Might need this if StreamCluster is used again in future.
         if predictedCluster!=None: self.clusters[predictedCluster].addStream(stream, **self.stream_settings)
         '''
-        if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream)
+        if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream, **self.stream_settings)
         else:
             newCluster = StreamCluster(stream)
             newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
@@ -69,6 +69,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         Do not remove this comment. Might need this if StreamCluster is used again in future.
         for cluster in self.clusters.itervalues(): cluster.updateScore(occuranceTime, 0, **self.stream_settings)
         '''
+        for cluster in self.clusters.itervalues(): cluster.updateScore(occuranceTime, 0, **self.stream_settings)
         for cluster in StreamCluster.getClustersByAttributeAndThreshold(self.clusters.values(), 
                                                                   self.stream_settings['cluster_filter_attribute'], 
                                                                   self.stream_settings['cluster_filter_threshold'], StreamCluster.BELOW_THRESHOLD): del self.clusters[cluster.clusterId]
