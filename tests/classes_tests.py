@@ -10,7 +10,7 @@ from classes import Stream, Message, VectorUpdateMethods, UtilityMethods, Phrase
 from datetime import datetime, timedelta
 from settings import twitter_stream_settings as stream_settings
 from library.classes import TwoWayMap, GeneralMethods
-from streaming_lsh.classes import Cluster
+#from streaming_lsh.classes import Cluster
 from library.twitter import getStringRepresentationForTweetTimestamp
 
 test_time = datetime.now()
@@ -151,48 +151,73 @@ class StreamClusterTests(unittest.TestCase):
         self.m2 = Message(2, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
         self.m2.vector=Vector({2:4})
         self.stream2 = Stream(2, self.m2)
+        self.m3 = Message(3, 'sdf', 'A project to cluster high-dimensional streams.', test_time+timedelta(seconds=60))
+        self.m3.vector=Vector({2:4})
+        self.stream3 = Stream(3, self.m3)
         self.cluster1 = StreamCluster(self.stream1)
         self.cluster2 = StreamCluster(self.stream2)
+        self.cluster3 = StreamCluster(self.stream3)
     def test_initialization(self):
         self.assertEqual(test_time-timedelta(seconds=60), self.cluster1.lastStreamAddedTime)
         self.assertEqual(test_time, self.cluster2.lastStreamAddedTime)
-#    def test_addDocument(self):
-#        message1 = Message(3, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
-#        message1.vector=Vector({3:4})
-#        stream1 = Stream(3, message1)
-#        message2 = Message(4, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
-#        message2.vector=Vector({2:4})
-#        stream2 = Stream(4, message2)
-#        self.assertEqual(1, self.cluster1.score)
-#        self.cluster1.addDocument(stream1, **stream_settings)
-#        self.assertEqual(1.5, self.cluster1.score)
-#        # Test if cluster id is set.
-#        self.assertEqual(self.cluster1.clusterId, stream1.clusterId)
-#        # Test that cluster mean is updated.
-#        self.assertEqual({1:2/2.,2:2.,3:2.}, self.cluster1)
-#        # Test that cluster aggrefate is updated.
-#        self.assertEqual({1:2,2:4,3:4}, self.cluster1.aggregateVector)
-#        # Test that document is added to cluster documents.
-#        self.assertEqual(stream1, self.cluster1.documentsInCluster[stream1.docId])
-#        self.cluster1.addDocument(stream2, **stream_settings)
-#        self.assertEqual(2.5, self.cluster1.score)
-#        self.assertEqual(3, self.cluster1.vectorWeights)
-#        self.assertEqual({1:2/3.,2:8/3.,3:4/3.}, self.cluster1)
-#        self.assertEqual({1:2,2:8,3:4}, self.cluster1.aggregateVector)
-#        self.cluster2.addDocument(stream2, **stream_settings)
-#        self.assertEqual(2, self.cluster2.score)
+    def test_getClusterObjectToMergeFrom(self):
+        documentsInCluster=list(self.cluster1.iterateDocumentsInCluster())
+        mergedCluster = StreamCluster.getClusterObjectToMergeFrom(self.cluster1)
+        self.assertEqual(test_time-timedelta(seconds=60), mergedCluster.lastStreamAddedTime)
+        self.assertEqual(self.cluster1, mergedCluster)
+        self.assertNotEqual(self.cluster1.clusterId, mergedCluster.clusterId)
+        self.assertEqual(documentsInCluster, list(mergedCluster.iterateDocumentsInCluster()))
+        self.assertEqual(self.cluster1.aggregateVector, mergedCluster.aggregateVector)
+        self.assertEqual(self.cluster1.vectorWeights, mergedCluster.vectorWeights)
+        self.assertEqual(self.cluster1.lastStreamAddedTime, mergedCluster.lastStreamAddedTime)
+    def test_mergeCluster_compare_vector_lastStreamAddedTime_more_than_original_cluster(self):
+        mergedCluster = StreamCluster.getClusterObjectToMergeFrom(self.cluster1)
+        mergedCluster.mergeCluster(self.cluster2)
+        self.assertEqual([self.stream1, self.stream2], list(mergedCluster.iterateDocumentsInCluster()))
+        meanVectorForAllDocuments = Vector.getMeanVector([self.stream1, self.stream2])
+        self.assertEqual(meanVectorForAllDocuments, mergedCluster)
+        self.assertEqual([mergedCluster.docId, mergedCluster.docId], list(doc.clusterId for doc in mergedCluster.iterateDocumentsInCluster()))
+        self.assertEqual(self.cluster2.lastStreamAddedTime, mergedCluster.lastStreamAddedTime)
+    def test_mergeCluster_lastStreamAddedTime_lesser_than_original_cluster(self):
+        mergedCluster = StreamCluster.getClusterObjectToMergeFrom(self.cluster3)
+        mergedCluster.mergeCluster(self.cluster1)
+        self.assertTrue(self.cluster1.lastStreamAddedTime<self.cluster3.lastStreamAddedTime)
+        self.assertEqual(self.cluster3.lastStreamAddedTime, mergedCluster.lastStreamAddedTime)
+        self.assertNotEqual(self.cluster1.lastStreamAddedTime, mergedCluster.lastStreamAddedTime)
+    def test_addDocument(self):
+        message1 = Message(3, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
+        message1.vector=Vector({3:4})
+        stream1 = Stream(3, message1)
+        message2 = Message(4, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
+        message2.vector=Vector({2:4})
+        stream2 = Stream(4, message2)
+        self.cluster1.addDocument(stream1)
+        # Test if cluster id is set.
+        self.assertEqual(self.cluster1.clusterId, stream1.clusterId)
+        # Test that cluster mean is updated.
+        self.assertEqual({1:2/2.,2:2.,3:2.}, self.cluster1)
+        # Test that cluster aggrefate is updated.
+        self.assertEqual({1:2,2:4,3:4}, self.cluster1.aggregateVector)
+        # Test that document is added to cluster documents.
+        self.assertEqual(stream1, self.cluster1.documentsInCluster[stream1.docId])
+        self.cluster1.addDocument(stream2)
+        self.assertEqual(3, self.cluster1.vectorWeights)
+        self.assertEqual({1:2/3.,2:8/3.,3:4/3.}, self.cluster1)
+        self.assertEqual({1:2,2:8,3:4}, self.cluster1.aggregateVector)
 
 class CrowdTests(unittest.TestCase):
     def setUp(self):
-        self.cluster = Cluster({})
+        self.m1 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time-timedelta(seconds=60))
+        self.m1.vector=Vector({1:1.,2:3.})
+        self.stream = Stream(1, self.m1)
+        self.cluster = StreamCluster(self.stream)
         self.crowd = Crowd(self.cluster, test_time)
     def test_intitialization(self):
         self.assertEqual(self.cluster.clusterId, self.crowd.crowdId)
     def test_append(self):
-        cluster2 = Cluster({})
-        self.crowd.append(cluster2, test_time+timedelta(days=1))
+        self.crowd.append(self.cluster, test_time+timedelta(days=1))
         self.assertEqual([GeneralMethods.getEpochFromDateTimeObject(test_time), GeneralMethods.getEpochFromDateTimeObject(test_time+timedelta(days=1))], sorted(self.crowd.clusters.keys()))
-        self.assertEqual(Cluster, type(self.crowd.clusters[GeneralMethods.getEpochFromDateTimeObject(test_time)]))
+        self.assertEqual(StreamCluster, type(self.crowd.clusters[GeneralMethods.getEpochFromDateTimeObject(test_time)]))
         self.assertEqual(2, self.crowd.lifespan)
         self.assertEqual(getStringRepresentationForTweetTimestamp(test_time), getStringRepresentationForTweetTimestamp(self.crowd.startTime))
         self.assertEqual(getStringRepresentationForTweetTimestamp(test_time+timedelta(days=1)), getStringRepresentationForTweetTimestamp(self.crowd.endTime))

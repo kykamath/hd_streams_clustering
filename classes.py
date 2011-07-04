@@ -34,8 +34,6 @@ class UtilityMethods:
             return phraseObject
         UtilityMethods.pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, currentTime, UtilityMethods.pruningConditionDeterministic, **stream_settings)
         topPhrasesList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in phraseTextToPhraseObjectMap.itervalues()), reverse=True)[:stream_settings['max_dimensions']]]
-#        print topPhrasesList[:10]
-#        topPhrasesSet = set(topPhrasesList)
         newPhraseIterator = getNextNewPhrase(topPhrasesList)
         availableIds = set(list(range(stream_settings['max_dimensions'])))
         for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
@@ -98,8 +96,8 @@ class Stream(Document):
         self.lastMessageTime = message.timeStamp
 
 class StreamCluster(Cluster):
-    def __init__(self, stream):
-        super(StreamCluster, self).__init__(stream)
+    def __init__(self, stream, **kwargs):
+        super(StreamCluster, self).__init__(stream, **kwargs)
         self.lastStreamAddedTime = stream.lastMessageTime
 #    def addDocument(self, stream, **stream_settings):
 #        super(StreamCluster, self).addDocument(stream)
@@ -108,18 +106,22 @@ class StreamCluster(Cluster):
 #        timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.lastStreamAddedTime, stream_settings['time_unit_in_seconds'].seconds)
 #        self.score=exponentialDecay(self.score, stream_settings['stream_cluster_decay_coefficient'], timeDifference)+scoreToUpdate
 #        self.lastStreamAddedTime=currentOccuranceTime
-    def mergeCluster(self, otherCluster):
-        # Test addig clusters with new message times greater than and less than. Test super methods
-        self.addDocument(otherCluster, shouldUpdateDocumentId=False)
-        [self.updateDocumentId(document) for document in otherCluster.iterateDocumentsInCluster()]
-        if self.lastStreamAddedTime < otherCluster.lastStreamAddedTime: self.lastStreamAddedTime=otherCluster.lastStreamAddedTime
+    def mergeCluster(self, otherStreamCluster):
+        StreamCluster.updateClusterAttributes(self, otherStreamCluster)
+        if self.lastStreamAddedTime < otherStreamCluster.lastStreamAddedTime: self.lastStreamAddedTime=otherStreamCluster.lastStreamAddedTime
     @staticmethod
-    def getClusterObjectToMergeFrom(cluster):
-        # Test adding a stream with time.
-        cluster.lastMessageTime = cluster.lastStreamAddedTime
-        mergedCluster = StreamCluster(cluster)
-        [mergedCluster.updateDocumentId(document) for document in cluster.iterateDocumentsInCluster()]
+    def getClusterObjectToMergeFrom(streamCluster):
+        streamCluster.lastMessageTime = streamCluster.lastStreamAddedTime
+        mergedCluster = StreamCluster(streamCluster, shouldUpdateDocumentId=False)
+        mergedCluster.aggregateVector, mergedCluster.vectorWeights  = Vector({}), 0.0
+        StreamCluster.updateClusterAttributes(mergedCluster, streamCluster)
         return mergedCluster
+    @staticmethod
+    def updateClusterAttributes(newStreamCluster, oldStreamCluster):
+        newStreamCluster.aggregateVector+=oldStreamCluster.aggregateVector
+        newStreamCluster.vectorWeights+=oldStreamCluster.vectorWeights
+        [newStreamCluster.updateDocumentId(document) for document in oldStreamCluster.iterateDocumentsInCluster()]
+        for k in newStreamCluster.aggregateVector: newStreamCluster[k]=newStreamCluster.aggregateVector[k]/newStreamCluster.vectorWeights
 
 class Crowd:
     '''
