@@ -98,16 +98,28 @@ class Stream(Document):
         self.lastMessageTime = message.timeStamp
 
 class StreamCluster(Cluster):
-    def __init__(self, stream, score=1):
+    def __init__(self, stream):
         super(StreamCluster, self).__init__(stream)
-        self.lastStreamAddedTime, self.score = stream.lastMessageTime, score
-    def addDocument(self, stream, **stream_settings):
-        super(StreamCluster, self).addDocument(stream)
-        self.updateScore(stream.lastMessageTime, scoreToUpdate=1, **stream_settings)
-    def updateScore(self, currentOccuranceTime, scoreToUpdate, **stream_settings):
-        timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.lastStreamAddedTime, stream_settings['time_unit_in_seconds'].seconds)
-        self.score=exponentialDecay(self.score, stream_settings['stream_cluster_decay_coefficient'], timeDifference)+scoreToUpdate
-        self.lastStreamAddedTime=currentOccuranceTime
+        self.lastStreamAddedTime = stream.lastMessageTime
+#    def addDocument(self, stream, **stream_settings):
+#        super(StreamCluster, self).addDocument(stream)
+#        self.updateScore(stream.lastMessageTime, scoreToUpdate=1, **stream_settings)
+#    def updateScore(self, currentOccuranceTime, scoreToUpdate, **stream_settings):
+#        timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.lastStreamAddedTime, stream_settings['time_unit_in_seconds'].seconds)
+#        self.score=exponentialDecay(self.score, stream_settings['stream_cluster_decay_coefficient'], timeDifference)+scoreToUpdate
+#        self.lastStreamAddedTime=currentOccuranceTime
+    def mergeCluster(self, otherCluster):
+        # Test addig clusters with new message times greater than and less than. Test super methods
+        self.addDocument(otherCluster, shouldUpdateDocumentId=False)
+        [self.updateDocumentId(document) for document in otherCluster.iterateDocumentsInCluster()]
+        if self.lastStreamAddedTime < otherCluster.lastStreamAddedTime: self.lastStreamAddedTime=otherCluster.lastStreamAddedTime
+    @staticmethod
+    def getClusterObjectToMergeFrom(cluster):
+        # Test adding a stream with time.
+        cluster.lastMessageTime = cluster.lastStreamAddedTime
+        mergedCluster = StreamCluster(cluster)
+        [mergedCluster.updateDocumentId(document) for document in cluster.iterateDocumentsInCluster()]
+        return mergedCluster
 
 class Crowd:
     '''
