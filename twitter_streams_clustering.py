@@ -5,7 +5,7 @@ Created on Jun 22, 2011
 '''
 from settings import experts_twitter_stream_settings
 from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
-from classes import Message, StreamCluster
+from classes import Message, StreamCluster, Stream
 from collections import defaultdict
 from datetime import datetime, timedelta
 from streaming_lsh.library.file_io import FileIO
@@ -14,7 +14,6 @@ from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 from nltk.metrics.distance import jaccard_distance
 from operator import itemgetter
-from streaming_lsh.classes import Cluster
 
 def getExperts(byScreenName=False):
     usersList, usersData = {}, defaultdict(list)
@@ -56,8 +55,9 @@ class TwitterCrowdsSpecificMethods:
     @staticmethod
     def combineClusters(clusters, **twitter_stream_settings):
         def getHashtagSet(vector): return set([word for dimension in vector for word in dimension.split() if word.startswith('#')])
+        def getClusterInt(id): return int(id.split('_')[1])
         mergedClustersMap = {}
-        for cluster in clusters.itervalues():
+        for cluster in [clusters[v] for v in sorted(clusters, key=getClusterInt)]:
             mergedClusterId = None
             for mergedCluster in mergedClustersMap.itervalues():
                 clusterHashtags, mergedClusterHashtags = getHashtagSet(cluster), getHashtagSet(mergedCluster)
@@ -77,7 +77,10 @@ class TwitterCrowdsSpecificMethods:
                'dimensions': cluster.getTopDimensions(numberOfFeatures=numberOfMaxDimensionsToRepresent)}
     @staticmethod
     def getClusterFromMapFormat(clusterMap):
-        cluster = Cluster({})
+        dummyMessage = Message(1, '', '', datetime.now())
+        dummyMessage.vector=Vector({})
+        dummyStream=Stream(1, dummyMessage)
+        cluster = StreamCluster(dummyStream)
         cluster.clusterId = clusterMap['clusterId']
         cluster.lastStreamAddedTime = clusterMap['lastStreamAddedTime']
         cluster.mergedClustersList = clusterMap['mergedClustersList']
