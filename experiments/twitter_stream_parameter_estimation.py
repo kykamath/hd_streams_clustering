@@ -43,7 +43,7 @@ class Dimensions:
         if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
             dimensions_estimation = {}
             for boundary in estimateDimensionsObject.boundaries:
-                if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): dimensions_estimation[boundary]=len(set(newList[:boundary]).difference(oldList[:boundary]))
+                if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): dimensions_estimation[str(boundary)]=len(set(newList[:boundary]).difference(oldList[:boundary]))
             print currentMessageTime, len(estimateDimensionsObject.phraseTextToPhraseObjectMap)
             iterationData = {
                              'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
