@@ -4,12 +4,12 @@ Created on Jul 4, 2011
 @author: kykamath
 '''
 import sys
-from library.twitter import getStringRepresentationForTweetTimestamp
 sys.path.append('../')
 from settings import experts_twitter_stream_settings
 from hd_streams_clustering import DataStreamMethods
 from classes import UtilityMethods, Phrase
 from library.classes import GeneralMethods
+from library.twitter import getStringRepresentationForTweetTimestamp
 from twitter_streams_clustering import TwitterIterators,\
     TwitterCrowdsSpecificMethods
 
