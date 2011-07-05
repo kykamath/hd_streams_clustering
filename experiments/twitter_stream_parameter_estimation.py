@@ -22,7 +22,7 @@ class Dimensions:
         self.timeUnitInSeconds = twitter_stream_settings['time_unit_in_seconds']
         self.topDimensionsDuringPreviousIteration = None
         self.boundaries = [50, 100, 500, 1000, 5000]+[10000*i for i in range(1,21)]
-        self.dimensionsEstimationFile = twitter_stream_settings.parameter_estimation_folder+'dimensions'
+        self.dimensionsEstimationFile = twitter_stream_settings['parameter_estimation_folder']+'dimensions'
         
     def run(self, dataIterator):
         for data in dataIterator:
@@ -56,8 +56,8 @@ class Dimensions:
 
 def estimateParametersForExpertsStream():
     experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-    pprint.pprint(experts_twitter_stream_settings)
-    exit()
+#    pprint.pprint(experts_twitter_stream_settings)
+#    exit()
     Dimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
     
 if __name__ == '__main__':
