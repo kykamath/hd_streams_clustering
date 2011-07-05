@@ -7,6 +7,7 @@ import sys
 from matplotlib.dates import AutoDateLocator
 from matplotlib.ticker import ScalarFormatter, FuncFormatter
 from library.plotting import getLatexForString, CurveFit
+from library.math_modified import getSmallestPrimeNumberGreaterThan
 sys.path.append('../')
 import pprint
 from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
@@ -86,18 +87,18 @@ class Dimensions:
         exponentialCurveParams = CurveFit.getParamsForExponentialFitting(x, y)
         print self.twitter_stream_settings['plot_label'], exponentialCurveParams
         plt.ylabel(getLatexForString('\% of new dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
-        plt.semilogy(x,y, 'o', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{-%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
-#        plt.semilogy(x, CurveFit.getYValuesForExponential(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
+        plt.semilogy(x,y,'o', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{-%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
+        plt.semilogy(x, CurveFit.getYValuesForExponential(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
         plt.legend()
         if returnAxisValuesOnly: plt.show()
     @staticmethod
     def calculateDimensionsFor(params, percentageOfNewDimensions): 
         '''
-        Experts stream [  1.09194452e+03   1.03448106e+00]; Dimensions.calculateDimensionsFor([  1.09194452e+03,   1.03448106e+00], 0.01)
-        Houston stream [  2.18650595e+03   1.02834433e+00]; Dimensions.calculateDimensionsFor([  2.18650595e+03,   1.02834433e+00], 0.01)
+        Experts stream: Dimensions.calculateDimensionsFor([  1.09194452e+03,   1.03448106e+00], 0.01) = 74177
+        Houston stream: Dimensions.calculateDimensionsFor([  2.18650595e+03,   1.02834433e+00], 0.01) = 155801
 
         '''
-        print CurveFit.inverseExponentialFunction(params, percentageOfNewDimensions)
+        print getSmallestPrimeNumberGreaterThan(int(CurveFit.inverseExponentialFunction(params, percentageOfNewDimensions)))
     @staticmethod
     def estimate(estimateDimensionsObject, currentMessageTime):
         def updatePhraseScore(phraseObject): 
@@ -126,5 +127,4 @@ def estimateParametersForHoustonStream(): pass
     
 if __name__ == '__main__':
     experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-    Dimensions.plotMethods([Dimensions(**experts_twitter_stream_settings).plotGrowthOfPhraseInTime, Dimensions(**houston_twitter_stream_settings).plotGrowthOfPhraseInTime])
-#    Dimensions.calculateDimensionsFor([  2.18650595e+03,   1.02834433e+00], 0.01)
+    Dimensions.plotMethods([Dimensions(**experts_twitter_stream_settings).plotEstimate, Dimensions(**houston_twitter_stream_settings).plotEstimate])
