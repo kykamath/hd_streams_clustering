@@ -12,9 +12,10 @@ twitterDataFolder='/mnt/chevron/kykamath/data/twitter/'
 
 # General twitter stream settings.
 twitter_stream_settings = Settings(
+                                   stream_id='twitter_stream', # Unique id to represent the stream.
                                    max_dimensions=99991, # Number of maximum dimensions to consider at a time. Make sue this is prime. This is also equal to the number of top phrases that will be considered for crowd discovery.
-                                   min_phrase_length=1, # Minumum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=1 will result in only unigrams as features.
-                                   max_phrase_length=4, # Maximum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=2 will result in both unigrams and bigrams as features.
+                                   min_phrase_length=2, # Minumum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=1 will result in only unigrams as features.
+                                   max_phrase_length=2, # Maximum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=2 will result in both unigrams and bigrams as features.
                                    
                                    phrase_decay_coefficient=0.75, # The rate at which phrases decays.
                                    stream_decay_coefficient=0.75, # The rate at which stream decays.
@@ -43,12 +44,12 @@ twitter_stream_settings.update(streaming_lsh_settings)
 # Settings for trends specific streams.
 trends_twitter_stream_settings = Settings()
 trends_twitter_stream_settings.update(twitter_stream_settings)
+trends_twitter_stream_settings.stream_id = 'trends_twitter_stream'
 
 # Settings for expert specific streams.
 experts_twitter_stream_settings = Settings()
 experts_twitter_stream_settings.update(twitter_stream_settings)
-experts_twitter_stream_settings.min_phrase_length=2
-experts_twitter_stream_settings.max_phrase_length=2
+experts_twitter_stream_settings.stream_id = 'experts_twitter_stream'
 experts_twitter_stream_settings.dimension_update_frequency_in_seconds=timedelta(seconds=30*60)
 experts_twitter_stream_settings.cluster_filter_threshold = 2
 experts_twitter_stream_settings.twitter_users_tweets_folder='%susers/tweets/'%twitterDataFolder

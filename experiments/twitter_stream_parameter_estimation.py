@@ -40,9 +40,14 @@ class EstimateDimensions:
         oldList, newList = estimateDimensionsObject.topDimensionsDuringPreviousIteration, topDimensionsDuringCurrentIteration
         if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
             print ' **** ', len(estimateDimensionsObject.phraseTextToPhraseObjectMap)
-            iterationData = {'total_number_of_phrases': len(estimateDimensionsObject.phraseTextToPhraseObjectMap)}
+            dimensions_estimation = {}
             for boundary in estimateDimensionsObject.boundaries:
-                if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): iterationData[boundary]=len(set(newList[:boundary]).difference(oldList[:boundary]))
+                if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): dimensions_estimation[boundary]=len(set(newList[:boundary]).difference(oldList[:boundary]))
+            iterationData = {
+                             'total_number_of_phrases': len(estimateDimensionsObject.phraseTextToPhraseObjectMap),
+                             'settings': experts_twitter_stream_settings.convertToSerializableObject(),
+                             'dimensions_estimation':dimensions_estimation
+                             }
             print iterationData
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
             
