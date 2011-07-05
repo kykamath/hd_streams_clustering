@@ -41,7 +41,7 @@ class EstimateDimensions:
         if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
             print ' **** ', len(estimateDimensionsObject.phraseTextToPhraseObjectMap)
             for boundary in estimateDimensionsObject.boundaries:
-                if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): print boundary, len(set(oldList[:boundary]).difference(newList[:boundary]))+len(set(newList[:boundary]).difference(oldList[:boundary]))
+                if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): print boundary, len(set(newList[:boundary]).difference(oldList[:boundary]))
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
             
 if __name__ == '__main__':
