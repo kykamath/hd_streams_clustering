@@ -22,9 +22,9 @@ class EstimateDimensions:
         
     def run(self, dataIterator):
         for data in dataIterator:
-            message = self.convertDataToMessageMethod(data, **self.stream_settings)
+            message = self.convertDataToMessageMethod(data, **self.twitter_stream_settings)
             if DataStreamMethods.messageInOrder(message.timeStamp):
-                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
+                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.twitter_stream_settings)
                 GeneralMethods.callMethodEveryInterval(EstimateDimensions.estimateMaxDimensions, self.timeUnitInSeconds, message.timeStamp, 
                                                        estimateDimensionsObject=self,
                                                        currentMessageTime=message.timeStamp)
@@ -32,9 +32,9 @@ class EstimateDimensions:
     def estimateMaxDimensions(estimateDimensionsObject, currentMessageTime):
         print currentMessageTime
 #        def updatePhraseScore(phraseObject): 
-#            phraseObject.updateScore(currentMessageTime, 0, **estimateDimensionsObject.stream_settings)
+#            phraseObject.updateScore(currentMessageTime, 0, **estimateDimensionsObject.twitter_stream_settings)
 #            return phraseObject
-#        UtilityMethods.pruneUnnecessaryPhrases(estimateDimensionsObject.phraseTextToPhraseObjectMap, currentMessageTime, UtilityMethods.pruningConditionDeterministic, **estimateDimensionsObject.stream_settings)
+#        UtilityMethods.pruneUnnecessaryPhrases(estimateDimensionsObject.phraseTextToPhraseObjectMap, currentMessageTime, UtilityMethods.pruningConditionDeterministic, **estimateDimensionsObject.twitter_stream_settings)
 #        topDimensionsDuringCurrentIteration = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimateDimensionsObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
 #        if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
 #            pass
