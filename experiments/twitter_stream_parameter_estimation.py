@@ -93,5 +93,5 @@ def estimateParametersForHoustonStream():
 #    Dimensions(**houston_twitter_stream_settings).plotEstimate()
     
 if __name__ == '__main__':
-    estimateParametersForExpertsStream()
-#    estimateParametersForHoustonStream()
+#    estimateParametersForExpertsStream()
+    estimateParametersForHoustonStream()
