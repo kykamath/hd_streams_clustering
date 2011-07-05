@@ -9,10 +9,12 @@ import pprint
 from settings import experts_twitter_stream_settings
 from library.file_io import FileIO
 from library.classes import GeneralMethods
-from library.twitter import getStringRepresentationForTweetTimestamp
+from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
 from hd_streams_clustering import DataStreamMethods
 from classes import UtilityMethods, Phrase
 from twitter_streams_clustering import TwitterIterators, TwitterCrowdsSpecificMethods
+from collections import defaultdict
+import matplotlib.pyplot as plt
 
 class Dimensions:
     '''
@@ -21,6 +23,7 @@ class Dimensions:
     The dimension at which the number of phrases added stablizes is the number of dimensions
     for the stream.
     '''
+    id = 'dimensions_estimation'
     def __init__(self, **twitter_stream_settings):
         self.twitter_stream_settings = twitter_stream_settings
         self.phraseTextToPhraseObjectMap = {}
@@ -38,6 +41,17 @@ class Dimensions:
                 GeneralMethods.callMethodEveryInterval(Dimensions.estimate, self.timeUnitInSeconds, message.timeStamp, 
                                                        estimateDimensionsObject=self,
                                                        currentMessageTime=message.timeStamp)
+    def plotEstimate(self):
+        dataDistribution = defaultdict(list)
+        for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile):
+            for k, v in line[Dimensions.id].iteritems():
+                k=int(k)
+                if k not in dataDistribution: dataDistribution[k]=[0.,0.]
+                dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
+        x, y = [], []
+        for k in sorted(dataDistribution): x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)
+        plt.plot(x,y)
+        plt.show()
     @staticmethod
     def estimate(estimateDimensionsObject, currentMessageTime):
         def updatePhraseScore(phraseObject): 
@@ -55,14 +69,15 @@ class Dimensions:
                              'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                              'total_number_of_phrases': len(estimateDimensionsObject.phraseTextToPhraseObjectMap),
                              'settings': experts_twitter_stream_settings.convertToSerializableObject(),
-                             'dimensions_estimation':dimensions_estimation
+                             Dimensions.id:dimensions_estimation
                              }
             FileIO.writeToFileAsJson(iterationData, estimateDimensionsObject.dimensionsEstimationFile)
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
 
 def estimateParametersForExpertsStream():
     experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-    Dimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
+#    Dimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
+    Dimensions(**experts_twitter_stream_settings).plotEstimate()
     
 if __name__ == '__main__':
     estimateParametersForExpertsStream()

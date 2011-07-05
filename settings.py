@@ -57,5 +57,13 @@ experts_twitter_stream_settings.users_to_crawl_file='%susers/crawl/users_to_craw
 experts_twitter_stream_settings.lsh_clusters_folder='%slsh_crowds/experts_stream/clusters/'%twitterDataFolder
 experts_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/experts_stream/parameter_estimation/'%twitterDataFolder
 
+# Settings for houston specific streams.
+houston_twitter_stream_settings = Settings()
+houston_twitter_stream_settings.update(twitter_stream_settings)
+houston_twitter_stream_settings.stream_id = 'houston_twitter_stream'
+houston_twitter_stream_settings.twitter_users_tweets_folder='%shouston/'%twitterDataFolder
+houston_twitter_stream_settings.lsh_clusters_folder='%slsh_crowds/houston_stream/clusters/'%twitterDataFolder
+houston_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/houston_stream/parameter_estimation/'%twitterDataFolder
+
 if __name__ == '__main__':
     print getLargestPrimeLesserThan(23)

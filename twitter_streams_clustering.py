@@ -3,7 +3,7 @@ Created on Jun 22, 2011
 
 @author: kykamath
 '''
-from settings import experts_twitter_stream_settings
+from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
 from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
 from classes import Message, StreamCluster, Stream
 from collections import defaultdict
@@ -40,6 +40,12 @@ class TwitterIterators:
         while currentTime <= expertsDataEndTime:
             for tweet in TwitterIterators.iterateFromFile(experts_twitter_stream_settings.twitter_users_tweets_folder+'%s.gz'%FileIO.getFileByDay(currentTime)):
                 if tweet['user']['id_str'] in experts: yield tweet
+            currentTime+=timedelta(days=1)
+    @staticmethod
+    def iterateTweetsFromHouston(houstonDataStartTime=datetime(2010,11,1), houstonDataEndTime=datetime(2011,5,30)):
+        currentTime = houstonDataStartTime
+        while currentTime <= houstonDataEndTime:
+            for tweet in TwitterIterators.iterateFromFile(houston_twitter_stream_settings.twitter_users_tweets_folder+'%s.gz'%FileIO.getFileByDay(currentTime)): yield tweet
             currentTime+=timedelta(days=1)
 
 class TwitterCrowdsSpecificMethods:
@@ -108,4 +114,6 @@ def clusterTwitterStreams():
 #    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'))
             
 if __name__ == '__main__':
-    clusterTwitterStreams()
+#    clusterTwitterStreams()
+    i=1
+    for tweet in TwitterIterators.iterateTweetsFromHouston(): print i, tweet['created_at']; i+=1
