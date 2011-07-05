@@ -4,6 +4,7 @@ Created on Jul 4, 2011
 @author: kykamath
 '''
 import sys
+from library.twitter import getStringRepresentationForTweetTimestamp
 sys.path.append('../')
 from settings import experts_twitter_stream_settings
 from hd_streams_clustering import DataStreamMethods
@@ -31,7 +32,6 @@ class EstimateDimensions:
                                                        currentMessageTime=message.timeStamp)
     @staticmethod
     def estimateMaxDimensions(estimateDimensionsObject, currentMessageTime):
-        print currentMessageTime
         def updatePhraseScore(phraseObject): 
             phraseObject.updateScore(currentMessageTime, 0, **estimateDimensionsObject.twitter_stream_settings)
             return phraseObject
@@ -39,16 +39,16 @@ class EstimateDimensions:
         topDimensionsDuringCurrentIteration = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimateDimensionsObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
         oldList, newList = estimateDimensionsObject.topDimensionsDuringPreviousIteration, topDimensionsDuringCurrentIteration
         if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
-            print ' **** ', len(estimateDimensionsObject.phraseTextToPhraseObjectMap)
             dimensions_estimation = {}
             for boundary in estimateDimensionsObject.boundaries:
                 if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): dimensions_estimation[boundary]=len(set(newList[:boundary]).difference(oldList[:boundary]))
+            print currentMessageTime, len(estimateDimensionsObject.phraseTextToPhraseObjectMap)
             iterationData = {
+                             'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                              'total_number_of_phrases': len(estimateDimensionsObject.phraseTextToPhraseObjectMap),
                              'settings': experts_twitter_stream_settings.convertToSerializableObject(),
                              'dimensions_estimation':dimensions_estimation
                              }
-            print iterationData
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
             
 if __name__ == '__main__':
