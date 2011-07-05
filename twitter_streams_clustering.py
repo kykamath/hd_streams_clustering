@@ -114,6 +114,4 @@ def clusterTwitterStreams():
 #    hdsClustering.cluster(TwitterIterators.iterateFromFile('/mnt/chevron/kykamath/data/twitter/filter/2011_2_6.gz'))
             
 if __name__ == '__main__':
-#    clusterTwitterStreams()
-    i=1
-    for tweet in TwitterIterators.iterateTweetsFromHouston(): print i, tweet['created_at']; i+=1
+    clusterTwitterStreams()
