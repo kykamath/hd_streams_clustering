@@ -4,15 +4,14 @@ Created on Jul 4, 2011
 @author: kykamath
 '''
 import sys
-from library.file_io import FileIO
 sys.path.append('../')
 from settings import experts_twitter_stream_settings
-from hd_streams_clustering import DataStreamMethods
-from classes import UtilityMethods, Phrase
+from library.file_io import FileIO
 from library.classes import GeneralMethods
 from library.twitter import getStringRepresentationForTweetTimestamp
-from twitter_streams_clustering import TwitterIterators,\
-    TwitterCrowdsSpecificMethods
+from hd_streams_clustering import DataStreamMethods
+from classes import UtilityMethods, Phrase
+from twitter_streams_clustering import TwitterIterators, TwitterCrowdsSpecificMethods
 
 class Dimensions:
     def __init__(self, **twitter_stream_settings):
