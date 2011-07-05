@@ -27,7 +27,7 @@ endingDay=datetime(2011,3,22)
 
 def iterateExpertClusters(startingDay=startingDay, endingDay=endingDay):
     while startingDay<=endingDay:
-        for line in FileIO.iterateJsonFromFile(experts_twitter_stream_settings.lsh_crowds_folder+FileIO.getFileByDay(startingDay)): 
+        for line in FileIO.iterateJsonFromFile(experts_twitter_stream_settings.lsh_clusters_folder+FileIO.getFileByDay(startingDay)): 
             currentTime = getDateTimeObjectFromTweetTimestamp(line['time_stamp'])
             for clusterMap in line['clusters']: yield (currentTime, TwitterCrowdsSpecificMethods.getClusterFromMapFormat(clusterMap))
         startingDay+=timedelta(days=1)
@@ -41,7 +41,7 @@ class GenerateData:
                              'clusters': map(TwitterCrowdsSpecificMethods.getClusterInMapFormat, [cluster for cluster, _ in sorted(StreamCluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)]),
                              'settings': experts_twitter_stream_settings.convertToSerializableObject()
                              }
-            FileIO.writeToFileAsJson(iterationData, experts_twitter_stream_settings.lsh_crowds_folder+FileIO.getFileByDay(currentMessageTime))
+            FileIO.writeToFileAsJson(iterationData, experts_twitter_stream_settings.lsh_clusters_folder+FileIO.getFileByDay(currentMessageTime))
             print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         
         experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage

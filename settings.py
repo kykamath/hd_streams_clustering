@@ -54,7 +54,8 @@ experts_twitter_stream_settings.dimension_update_frequency_in_seconds=timedelta(
 experts_twitter_stream_settings.cluster_filter_threshold = 2
 experts_twitter_stream_settings.twitter_users_tweets_folder='%susers/tweets/'%twitterDataFolder
 experts_twitter_stream_settings.users_to_crawl_file='%susers/crawl/users_to_crawl'%twitterDataFolder
-experts_twitter_stream_settings.lsh_crowds_folder='%slsh_crowds/experts_stream/'%twitterDataFolder
+experts_twitter_stream_settings.lsh_clusters_folder='%slsh_crowds/experts_stream/clusters/'%twitterDataFolder
+experts_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/experts_stream/parameter_estimation/'%twitterDataFolder
 
 if __name__ == '__main__':
     print getLargestPrimeLesserThan(23)

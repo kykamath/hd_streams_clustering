@@ -4,6 +4,7 @@ Created on Jul 4, 2011
 @author: kykamath
 '''
 import sys
+from library.file_io import FileIO
 sys.path.append('../')
 from settings import experts_twitter_stream_settings
 from hd_streams_clustering import DataStreamMethods
@@ -13,7 +14,7 @@ from library.twitter import getStringRepresentationForTweetTimestamp
 from twitter_streams_clustering import TwitterIterators,\
     TwitterCrowdsSpecificMethods
 
-class EstimateDimensions:
+class Dimensions:
     def __init__(self, **twitter_stream_settings):
         self.twitter_stream_settings = twitter_stream_settings
         self.phraseTextToPhraseObjectMap = {}
@@ -21,17 +22,18 @@ class EstimateDimensions:
         self.timeUnitInSeconds = twitter_stream_settings['time_unit_in_seconds']
         self.topDimensionsDuringPreviousIteration = None
         self.boundaries = [50, 100, 500, 1000, 5000]+[10000*i for i in range(1,21)]
+        self.dimensionsEstimationFile = twitter_stream_settings.parameter_estimation_folder+'dimensions'
         
     def run(self, dataIterator):
         for data in dataIterator:
             message = self.convertDataToMessageMethod(data, **self.twitter_stream_settings)
             if DataStreamMethods.messageInOrder(message.timeStamp):
                 UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.twitter_stream_settings)
-                GeneralMethods.callMethodEveryInterval(EstimateDimensions.estimateMaxDimensions, self.timeUnitInSeconds, message.timeStamp, 
+                GeneralMethods.callMethodEveryInterval(Dimensions.estimate, self.timeUnitInSeconds, message.timeStamp, 
                                                        estimateDimensionsObject=self,
                                                        currentMessageTime=message.timeStamp)
     @staticmethod
-    def estimateMaxDimensions(estimateDimensionsObject, currentMessageTime):
+    def estimate(estimateDimensionsObject, currentMessageTime):
         def updatePhraseScore(phraseObject): 
             phraseObject.updateScore(currentMessageTime, 0, **estimateDimensionsObject.twitter_stream_settings)
             return phraseObject
@@ -49,9 +51,12 @@ class EstimateDimensions:
                              'settings': experts_twitter_stream_settings.convertToSerializableObject(),
                              'dimensions_estimation':dimensions_estimation
                              }
+            FileIO.writeToFileAsJson(iterationData, estimateDimensionsObject.dimensionsEstimationFile)
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
-            
-if __name__ == '__main__':
-#    ParameterEstimation.estimateMaxDimensions(TwitterIterators.iterateFromFile('/Users/kykamath/data/sample.gz'), **experts_twitter_stream_settings)
+
+def estimateParametersForExpertsStream():
     experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-    EstimateDimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
+    Dimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
+    
+if __name__ == '__main__':
+    estimateParametersForExpertsStream()
