@@ -15,6 +15,12 @@ from classes import UtilityMethods, Phrase
 from twitter_streams_clustering import TwitterIterators, TwitterCrowdsSpecificMethods
 
 class Dimensions:
+    '''
+    This class is used to estimate dimensions in the stream. To estimate it we calculate
+    the number of phrases that need to added every iteration for different dimensions.
+    The dimension at which the number of phrases added stablizes is the number of dimensions
+    for the stream.
+    '''
     def __init__(self, **twitter_stream_settings):
         self.twitter_stream_settings = twitter_stream_settings
         self.phraseTextToPhraseObjectMap = {}
