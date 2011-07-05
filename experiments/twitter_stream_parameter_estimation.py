@@ -3,6 +3,8 @@ Created on Jul 4, 2011
 
 @author: kykamath
 '''
+import sys
+sys.path.append('../')
 from settings import experts_twitter_stream_settings
 from hd_streams_clustering import DataStreamMethods
 from classes import UtilityMethods, Phrase
