@@ -1,1 +1,1 @@
-print [2**i for i in range(5, 18)]
+print [500, 1000, 5000]+[10000*i for i in range(21)]

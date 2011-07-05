@@ -19,7 +19,7 @@ class EstimateDimensions:
         self.convertDataToMessageMethod=twitter_stream_settings['convert_data_to_message_method']
         self.timeUnitInSeconds = twitter_stream_settings['time_unit_in_seconds']
         self.topDimensionsDuringPreviousIteration = None
-        self.boundaries = [2**i for i in range(5, 18)]
+        self.boundaries = [500, 1000, 5000]+[10000*i for i in range(21)]
         
     def run(self, dataIterator):
         for data in dataIterator:
