@@ -22,6 +22,12 @@ class Dimensions:
     the number of phrases that need to added every iteration for different dimensions.
     The dimension at which the number of phrases added stablizes is the number of dimensions
     for the stream.
+    
+    Why do we need this?
+    The aim is to get dimensions, that dont change too often at the same time are not very huge.
+    This experiments gives us an approximate idea of the number of dimensions. Randomly picking 
+    a small value will result in dimensions that are not good and picking too big a value will 
+    result in inefficiency.  
     '''
     id = 'dimensions_estimation'
     def __init__(self, **twitter_stream_settings):
@@ -52,12 +58,14 @@ class Dimensions:
         for k in sorted(dataDistribution): x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)
         plt.plot(x,y)
         plt.show()
+    def plotGrowthOfPhraseInTime(self):
+        for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile):
+            print line['time_stamp'], line['total_number_of_phrases']
     @staticmethod
     def estimate(estimateDimensionsObject, currentMessageTime):
         def updatePhraseScore(phraseObject): 
             phraseObject.updateScore(currentMessageTime, 0, **estimateDimensionsObject.twitter_stream_settings)
             return phraseObject
-        UtilityMethods.pruneUnnecessaryPhrases(estimateDimensionsObject.phraseTextToPhraseObjectMap, currentMessageTime, UtilityMethods.pruningConditionDeterministic, **estimateDimensionsObject.twitter_stream_settings)
         topDimensionsDuringCurrentIteration = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimateDimensionsObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
         oldList, newList = estimateDimensionsObject.topDimensionsDuringPreviousIteration, topDimensionsDuringCurrentIteration
         if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
@@ -76,8 +84,8 @@ class Dimensions:
 
 def estimateParametersForExpertsStream():
     experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-#    Dimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
-    Dimensions(**experts_twitter_stream_settings).plotEstimate()
+    Dimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
+#    Dimensions(**experts_twitter_stream_settings).plotGrowthOfPhraseInTime()
 
 def estimateParametersForHoustonStream():
     houston_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
@@ -85,5 +93,5 @@ def estimateParametersForHoustonStream():
 #    Dimensions(**houston_twitter_stream_settings).plotEstimate()
     
 if __name__ == '__main__':
-#    estimateParametersForExpertsStream()
-    estimateParametersForHoustonStream()
+    estimateParametersForExpertsStream()
+#    estimateParametersForHoustonStream()
