@@ -5,6 +5,7 @@ Created on Jul 4, 2011
 '''
 import sys
 sys.path.append('../')
+import pprint
 from settings import experts_twitter_stream_settings
 from library.file_io import FileIO
 from library.classes import GeneralMethods
@@ -55,6 +56,7 @@ class Dimensions:
 
 def estimateParametersForExpertsStream():
     experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+    pprint.pprint(experts_twitter_stream_settings)
     Dimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
     
 if __name__ == '__main__':
