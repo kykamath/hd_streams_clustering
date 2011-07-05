@@ -4,6 +4,9 @@ Created on Jul 4, 2011
 @author: kykamath
 '''
 import sys
+from matplotlib.dates import AutoDateLocator
+from matplotlib.ticker import ScalarFormatter, FuncFormatter
+from library.plotting import getLatexForString, CurveFit
 sys.path.append('../')
 import pprint
 from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
@@ -15,6 +18,15 @@ from classes import UtilityMethods, Phrase
 from twitter_streams_clustering import TwitterIterators, TwitterCrowdsSpecificMethods
 from collections import defaultdict
 import matplotlib.pyplot as plt
+ 
+ 
+'''
+Phrase not touched in 5 minutes came back to dimensions
+phases not tocuhed in 10 minutes came back again
+and so on.
+Find the time after which percentage of phrases returning is constant.
+'''
+ 
 
 class Dimensions:
     '''
@@ -47,20 +59,45 @@ class Dimensions:
                 GeneralMethods.callMethodEveryInterval(Dimensions.estimate, self.timeUnitInSeconds, message.timeStamp, 
                                                        estimateDimensionsObject=self,
                                                        currentMessageTime=message.timeStamp)
-    def plotEstimate(self):
+    def plotGrowthOfPhraseInTime(self, returnAxisValuesOnly=True):
+        '''
+        This plot tells us the time when the number of phrases in the stream stablizes. 
+        Consider the time after we have seen maximum phrases to determine dimensions.
+        But, if these phrases increase linearly with time, it shows that we have infinte
+        dimensions and hence this motivates us to have a way to determine number of 
+        dimensions.
+        '''
+        x, y = [], []; [(x.append(getDateTimeObjectFromTweetTimestamp(line['time_stamp'])),y.append(line['total_number_of_phrases'])) for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile)]
+#        x=x[:1500]; y=y[:1500]
+        plt.subplot(111).yaxis.set_major_formatter(FuncFormatter(lambda x,i: '%0.1f'%(x/10.**6)))
+        plt.text(0.0, 1.01, getLatexForString('10^6'), transform = plt.gca().transAxes)
+        plt.ylabel(getLatexForString('\# of dimensions')), plt.xlabel(getLatexForString('Time units')), plt.title(getLatexForString('Growth in dimensions with increasing time.'))
+        plt.plot(y, color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
+        plt.legend(loc=4)
+        if returnAxisValuesOnly: plt.show()
+    def plotEstimate(self, returnAxisValuesOnly=True):
         dataDistribution = defaultdict(list)
         for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile):
             for k, v in line[Dimensions.id].iteritems():
                 k=int(k)
                 if k not in dataDistribution: dataDistribution[k]=[0.,0.]
                 dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
-        x, y = [], []
-        for k in sorted(dataDistribution): x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)
-        plt.plot(x,y)
-        plt.show()
-    def plotGrowthOfPhraseInTime(self):
-        for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile):
-            print line['time_stamp'], line['total_number_of_phrases']
+        x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution) if k>1000] 
+        exponentialCurveParams = CurveFit.getParamsForExponentialFitting(x, y)
+        print self.twitter_stream_settings['plot_label'], exponentialCurveParams
+        plt.ylabel(getLatexForString('\% of new dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
+        plt.semilogy(x,y, 'o', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{-%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
+#        plt.semilogy(x, CurveFit.getYValuesForExponential(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
+        plt.legend()
+        if returnAxisValuesOnly: plt.show()
+    @staticmethod
+    def calculateDimensionsFor(params, percentageOfNewDimensions): 
+        '''
+        Experts stream [  1.09194452e+03   1.03448106e+00]; Dimensions.calculateDimensionsFor([  1.09194452e+03,   1.03448106e+00], 0.01)
+        Houston stream [  2.18650595e+03   1.02834433e+00]; Dimensions.calculateDimensionsFor([  2.18650595e+03,   1.02834433e+00], 0.01)
+
+        '''
+        print CurveFit.inverseExponentialFunction(params, percentageOfNewDimensions)
     @staticmethod
     def estimate(estimateDimensionsObject, currentMessageTime):
         def updatePhraseScore(phraseObject): 
@@ -81,17 +118,13 @@ class Dimensions:
                              }
             FileIO.writeToFileAsJson(iterationData, estimateDimensionsObject.dimensionsEstimationFile)
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
+    @staticmethod
+    def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
 
-def estimateParametersForExpertsStream():
-    experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-    Dimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
-#    Dimensions(**experts_twitter_stream_settings).plotGrowthOfPhraseInTime()
-
-def estimateParametersForHoustonStream():
-    houston_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-    Dimensions(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston())
-#    Dimensions(**houston_twitter_stream_settings).plotEstimate()
+def estimateParametersForExpertsStream(): pass
+def estimateParametersForHoustonStream(): pass
     
 if __name__ == '__main__':
-#    estimateParametersForExpertsStream()
-    estimateParametersForHoustonStream()
+    experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+    Dimensions.plotMethods([Dimensions(**experts_twitter_stream_settings).plotGrowthOfPhraseInTime, Dimensions(**houston_twitter_stream_settings).plotGrowthOfPhraseInTime])
+#    Dimensions.calculateDimensionsFor([  2.18650595e+03,   1.02834433e+00], 0.01)

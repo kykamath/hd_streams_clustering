@@ -50,6 +50,8 @@ trends_twitter_stream_settings.stream_id = 'trends_twitter_stream'
 experts_twitter_stream_settings = Settings()
 experts_twitter_stream_settings.update(twitter_stream_settings)
 experts_twitter_stream_settings.stream_id = 'experts_twitter_stream'
+experts_twitter_stream_settings.plot_color = '#F28500'
+experts_twitter_stream_settings.plot_label = 'Experts stream'
 experts_twitter_stream_settings.dimension_update_frequency_in_seconds=timedelta(seconds=30*60)
 experts_twitter_stream_settings.cluster_filter_threshold = 2
 experts_twitter_stream_settings.twitter_users_tweets_folder='%susers/tweets/'%twitterDataFolder
@@ -61,6 +63,8 @@ experts_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/expert
 houston_twitter_stream_settings = Settings()
 houston_twitter_stream_settings.update(twitter_stream_settings)
 houston_twitter_stream_settings.stream_id = 'houston_twitter_stream'
+houston_twitter_stream_settings.plot_color = '#CC00FF'
+houston_twitter_stream_settings.plot_label = 'Houston stream'
 houston_twitter_stream_settings.twitter_users_tweets_folder='%shouston/'%twitterDataFolder
 houston_twitter_stream_settings.lsh_clusters_folder='%slsh_crowds/houston_stream/clusters/'%twitterDataFolder
 houston_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/houston_stream/parameter_estimation/'%twitterDataFolder
