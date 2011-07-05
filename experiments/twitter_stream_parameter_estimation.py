@@ -19,6 +19,7 @@ class EstimateDimensions:
         self.convertDataToMessageMethod=twitter_stream_settings['convert_data_to_message_method']
         self.timeUnitInSeconds = twitter_stream_settings['time_unit_in_seconds']
         self.topDimensionsDuringPreviousIteration = None
+        self.boundaries = [2**i for i in range(5, 18)]
         
     def run(self, dataIterator):
         for data in dataIterator:
@@ -36,9 +37,11 @@ class EstimateDimensions:
             return phraseObject
         UtilityMethods.pruneUnnecessaryPhrases(estimateDimensionsObject.phraseTextToPhraseObjectMap, currentMessageTime, UtilityMethods.pruningConditionDeterministic, **estimateDimensionsObject.twitter_stream_settings)
         topDimensionsDuringCurrentIteration = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimateDimensionsObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
-        print 'new', topDimensionsDuringCurrentIteration[:10]
+        oldList, newList = estimateDimensionsObject.topDimensionsDuringPreviousIteration, topDimensionsDuringCurrentIteration
         if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
-            print 'old', estimateDimensionsObject.topDimensionsDuringPreviousIteration[:10]
+            for boundary in estimateDimensionsObject.boundaries:
+                print ' **** ', len(estimateDimensionsObject.phraseTextToPhraseObjectMap)
+                if boundary>len(estimateDimensionsObject.phraseTextToPhraseObjectMap): print boundary, len(set(oldList).difference(newList))+len(set(newList).difference(oldList))
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
             
 if __name__ == '__main__':
