@@ -35,10 +35,10 @@ class EstimateDimensions:
             return phraseObject
         UtilityMethods.pruneUnnecessaryPhrases(estimateDimensionsObject.phraseTextToPhraseObjectMap, currentMessageTime, UtilityMethods.pruningConditionDeterministic, **estimateDimensionsObject.twitter_stream_settings)
         topDimensionsDuringCurrentIteration = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimateDimensionsObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
-        print topDimensionsDuringCurrentIteration[:10]
+        print 'new', topDimensionsDuringCurrentIteration[:10]
         if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
-            print estimateDimensionsObject.topDimensionsDuringPreviousIteration[:10]
-        estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration
+            print 'old', estimateDimensionsObject.topDimensionsDuringPreviousIteration[:10]
+        estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
             
 if __name__ == '__main__':
 #    ParameterEstimation.estimateMaxDimensions(TwitterIterators.iterateFromFile('/Users/kykamath/data/sample.gz'), **experts_twitter_stream_settings)
