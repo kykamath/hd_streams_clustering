@@ -19,7 +19,7 @@ class EstimateDimensions:
         self.convertDataToMessageMethod=twitter_stream_settings['convert_data_to_message_method']
         self.timeUnitInSeconds = twitter_stream_settings['time_unit_in_seconds']
         self.topDimensionsDuringPreviousIteration = None
-        self.boundaries = [500, 1000, 5000]+[10000*i for i in range(21)]
+        self.boundaries = [50, 100, 500, 1000, 5000]+[10000*i for i in range(1,21)]
         
     def run(self, dataIterator):
         for data in dataIterator:
@@ -40,8 +40,10 @@ class EstimateDimensions:
         oldList, newList = estimateDimensionsObject.topDimensionsDuringPreviousIteration, topDimensionsDuringCurrentIteration
         if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
             print ' **** ', len(estimateDimensionsObject.phraseTextToPhraseObjectMap)
+            iterationData = {'total_number_of_phrases': len(estimateDimensionsObject.phraseTextToPhraseObjectMap)}
             for boundary in estimateDimensionsObject.boundaries:
-                if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): print boundary, len(set(newList[:boundary]).difference(oldList[:boundary]))
+                if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): iterationData[boundary]=len(set(newList[:boundary]).difference(oldList[:boundary]))
+            print iterationData
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
             
 if __name__ == '__main__':
