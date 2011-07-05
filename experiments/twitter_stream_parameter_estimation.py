@@ -39,9 +39,9 @@ class EstimateDimensions:
         topDimensionsDuringCurrentIteration = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimateDimensionsObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
         oldList, newList = estimateDimensionsObject.topDimensionsDuringPreviousIteration, topDimensionsDuringCurrentIteration
         if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
+            print ' **** ', len(estimateDimensionsObject.phraseTextToPhraseObjectMap)
             for boundary in estimateDimensionsObject.boundaries:
-                print ' **** ', len(estimateDimensionsObject.phraseTextToPhraseObjectMap)
-                if boundary>len(estimateDimensionsObject.phraseTextToPhraseObjectMap): print boundary, len(set(oldList).difference(newList))+len(set(newList).difference(oldList))
+                if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): print boundary, len(set(oldList).difference(newList))+len(set(newList).difference(oldList))
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
             
 if __name__ == '__main__':
