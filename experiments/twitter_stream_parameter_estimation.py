@@ -30,15 +30,16 @@ class EstimateDimensions:
                                                        currentMessageTime=message.timeStamp)
     @staticmethod
     def estimateMaxDimensions(estimateDimensionsObject, currentMessageTime):
-        print currentMessageTime
-#        def updatePhraseScore(phraseObject): 
-#            phraseObject.updateScore(currentMessageTime, 0, **estimateDimensionsObject.twitter_stream_settings)
-#            return phraseObject
-#        UtilityMethods.pruneUnnecessaryPhrases(estimateDimensionsObject.phraseTextToPhraseObjectMap, currentMessageTime, UtilityMethods.pruningConditionDeterministic, **estimateDimensionsObject.twitter_stream_settings)
-#        topDimensionsDuringCurrentIteration = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimateDimensionsObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
-#        if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
-#            pass
-#        print topDimensionsDuringCurrentIteration
+        def updatePhraseScore(phraseObject): 
+            phraseObject.updateScore(currentMessageTime, 0, **estimateDimensionsObject.twitter_stream_settings)
+            return phraseObject
+        UtilityMethods.pruneUnnecessaryPhrases(estimateDimensionsObject.phraseTextToPhraseObjectMap, currentMessageTime, UtilityMethods.pruningConditionDeterministic, **estimateDimensionsObject.twitter_stream_settings)
+        topDimensionsDuringCurrentIteration = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimateDimensionsObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
+        if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
+            pass
+        print topDimensionsDuringCurrentIteration[:10]
+        print estimateDimensionsObject.topDimensionsDuringPreviousIteration[:10]
+        estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration
             
 if __name__ == '__main__':
 #    ParameterEstimation.estimateMaxDimensions(TwitterIterators.iterateFromFile('/Users/kykamath/data/sample.gz'), **experts_twitter_stream_settings)
