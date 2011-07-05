@@ -56,8 +56,6 @@ class Dimensions:
 
 def estimateParametersForExpertsStream():
     experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-#    pprint.pprint(experts_twitter_stream_settings)
-#    exit()
     Dimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
     
 if __name__ == '__main__':
