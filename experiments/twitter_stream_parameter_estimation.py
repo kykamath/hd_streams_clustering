@@ -30,6 +30,7 @@ class EstimateDimensions:
                                                        currentMessageTime=message.timeStamp)
     @staticmethod
     def estimateMaxDimensions(estimateDimensionsObject, currentMessageTime):
+        print currentMessageTime
         def updatePhraseScore(phraseObject): 
             phraseObject.updateScore(currentMessageTime, 0, **estimateDimensionsObject.twitter_stream_settings)
             return phraseObject
