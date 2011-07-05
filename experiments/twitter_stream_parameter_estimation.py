@@ -9,7 +9,8 @@ from settings import experts_twitter_stream_settings
 from hd_streams_clustering import DataStreamMethods
 from classes import UtilityMethods, Phrase
 from library.classes import GeneralMethods
-from twitter_streams_clustering import TwitterIterators
+from twitter_streams_clustering import TwitterIterators,\
+    TwitterCrowdsSpecificMethods
 
 class EstimateDimensions:
     def __init__(self, **twitter_stream_settings):
@@ -41,4 +42,5 @@ class EstimateDimensions:
             
 if __name__ == '__main__':
 #    ParameterEstimation.estimateMaxDimensions(TwitterIterators.iterateFromFile('/Users/kykamath/data/sample.gz'), **experts_twitter_stream_settings)
+    experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
     EstimateDimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
