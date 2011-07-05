@@ -6,7 +6,7 @@ Created on Jul 4, 2011
 import sys
 sys.path.append('../')
 import pprint
-from settings import experts_twitter_stream_settings
+from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
 from library.file_io import FileIO
 from library.classes import GeneralMethods
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
@@ -78,6 +78,11 @@ def estimateParametersForExpertsStream():
     experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
 #    Dimensions(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
     Dimensions(**experts_twitter_stream_settings).plotEstimate()
+
+def estimateParametersForHoustonStream():
+    houston_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+    Dimensions(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston())
+#    Dimensions(**houston_twitter_stream_settings).plotEstimate()
     
 if __name__ == '__main__':
     estimateParametersForExpertsStream()
