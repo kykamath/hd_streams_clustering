@@ -130,7 +130,7 @@ class ParameterEstimation:
         dimensions=estimationObject.twitter_stream_settings['dimensions']
         newList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimationObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)][:dimensions]
         print currentMessageTime, len(newList)
-        if len(newList)>dimensions:
+        if len(newList)>=dimensions:
             idsOfDimensionsListToCompare = [(i, GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i)) for i in estimationObject.dimensionUpdateTimeDeltas if GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i) in estimationObject.dimensionListsMap]
             dimensionsUpdateFrequency = {}
             for td, id in idsOfDimensionsListToCompare:
