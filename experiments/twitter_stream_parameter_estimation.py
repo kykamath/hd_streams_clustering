@@ -51,7 +51,7 @@ class ParameterEstimation:
         self.topDimensionsDuringPreviousIteration = None
         self.dimensionListsMap = {}
         self.boundaries = [50, 100, 500, 1000, 5000]+[10000*i for i in range(1,21)]
-        self.dimensionUpdateTimeDeltas = [timedelta(seconds=i*10*60) for i in range(1,7)]
+        self.dimensionUpdateTimeDeltas = [timedelta(seconds=i*30*60) for i in range(1,7)]
         self.dimensionsEstimationFile = twitter_stream_settings['parameter_estimation_folder']+'dimensions'
         
     def run(self, dataIterator, estimationMethod):
