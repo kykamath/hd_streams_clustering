@@ -49,6 +49,7 @@ class ParameterEstimation:
         self.convertDataToMessageMethod=twitter_stream_settings['convert_data_to_message_method']
         self.timeUnitInSeconds = twitter_stream_settings['time_unit_in_seconds']
         self.topDimensionsDuringPreviousIteration = None
+        self.dimensionListsMap = {}
         self.boundaries = [50, 100, 500, 1000, 5000]+[10000*i for i in range(1,21)]
         self.dimensionUpdateTimeDeltas = [timedelta(seconds=i*10*60) for i in range(1,7)]
         self.dimensionsEstimationFile = twitter_stream_settings['parameter_estimation_folder']+'dimensions'
@@ -123,8 +124,10 @@ class ParameterEstimation:
         estimationObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
     @staticmethod
     def dimensionsUpdateFrequencyEstimation(estimationObject, currentMessageTime):
-        idsOfDimensionsListToCompare = [currentMessageTime-i for i in estimationObject.dimensionUpdateTimeDeltas]
-        print ' *** ', currentMessageTime, idsOfDimensionsListToCompare
+        idsOfDimensionsListToCompare = [currentMessageTime-i for i in estimationObject.dimensionUpdateTimeDeltas if currentMessageTime-i in estimationObject.dimensionListsMap]
+        topDimensionsDuringCurrentIteration = []
+        print len(estimationObject.dimensionListsMap), currentMessageTime, idsOfDimensionsListToCompare
+        estimationObject.dimensionListsMap[currentMessageTime] = topDimensionsDuringCurrentIteration[:]
 
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
