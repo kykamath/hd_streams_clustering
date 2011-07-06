@@ -6,14 +6,14 @@ Created on Jul 4, 2011
 import sys
 from matplotlib.dates import AutoDateLocator
 from matplotlib.ticker import ScalarFormatter, FuncFormatter
-from library.plotting import getLatexForString, CurveFit
-from library.math_modified import getSmallestPrimeNumberGreaterThan
 sys.path.append('../')
 import pprint
 from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
 from library.file_io import FileIO
 from library.classes import GeneralMethods
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
+from library.plotting import getLatexForString, CurveFit
+from library.math_modified import getSmallestPrimeNumberGreaterThan
 from hd_streams_clustering import DataStreamMethods
 from classes import UtilityMethods, Phrase
 from twitter_streams_clustering import TwitterIterators, TwitterCrowdsSpecificMethods
