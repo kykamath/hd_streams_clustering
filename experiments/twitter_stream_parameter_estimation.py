@@ -208,7 +208,7 @@ def dimensionsUpdateFrequencyEstimation():
 
 def dimensionInActivityEstimation():
     def parameterSpecificDataCollectionMethod(estimationObject, message):
-        print message.timestamp
+        print message.timeStamp
     ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 
 if __name__ == '__main__':
