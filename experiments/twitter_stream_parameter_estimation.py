@@ -4,8 +4,6 @@ Created on Jul 4, 2011
 @author: kykamath
 '''
 import sys
-from matplotlib.dates import AutoDateLocator
-from matplotlib.ticker import ScalarFormatter, FuncFormatter
 sys.path.append('../')
 import pprint
 from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
@@ -16,9 +14,11 @@ from library.plotting import getLatexForString, CurveFit
 from library.math_modified import getSmallestPrimeNumberGreaterThan
 from hd_streams_clustering import DataStreamMethods
 from classes import UtilityMethods, Phrase
+from matplotlib.ticker import FuncFormatter
 from twitter_streams_clustering import TwitterIterators, TwitterCrowdsSpecificMethods
 from collections import defaultdict
 import matplotlib.pyplot as plt
+from datetime import timedelta
  
 
 experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
@@ -50,6 +50,7 @@ class ParameterEstimation:
         self.timeUnitInSeconds = twitter_stream_settings['time_unit_in_seconds']
         self.topDimensionsDuringPreviousIteration = None
         self.boundaries = [50, 100, 500, 1000, 5000]+[10000*i for i in range(1,21)]
+        self.dimensionUpdateTimeDeltas = [timedelta(seconds=i*10*60) for i in range(1,7)]
         self.dimensionsEstimationFile = twitter_stream_settings['parameter_estimation_folder']+'dimensions'
         
     def run(self, dataIterator, estimationMethod):
@@ -58,7 +59,7 @@ class ParameterEstimation:
             if DataStreamMethods.messageInOrder(message.timeStamp):
                 UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.twitter_stream_settings)
                 GeneralMethods.callMethodEveryInterval(estimationMethod, self.timeUnitInSeconds, message.timeStamp, 
-                                                       estimateDimensionsObject=self,
+                                                       estimationObject=self,
                                                        currentMessageTime=message.timeStamp)
     def plotGrowthOfPhrasesInTime(self, returnAxisValuesOnly=True):
         '''
@@ -101,28 +102,29 @@ class ParameterEstimation:
     @staticmethod
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
     @staticmethod
-    def dimensionsEstimation(estimateDimensionsObject, currentMessageTime):
+    def dimensionsEstimation(estimationObject, currentMessageTime):
         def updatePhraseScore(phraseObject): 
-            phraseObject.updateScore(currentMessageTime, 0, **estimateDimensionsObject.twitter_stream_settings)
+            phraseObject.updateScore(currentMessageTime, 0, **estimationObject.twitter_stream_settings)
             return phraseObject
-        topDimensionsDuringCurrentIteration = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimateDimensionsObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
-        oldList, newList = estimateDimensionsObject.topDimensionsDuringPreviousIteration, topDimensionsDuringCurrentIteration
-        if estimateDimensionsObject.topDimensionsDuringPreviousIteration:
+        topDimensionsDuringCurrentIteration = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimationObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
+        oldList, newList = estimationObject.topDimensionsDuringPreviousIteration, topDimensionsDuringCurrentIteration
+        if estimationObject.topDimensionsDuringPreviousIteration:
             dimensions_estimation = {}
-            for boundary in estimateDimensionsObject.boundaries:
-                if boundary<len(estimateDimensionsObject.phraseTextToPhraseObjectMap): dimensions_estimation[str(boundary)]=len(set(newList[:boundary]).difference(oldList[:boundary]))
-            print currentMessageTime, len(estimateDimensionsObject.phraseTextToPhraseObjectMap)
+            for boundary in estimationObject.boundaries:
+                if boundary<len(estimationObject.phraseTextToPhraseObjectMap): dimensions_estimation[str(boundary)]=len(set(newList[:boundary]).difference(oldList[:boundary]))
+            print currentMessageTime, len(estimationObject.phraseTextToPhraseObjectMap)
             iterationData = {
                              'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
-                             'total_number_of_phrases': len(estimateDimensionsObject.phraseTextToPhraseObjectMap),
+                             'total_number_of_phrases': len(estimationObject.phraseTextToPhraseObjectMap),
                              'settings': experts_twitter_stream_settings.convertToSerializableObject(),
                              ParameterEstimation.dimensionsEstimationId:dimensions_estimation
                              }
-            FileIO.writeToFileAsJson(iterationData, estimateDimensionsObject.dimensionsEstimationFile)
-        estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
+            FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionsEstimationFile)
+        estimationObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
     @staticmethod
-    def dimensionsUpdateFrequencyEstimation(estimateDimensionsObject, currentMessageTime):
-        print ' *** ', currentMessageTime
+    def dimensionsUpdateFrequencyEstimation(estimationObject, currentMessageTime):
+        idsOfDimensionsListToCompare = [currentMessageTime-i for i in estimationObject.dimensionUpdateTimeDeltas]
+        print ' *** ', currentMessageTime, idsOfDimensionsListToCompare
 
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
