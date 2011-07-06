@@ -142,7 +142,7 @@ class ParameterEstimation:
             iterationData = {
                              'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                              'total_number_of_phrases': len(estimationObject.phraseTextToPhraseObjectMap),
-                             'settings': estimationObject.twitter_stream_settings.convertToSerializableObject(),
+                             'settings': pprint.pformat(estimationObject.twitter_stream_settings),
                              ParameterEstimation.dimensionsEstimationId:dimensionsUpdateFrequency
                              }
             print estimationObject.dimensionsUpdateFrequencyFile
