@@ -4,6 +4,7 @@ Created on Jun 30, 2011
 @author: kykamath
 '''
 import sys, os
+from library.plotting import getLatexForString
 sys.path.append('../')
 os.environ["PATH"] = os.environ["PATH"]+os.pathsep+'/opt/local/bin'
 from settings import experts_twitter_stream_settings
@@ -13,7 +14,7 @@ from hd_streams_clustering import HDStreaminClustering
 from datetime import datetime, timedelta
 from library.file_io import FileIO
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
-from library.classes import PlottingMethods, GeneralMethods
+from library.classes import GeneralMethods
 from library.clustering import EvaluationMetrics
 from operator import itemgetter
 from classes import Crowd, StreamCluster
@@ -108,9 +109,9 @@ class Plot:
     def lifeSpanDistribution():
         y,x= np.histogram([AnalyzeData.crowdMap[crowd].lifespan for crowd in AnalyzeData.crowdMap], bins=15)
         plt.semilogy(x[:-1], y, color='#F7AA45', lw=2)
-        plt.xlabel(PlottingMethods.getLatexForString('Lifespan'))
-        plt.ylabel(PlottingMethods.getLatexForString('\# of crowds'))
-        plt.title(PlottingMethods.getLatexForString('Crowd lifespan distribution'))
+        plt.xlabel(getLatexForString('Lifespan'))
+        plt.ylabel(getLatexForString('\# of crowds'))
+        plt.title(getLatexForString('Crowd lifespan distribution'))
         plt.show()
     @staticmethod
     def sampleCrowds():

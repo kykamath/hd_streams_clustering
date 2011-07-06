@@ -85,7 +85,7 @@ class Dimensions:
                 dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
         x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution) if k>1000] 
         exponentialCurveParams = CurveFit.getParamsForExponentialFitting(x, y)
-        print self.twitter_stream_settings['plot_label'], exponentialCurveParams
+        print self.twitter_stream_settings['plot_label'], exponentialCurveParams, Dimensions.calculateDimensionsFor(exponentialCurveParams, 0.01) 
         plt.ylabel(getLatexForString('\% of new dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
         plt.semilogy(x,y,'o', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{-%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
         plt.semilogy(x, CurveFit.getYValuesForExponential(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
@@ -121,6 +121,8 @@ class Dimensions:
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
     @staticmethod
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
+
+
 
 def estimateParametersForExpertsStream(): pass
 def estimateParametersForHoustonStream(): pass

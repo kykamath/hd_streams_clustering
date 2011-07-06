@@ -13,7 +13,7 @@ twitterDataFolder='/mnt/chevron/kykamath/data/twitter/'
 # General twitter stream settings.
 twitter_stream_settings = Settings(
                                    stream_id='twitter_stream', # Unique id to represent the stream.
-                                   max_dimensions=99991, # Number of maximum dimensions to consider at a time. Make sue this is prime. This is also equal to the number of top phrases that will be considered for crowd discovery.
+                                   dimensions=0, # Number of maximum dimensions to consider at a time. Make sue this is prime. This is also equal to the number of top phrases that will be considered for crowd discovery.
                                    min_phrase_length=2, # Minumum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=1 will result in only unigrams as features.
                                    max_phrase_length=2, # Maximum lenght of phrases. For example min_phrase_length=1 and max_phrase_length=2 will result in both unigrams and bigrams as features.
                                    
@@ -34,7 +34,6 @@ twitter_stream_settings = Settings(
 
 # Streaming LSH clustering specific settings.
 streaming_lsh_settings=Settings(
-                                dimensions=twitter_stream_settings.max_dimensions,
                                 signature_length=23,
                                 number_of_permutations=13,
                                 threshold_for_document_to_be_in_cluster=0.005
@@ -42,13 +41,14 @@ streaming_lsh_settings=Settings(
 twitter_stream_settings.update(streaming_lsh_settings)
 
 # Settings for trends specific streams.
-trends_twitter_stream_settings = Settings()
-trends_twitter_stream_settings.update(twitter_stream_settings)
-trends_twitter_stream_settings.stream_id = 'trends_twitter_stream'
+#trends_twitter_stream_settings = Settings()
+#trends_twitter_stream_settings.update(twitter_stream_settings)
+#trends_twitter_stream_settings.stream_id = 'trends_twitter_stream'
 
 # Settings for expert specific streams.
 experts_twitter_stream_settings = Settings()
 experts_twitter_stream_settings.update(twitter_stream_settings)
+experts_twitter_stream_settings.max_dimensions = 74177
 experts_twitter_stream_settings.stream_id = 'experts_twitter_stream'
 experts_twitter_stream_settings.plot_color = '#F28500'
 experts_twitter_stream_settings.plot_label = 'Experts stream'
@@ -62,6 +62,7 @@ experts_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/expert
 # Settings for houston specific streams.
 houston_twitter_stream_settings = Settings()
 houston_twitter_stream_settings.update(twitter_stream_settings)
+houston_twitter_stream_settings.max_dimensions = 155801
 houston_twitter_stream_settings.stream_id = 'houston_twitter_stream'
 houston_twitter_stream_settings.plot_color = '#CC00FF'
 houston_twitter_stream_settings.plot_label = 'Houston stream'

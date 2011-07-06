@@ -31,9 +31,9 @@ class UtilityMethodsTests(unittest.TestCase):
         self.phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, 'cluster', 1)
         self.phraseTextToPhraseObjectMap = {'project': Phrase('project', test_time, score=8), 'cluster': Phrase('cluster', test_time, score=8), 'abcd': Phrase('abcd', test_time-3*stream_settings['max_phrase_inactivity_time_in_seconds'], score=8)}
         self.vector = Vector({0:1, 1:1, 2:1, 3:1})
-        self.initial_max_dimensions = stream_settings['max_dimensions']
-        stream_settings['max_dimensions'] = 2
-    def tearDown(self): stream_settings['max_dimensions'] = self.initial_max_dimensions
+        self.initial_max_dimensions = stream_settings['dimensions']
+        stream_settings['dimensions'] = 2
+    def tearDown(self): stream_settings['dimensions'] = self.initial_max_dimensions
     def test_updatedPhraseObject_PhraseObjectScoresAreUpdatedCorrectly(self): 
         UtilityMethods.updatePhraseTextToPhraseObject(self.phraseVector, test_time+timedelta(seconds=60), self.phraseTextToPhraseObjectMap, **stream_settings)
         self.assertEqual(5, len(self.phraseTextToPhraseObjectMap))
@@ -41,7 +41,7 @@ class UtilityMethodsTests(unittest.TestCase):
         self.assertEqual(1, self.phraseTextToPhraseObjectMap['streams'].score)
     
     def test_updatedPhraseObject_phrase_does_not_exist_in_phraseToIdMap_but_exists_in_phraseTextToPhraseObjectMap_with_dimensions_full(self): 
-        stream_settings['max_dimensions'] = 1
+        stream_settings['dimensions'] = 1
         self.phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, 'cluster')
         UtilityMethods.updatePhraseTextToPhraseObject(self.phraseVector, test_time+timedelta(seconds=60), self.phraseTextToPhraseObjectMap, **stream_settings)
         self.assertEqual({'project':0}, self.phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD))
@@ -68,14 +68,14 @@ class UtilityMethodsTests(unittest.TestCase):
         self.assertEqual({'added':1, 'are': 0}, self.phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD))
     
     def test_updateDimensions_when_phraseTextToIdMap_has_lesser_than_max_dimensions(self):
-        stream_settings['max_dimensions'] = 4
+        stream_settings['dimensions'] = 4
         for phrase, score in zip(['new', 'phrases', 'are', 'added'], range(7,11)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
         UtilityMethods.updateDimensions(self.phraseTextAndDimensionMap, self.phraseTextToPhraseObjectMap, test_time, **stream_settings)
         self.assertEqual(set({'project':0, 'phrases': 1, 'are':2, 'added':3}), set(self.phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD)))
         self.assertEqual(4, len(self.phraseTextAndDimensionMap))
     
     def test_updateDimensions_when_phrases_with_lower_id_are_removed_from_phraseTextToIdMap(self):
-        stream_settings['max_dimensions'] = 3
+        stream_settings['dimensions'] = 3
         for phrase, score in zip(['new', 'phrases', 'are'], range(100,103)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)
         self.phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, 'cluster', 2)
         self.phraseTextToPhraseObjectMap['cluster'].score=100
@@ -93,7 +93,7 @@ class UtilityMethodsTests(unittest.TestCase):
     
     
     def test_updateDimensions_when_dimensions_have_to_be_removed(self):
-        stream_settings['max_dimensions'] = 4
+        stream_settings['dimensions'] = 4
         self.phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, 'abcdx', 2)
         self.phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, 'abcdxy', 3)
         for phrase, score in zip(['new_text'], range(7,8)): self.phraseTextToPhraseObjectMap[phrase] = Phrase(phrase, test_time, score=score)

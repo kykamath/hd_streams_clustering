@@ -33,9 +33,9 @@ class UtilityMethods:
             phraseObject.updateScore(currentTime, 0, **stream_settings)
             return phraseObject
         UtilityMethods.pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, currentTime, UtilityMethods.pruningConditionDeterministic, **stream_settings)
-        topPhrasesList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in phraseTextToPhraseObjectMap.itervalues()), reverse=True)[:stream_settings['max_dimensions']]]
+        topPhrasesList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in phraseTextToPhraseObjectMap.itervalues()), reverse=True)[:stream_settings['dimensions']]]
         newPhraseIterator = getNextNewPhrase(topPhrasesList)
-        availableIds = set(list(range(stream_settings['max_dimensions'])))
+        availableIds = set(list(range(stream_settings['dimensions'])))
         for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
             availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
             if phrase not in topPhrasesList:
@@ -54,7 +54,7 @@ class UtilityMethods:
         UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap(phraseTextAndDimensionMap, **stream_settings)
     @staticmethod
     def checkCriticalErrorsInPhraseTextToIdMap(phraseTextAndDimensionMap, **stream_settings):
-        if len(phraseTextAndDimensionMap)>stream_settings['max_dimensions']: print 'Illegal number of dimensions.', exit()
+        if len(phraseTextAndDimensionMap)>stream_settings['dimensions']: print 'Illegal number of dimensions.', exit()
     @staticmethod
     def pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, currentTime, pruningMethod, **stream_settings):
         def prune(phraseText): 
