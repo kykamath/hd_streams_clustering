@@ -43,6 +43,7 @@ class ParameterEstimation:
     result in inefficiency.  
     '''
     dimensionsEstimationId = 'dimensions_estimation'
+    dimensionsUpdateFrequencyId = 'dimensions_update_frequency_id'
     def __init__(self, **twitter_stream_settings):
         self.twitter_stream_settings = twitter_stream_settings
         self.phraseTextToPhraseObjectMap = {}
@@ -51,8 +52,9 @@ class ParameterEstimation:
         self.topDimensionsDuringPreviousIteration = None
         self.dimensionListsMap = {}
         self.boundaries = [50, 100, 500, 1000, 5000]+[10000*i for i in range(1,21)]
-        self.dimensionUpdateTimeDeltas = [timedelta(seconds=i*30*60) for i in range(1,7)]
+        self.dimensionUpdateTimeDeltas = [timedelta(seconds=i*10*60) for i in range(1,19)]
         self.dimensionsEstimationFile = twitter_stream_settings['parameter_estimation_folder']+'dimensions'
+        self.dimensionsUpdateFrequencyFile = twitter_stream_settings['parameter_estimation_folder']+'dimensions_update_frequency'
         
     def run(self, dataIterator, estimationMethod):
         for data in dataIterator:
@@ -117,7 +119,7 @@ class ParameterEstimation:
             iterationData = {
                              'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                              'total_number_of_phrases': len(estimationObject.phraseTextToPhraseObjectMap),
-                             'settings': experts_twitter_stream_settings.convertToSerializableObject(),
+                             'settings': estimationObject.twitter_stream_settings.convertToSerializableObject(),
                              ParameterEstimation.dimensionsEstimationId:dimensions_estimation
                              }
             FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionsEstimationFile)
@@ -135,8 +137,17 @@ class ParameterEstimation:
             dimensionsUpdateFrequency = {}
             for td, id in idsOfDimensionsListToCompare:
                 oldList = estimationObject.dimensionListsMap[id]
-                dimensionsUpdateFrequency[td.seconds]=len(set(newList).difference(oldList))
+                dimensionsUpdateFrequency[str(td.seconds)]=len(set(newList).difference(oldList))
             print len(estimationObject.dimensionListsMap), currentMessageTime, len(newList), [(k,dimensionsUpdateFrequency[k]) for k in sorted(dimensionsUpdateFrequency)]
+            iterationData = {
+                             'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
+                             'total_number_of_phrases': len(estimationObject.phraseTextToPhraseObjectMap),
+                             'settings': estimationObject.twitter_stream_settings.convertToSerializableObject(),
+                             ParameterEstimation.dimensionsEstimationId:dimensionsUpdateFrequency
+                             }
+            print estimationObject.dimensionsUpdateFrequencyFile
+            print iterationData
+#            FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionsEstimationFile)
             estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = newList[:]
             for key in estimationObject.dimensionListsMap.keys()[:]:
                 if currentMessageTime-key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
