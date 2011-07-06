@@ -129,11 +129,10 @@ class ParameterEstimation:
             return phraseObject
         newList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimationObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)]
         idsOfDimensionsListToCompare = [GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i) for i in estimationObject.dimensionUpdateTimeDeltas if GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i) in estimationObject.dimensionListsMap]
-        print len(estimationObject.dimensionListsMap), currentMessageTime, idsOfDimensionsListToCompare
         dimensionsUpdateFrequency = {}
         for id in idsOfDimensionsListToCompare:
             oldList = estimationObject.dimensionListsMap[id]
-            dimensionsUpdateFrequency[id.seconds]=len(set(newList).difference(oldList))
+            dimensionsUpdateFrequency[id.second]=len(set(newList).difference(oldList))
         print len(estimationObject.dimensionListsMap), currentMessageTime, dimensionsUpdateFrequency
         estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = newList[:]
         for key in estimationObject.dimensionListsMap.keys()[:]:
