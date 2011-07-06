@@ -11,7 +11,8 @@ from library.file_io import FileIO
 from library.classes import GeneralMethods
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
 from library.plotting import getLatexForString, CurveFit
-from library.math_modified import getSmallestPrimeNumberGreaterThan
+from library.math_modified import getSmallestPrimeNumberGreaterThan,\
+    DateTimeAirthematic
 from hd_streams_clustering import DataStreamMethods
 from classes import UtilityMethods, Phrase
 from matplotlib.ticker import FuncFormatter
@@ -209,10 +210,12 @@ def dimensionsUpdateFrequencyEstimation():
 
 def dimensionInActivityEstimation():
     def parameterSpecificDataCollectionMethod(estimationObject, message):
-        print message.timeStamp, [phrase for phrase in message.vector]
-#        estimationObject.lagBetweenMessagesDistribution
-#        estimationObject.phraseTextToPhraseObjectMap
-#        print message.timeStamp
+        for phrase in message.vector:
+            if phrase in estimationObject.phraseTextToPhraseObjectMap:
+                phraseObject = estimationObject.phraseTextToPhraseObjectMap[phrase]
+                lag=DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, phraseObject.latestOccuranceTime, estimationObject.twitter_stream_settings['time_unit_in_seconds'].seconds)
+                estimationObject.lagBetweenMessagesDistribution[lag]+=1
+                print message.timeStamp, phraseObject.latestOccuranceTime, lag
     ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 
 if __name__ == '__main__':
