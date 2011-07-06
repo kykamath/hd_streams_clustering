@@ -22,14 +22,12 @@ from datetime import timedelta
 from operator import itemgetter
 
 experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+'''
+Phrase not mentioned in 10 mimiutes probability it will ever get mentioned
+Phrase not mentioned in 2 minutes, probability it will ever get mentioned.
+'''
 
-'''
-Phrase not touched in 5 minutes came back to dimensions
-phases not tocuhed in 10 minutes came back again
-and so on.
-Find the time after which percentage of phrases returning is constant.
-'''
-class ParameterEstimation:
+class DimensionsAndDimensionsUpdateFrequencyEstimation:
     '''
     This class is used to dimensionsEstimation dimensions in the stream. To dimensionsEstimation it we calculate
     the number of phrases that need to added every iteration for different dimensions.
@@ -83,30 +81,44 @@ class ParameterEstimation:
     def plotDimensionsEstimation(self, returnAxisValuesOnly=True, numberOfTimeUnits=10*24*12):
         dataDistribution = defaultdict(list)
         for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile):
-            for k, v in line[ParameterEstimation.dimensionsEstimationId].iteritems():
+            for k, v in line[DimensionsAndDimensionsUpdateFrequencyEstimation.dimensionsEstimationId].iteritems():
                 k=int(k)
                 if k not in dataDistribution: dataDistribution[k]=[0.,0.]
                 dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
         x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution) if k>1000]
         x,y=x[:numberOfTimeUnits], y[:numberOfTimeUnits]
         exponentialCurveParams = CurveFit.getParamsForExponentialFitting(x, y)
-        print self.twitter_stream_settings['plot_label'], exponentialCurveParams, ParameterEstimation.calculateDimensionsFor(exponentialCurveParams, 0.01) 
+#        print self.twitter_stream_settings['plot_label'], exponentialCurveParams, DimensionsAndDimensionsUpdateFrequencyEstimation.calculateDimensionsFor(exponentialCurveParams, 0.01) 
         plt.ylabel(getLatexForString('\% of new dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
         plt.semilogy(x,y,'o', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{-%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
-        plt.semilogy(x, CurveFit.getYValuesForExponential(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
+        plt.semilogy(x,CurveFit.getYValuesForExponential(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
         plt.legend()
         if returnAxisValuesOnly: plt.show()
     def plotDimensionsUpdateFrequencyEstimation(self, returnAxisValuesOnly=True):
+        '''
+        Number of time units:  1321
+        Experts stream (12, 781.97497249724972)
+        Number of time units:  762
+        Houston stream (34, 1503.7962647869065)
+        '''
         dataDistribution = defaultdict(list)
+        i = 0
         for line in FileIO.iterateJsonFromFile(self.dimensionsUpdateFrequencyFile):
-            for k, v in line[ParameterEstimation.dimensionsUpdateFrequencyId].iteritems():
+            i+=1
+            for k, v in line[DimensionsAndDimensionsUpdateFrequencyEstimation.dimensionsUpdateFrequencyId].iteritems():
                 k=int(k)/self.timeUnitInSeconds.seconds
                 if k not in dataDistribution: dataDistribution[k]=[0.,0.]
                 dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
-        x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution)]
-        print self.twitter_stream_settings['plot_label'], max(zip(x,y),key=itemgetter(1))
-        plt.plot(x,y,'o', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
-        plt.legend()
+        print 'Number of time units: ', i
+        x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1]))) for k in sorted(dataDistribution)]
+        x1, y1 = [], []; [(x1.append(k), y1.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution)]
+        print self.twitter_stream_settings['plot_label'], max(zip(x1,y1),key=itemgetter(1))
+        plt.subplot(311)
+        plt.plot(x,y,'-', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
+        if self.twitter_stream_settings['stream_id']=='experts_twitter_stream': plt.subplot(312)
+        else: plt.subplot(313)
+        plt.semilogx(x1,y1,'-', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
+#        plt.legend()
         if returnAxisValuesOnly: plt.show()
     @staticmethod
     def calculateDimensionsFor(params, percentageOfNewDimensions): 
@@ -133,12 +145,21 @@ class ParameterEstimation:
                              'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                              'total_number_of_phrases': len(estimationObject.phraseTextToPhraseObjectMap),
                              'settings': estimationObject.twitter_stream_settings.convertToSerializableObject(),
-                             ParameterEstimation.dimensionsEstimationId:dimensions_estimation
+                             DimensionsAndDimensionsUpdateFrequencyEstimation.dimensionsEstimationId:dimensions_estimation
                              }
             FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionsEstimationFile)
         estimationObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
     @staticmethod
     def dimensionsUpdateFrequencyEstimation(estimationObject, currentMessageTime):
+        '''
+        Observe the new dimensions that get added to current dimension if the dimensions 
+        are being updated at regular intervals.
+        For example, number of dimensions being added after 10m, 20m,... 5 horus. 
+        As time increases the number of 'decayed' dimensions increase. The current dimensions
+        has a lot of unwanted decayed dimensions. Using this information identify the time 
+        interval that is best suited to refresh dimensions. 
+        Tentative: We decide to pick the time interval at which the rate of decay is maximum.
+        '''
         def updatePhraseScore(phraseObject): 
             phraseObject.updateScore(currentMessageTime, 0, **estimationObject.twitter_stream_settings)
             return phraseObject
@@ -156,25 +177,42 @@ class ParameterEstimation:
                              'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                              'total_number_of_phrases': len(estimationObject.phraseTextToPhraseObjectMap),
                              'settings': pprint.pformat(estimationObject.twitter_stream_settings),
-                             ParameterEstimation.dimensionsUpdateFrequencyId:dimensionsUpdateFrequency
+                             DimensionsAndDimensionsUpdateFrequencyEstimation.dimensionsUpdateFrequencyId:dimensionsUpdateFrequency
                              }
             FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionsUpdateFrequencyFile)
             estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = newList[:]
             for key in estimationObject.dimensionListsMap.keys()[:]:
                 if currentMessageTime-key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
 
+class DimensionInActivityTimeEstimation():
+    dimensionsUpdateFrequencyId = 'dimensions_update_frequency_id'
+    def __init__(self, **twitter_stream_settings):
+        self.twitter_stream_settings = twitter_stream_settings
+        self.phraseTextToPhraseObjectMap = {}
+        self.convertDataToMessageMethod=twitter_stream_settings['convert_data_to_message_method']
+        self.timeUnitInSeconds = twitter_stream_settings['time_unit_in_seconds']
+        self.topDimensionsDuringPreviousIteration = None
+        self.dimensionListsMap = {}
+        self.boundaries = [50, 100, 500, 1000, 5000]+[10000*i for i in range(1,21)]
+        self.dimensionUpdateTimeDeltas = [timedelta(seconds=i*10*60) for i in range(1,31)]
+        self.dimensionsEstimationFile = twitter_stream_settings['parameter_estimation_folder']+'dimensions'
+        self.dimensionsUpdateFrequencyFile = twitter_stream_settings['parameter_estimation_folder']+'dimensions_update_frequency'
+
+
 def dimensionsEstimation():
-#    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
-#    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsEstimation)
-#    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotGrowthOfPhrasesInTime, ParameterEstimation(**houston_twitter_stream_settings).plotGrowthOfPhrasesInTime])
-    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsEstimation, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsEstimation])
+#    DimensionsAndDimensionsUpdateFrequencyEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), DimensionsAndDimensionsUpdateFrequencyEstimation.dimensionsEstimation)
+#    DimensionsAndDimensionsUpdateFrequencyEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), DimensionsAndDimensionsUpdateFrequencyEstimation.dimensionsEstimation)
+#    DimensionsAndDimensionsUpdateFrequencyEstimation.plotMethods([DimensionsAndDimensionsUpdateFrequencyEstimation(**experts_twitter_stream_settings).plotGrowthOfPhrasesInTime, DimensionsAndDimensionsUpdateFrequencyEstimation(**houston_twitter_stream_settings).plotGrowthOfPhrasesInTime])
+    DimensionsAndDimensionsUpdateFrequencyEstimation.plotMethods([DimensionsAndDimensionsUpdateFrequencyEstimation(**experts_twitter_stream_settings).plotDimensionsEstimation, DimensionsAndDimensionsUpdateFrequencyEstimation(**houston_twitter_stream_settings).plotDimensionsEstimation])
 
 def dimensionsUpdateFrequencyEstimation():
-#    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
-    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
-#    ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation()
-#    ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation()
-    
+#    DimensionsAndDimensionsUpdateFrequencyEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), DimensionsAndDimensionsUpdateFrequencyEstimation.dimensionsUpdateFrequencyEstimation)
+#    DimensionsAndDimensionsUpdateFrequencyEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), DimensionsAndDimensionsUpdateFrequencyEstimation.dimensionsUpdateFrequencyEstimation)
+#    DimensionsAndDimensionsUpdateFrequencyEstimation(**experts_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation()
+#    DimensionsAndDimensionsUpdateFrequencyEstimation(**houston_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation()
+    DimensionsAndDimensionsUpdateFrequencyEstimation.plotMethods([DimensionsAndDimensionsUpdateFrequencyEstimation(**experts_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation, DimensionsAndDimensionsUpdateFrequencyEstimation(**houston_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation])
+
+
 if __name__ == '__main__':
 #    dimensionsEstimation()
     dimensionsUpdateFrequencyEstimation()
