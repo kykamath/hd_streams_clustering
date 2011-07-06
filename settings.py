@@ -48,7 +48,7 @@ twitter_stream_settings.update(streaming_lsh_settings)
 # Settings for expert specific streams.
 experts_twitter_stream_settings = Settings()
 experts_twitter_stream_settings.update(twitter_stream_settings)
-experts_twitter_stream_settings.dimensions = 74177
+experts_twitter_stream_settings.dimensions = 76819
 experts_twitter_stream_settings.stream_id = 'experts_twitter_stream'
 experts_twitter_stream_settings.plot_color = '#F28500'
 experts_twitter_stream_settings.plot_label = 'Experts stream'
@@ -62,7 +62,7 @@ experts_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/expert
 # Settings for houston specific streams.
 houston_twitter_stream_settings = Settings()
 houston_twitter_stream_settings.update(twitter_stream_settings)
-houston_twitter_stream_settings.dimensions = 155801
+houston_twitter_stream_settings.dimensions = 195731
 houston_twitter_stream_settings.stream_id = 'houston_twitter_stream'
 houston_twitter_stream_settings.plot_color = '#CC00FF'
 houston_twitter_stream_settings.plot_label = 'Houston stream'
