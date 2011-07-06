@@ -134,7 +134,7 @@ class ParameterEstimation:
         for td, id in idsOfDimensionsListToCompare:
             oldList = estimationObject.dimensionListsMap[id]
             dimensionsUpdateFrequency[td.seconds]=len(set(newList).difference(oldList))/float(dimensions)
-        print len(estimationObject.dimensionListsMap), currentMessageTime, [(k,dimensionsUpdateFrequency[k]) for k in sorted(dimensionsUpdateFrequency)]
+        print len(estimationObject.dimensionListsMap), currentMessageTime, len(newList), [(k,dimensionsUpdateFrequency[k]) for k in sorted(dimensionsUpdateFrequency)]
         estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = newList[:]
         for key in estimationObject.dimensionListsMap.keys()[:]:
             if currentMessageTime-key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
