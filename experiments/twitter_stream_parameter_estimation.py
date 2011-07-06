@@ -193,7 +193,7 @@ class ParameterEstimation:
                 if currentMessageTime-key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
     @staticmethod
     def dimensionInActivityTimeEstimation(estimationObject, currentMessageTime):
-        print ' *** ', currentMessageTime
+        print estimationObject.lagBetweenMessagesDistribution
 
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
@@ -215,7 +215,6 @@ def dimensionInActivityEstimation():
                 phraseObject = estimationObject.phraseTextToPhraseObjectMap[phrase]
                 lag=DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, phraseObject.latestOccuranceTime, estimationObject.twitter_stream_settings['time_unit_in_seconds'].seconds)
                 estimationObject.lagBetweenMessagesDistribution[lag]+=1
-                print message.timeStamp, phraseObject.latestOccuranceTime, lag
     ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 
 if __name__ == '__main__':
