@@ -129,7 +129,7 @@ class ParameterEstimation:
         print len(estimationObject.dimensionListsMap), currentMessageTime, idsOfDimensionsListToCompare
 #        print estimationObject.dimensionListsMap.keys()
         estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = topDimensionsDuringCurrentIteration[:]
-        for key in estimationObject.dimensionListsMap[:]:
+        for key in estimationObject.dimensionListsMap.keys()[:]:
             if currentMessageTime-key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
 
 def dimensionsEstimation():
