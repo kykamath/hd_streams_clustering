@@ -61,11 +61,11 @@ class ParameterEstimation:
         for data in dataIterator:
             message = self.convertDataToMessageMethod(data, **self.twitter_stream_settings)
             if DataStreamMethods.messageInOrder(message.timeStamp):
-                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.twitter_stream_settings)
                 if parameterSpecificDataCollectionMethod!=None: parameterSpecificDataCollectionMethod(
                                                                                                       estimationObject=self,
                                                                                                       message=message
                                                                                                       )
+                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.twitter_stream_settings)
                 GeneralMethods.callMethodEveryInterval(estimationMethod, self.timeUnitInSeconds, message.timeStamp, 
                                                        estimationObject=self,
                                                        currentMessageTime=message.timeStamp)
