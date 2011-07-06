@@ -54,6 +54,7 @@ class ParameterEstimation:
         self.dimensionsEstimationFile = twitter_stream_settings['parameter_estimation_folder']+'dimensions'
         self.dimensionsUpdateFrequencyFile = twitter_stream_settings['parameter_estimation_folder']+'dimensions_update_frequency'
         self.dimensionInActivityTimeFile = twitter_stream_settings['parameter_estimation_folder']+'dimension_inactivity_time'
+        self.lagBetweenMessagesDistribution = defaultdict(int)
         
     def run(self, dataIterator, estimationMethod, parameterSpecificDataCollectionMethod=None):
         for data in dataIterator:
@@ -208,7 +209,10 @@ def dimensionsUpdateFrequencyEstimation():
 
 def dimensionInActivityEstimation():
     def parameterSpecificDataCollectionMethod(estimationObject, message):
-        print message.timeStamp
+        print message.timeStamp, [phrase for phrase in message.vector]
+#        estimationObject.lagBetweenMessagesDistribution
+#        estimationObject.phraseTextToPhraseObjectMap
+#        print message.timeStamp
     ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 
 if __name__ == '__main__':
