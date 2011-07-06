@@ -122,7 +122,7 @@ class ParameterEstimation:
         estimateDimensionsObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
     @staticmethod
     def dimensionsUpdateFrequencyEstimation(estimateDimensionsObject, currentMessageTime):
-        print currentMessageTime
+        print ' *** ', currentMessageTime
 
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
