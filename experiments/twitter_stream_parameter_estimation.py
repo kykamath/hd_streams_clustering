@@ -145,9 +145,7 @@ class ParameterEstimation:
                              'settings': pprint.pformat(estimationObject.twitter_stream_settings),
                              ParameterEstimation.dimensionsEstimationId:dimensionsUpdateFrequency
                              }
-            print estimationObject.dimensionsUpdateFrequencyFile
-            print iterationData
-#            FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionsEstimationFile)
+            FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionsUpdateFrequencyFile)
             estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = newList[:]
             for key in estimationObject.dimensionListsMap.keys()[:]:
                 if currentMessageTime-key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
