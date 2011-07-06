@@ -95,6 +95,17 @@ class ParameterEstimation:
         plt.semilogy(x, CurveFit.getYValuesForExponential(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
         plt.legend()
         if returnAxisValuesOnly: plt.show()
+    def plotDimensionsUpdateFrequencyEstimation(self, returnAxisValuesOnly=True):
+        dataDistribution = defaultdict(list)
+        for line in FileIO.iterateJsonFromFile(self.dimensionsUpdateFrequencyFile):
+            for k, v in line[ParameterEstimation.dimensionsEstimationId].iteritems():
+                k=int(k)
+                if k not in dataDistribution: dataDistribution[k]=[0.,0.]
+                dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
+        x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1]))) for k in sorted(dataDistribution)]
+        plt.plot(x,y,'o', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
+        plt.legend()
+        if returnAxisValuesOnly: plt.show()
     @staticmethod
     def calculateDimensionsFor(params, percentageOfNewDimensions): 
         '''
@@ -153,10 +164,13 @@ class ParameterEstimation:
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsEstimation)
-    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotGrowthOfPhrasesInTime, ParameterEstimation(**houston_twitter_stream_settings).plotGrowthOfPhrasesInTime])
+#    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotGrowthOfPhrasesInTime, ParameterEstimation(**houston_twitter_stream_settings).plotGrowthOfPhrasesInTime])
+    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsEstimation, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsEstimation])
 
 def dimensionsUpdateFrequencyEstimation():
-    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
+#    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
+    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
+#    ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation()
     
 if __name__ == '__main__':
 #    dimensionsEstimation()
