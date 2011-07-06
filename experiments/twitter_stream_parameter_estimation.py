@@ -124,11 +124,11 @@ class ParameterEstimation:
         estimationObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
     @staticmethod
     def dimensionsUpdateFrequencyEstimation(estimationObject, currentMessageTime):
-        idsOfDimensionsListToCompare = [currentMessageTime-i for i in estimationObject.dimensionUpdateTimeDeltas if currentMessageTime-i in estimationObject.dimensionListsMap]
+        idsOfDimensionsListToCompare = [GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i) for i in estimationObject.dimensionUpdateTimeDeltas if GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i) in estimationObject.dimensionListsMap]
         topDimensionsDuringCurrentIteration = []
         print len(estimationObject.dimensionListsMap), currentMessageTime, idsOfDimensionsListToCompare
         print estimationObject.dimensionListsMap.keys()
-        estimationObject.dimensionListsMap[currentMessageTime] = topDimensionsDuringCurrentIteration[:]
+        estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = topDimensionsDuringCurrentIteration[:]
 
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
