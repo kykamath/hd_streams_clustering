@@ -196,7 +196,7 @@ class ParameterEstimation:
         phrasesLagDistribution = defaultdict(int)
         for phraseObject in estimationObject.phraseTextToPhraseObjectMap.itervalues():
             lag=DateTimeAirthematic.getDifferenceInTimeUnits(currentMessageTime, phraseObject.latestOccuranceTime, estimationObject.twitter_stream_settings['time_unit_in_seconds'].seconds)
-            phrasesLagDistribution[lag]+=1
+            phrasesLagDistribution[str(lag)]+=1
         print currentMessageTime
         iterationData = {
                          'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
@@ -225,7 +225,7 @@ def dimensionInActivityEstimation():
             if phrase in estimationObject.phraseTextToPhraseObjectMap:
                 phraseObject = estimationObject.phraseTextToPhraseObjectMap[phrase]
                 lag=DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, phraseObject.latestOccuranceTime, estimationObject.twitter_stream_settings['time_unit_in_seconds'].seconds)
-                estimationObject.lagBetweenMessagesDistribution[lag]+=1
+                estimationObject.lagBetweenMessagesDistribution[str(lag)]+=1
     ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 
