@@ -170,8 +170,8 @@ def dimensionsEstimation():
     ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsEstimation, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsEstimation])
 
 def dimensionsUpdateFrequencyEstimation():
-    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
-#    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
+#    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
+    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
 #    ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation()
 #    ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation()
     
