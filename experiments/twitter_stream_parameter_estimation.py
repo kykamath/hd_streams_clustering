@@ -129,15 +129,17 @@ class ParameterEstimation:
             return phraseObject
         dimensions=estimationObject.twitter_stream_settings['dimensions']
         newList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimationObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)][:dimensions]
-        idsOfDimensionsListToCompare = [(i, GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i)) for i in estimationObject.dimensionUpdateTimeDeltas if GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i) in estimationObject.dimensionListsMap]
-        dimensionsUpdateFrequency = {}
-        for td, id in idsOfDimensionsListToCompare:
-            oldList = estimationObject.dimensionListsMap[id]
-            dimensionsUpdateFrequency[td.seconds]=len(set(newList).difference(oldList))/float(dimensions)
-        print len(estimationObject.dimensionListsMap), currentMessageTime, len(newList), [(k,dimensionsUpdateFrequency[k]) for k in sorted(dimensionsUpdateFrequency)]
-        estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = newList[:]
-        for key in estimationObject.dimensionListsMap.keys()[:]:
-            if currentMessageTime-key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
+        print currentMessageTime, len(newList)
+        if len(newList)>dimensions:
+            idsOfDimensionsListToCompare = [(i, GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i)) for i in estimationObject.dimensionUpdateTimeDeltas if GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i) in estimationObject.dimensionListsMap]
+            dimensionsUpdateFrequency = {}
+            for td, id in idsOfDimensionsListToCompare:
+                oldList = estimationObject.dimensionListsMap[id]
+                dimensionsUpdateFrequency[td.seconds]=len(set(newList).difference(oldList))/float(dimensions)
+            print len(estimationObject.dimensionListsMap), currentMessageTime, len(newList), [(k,dimensionsUpdateFrequency[k]) for k in sorted(dimensionsUpdateFrequency)]
+            estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = newList[:]
+            for key in estimationObject.dimensionListsMap.keys()[:]:
+                if currentMessageTime-key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
 
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
