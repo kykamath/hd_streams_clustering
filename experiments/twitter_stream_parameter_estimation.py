@@ -194,7 +194,11 @@ class ParameterEstimation:
     @staticmethod
     def dimensionInActivityTimeEstimation(estimationObject, currentMessageTime):
         print estimationObject.lagBetweenMessagesDistribution
-
+        phrasesLagDistribution = defaultdict(int)
+        for phraseObject in estimationObject.phraseTextToPhraseObjectMap.itervalues():
+            lag=DateTimeAirthematic.getDifferenceInTimeUnits(currentMessageTime, phraseObject.latestOccuranceTime, estimationObject.twitter_stream_settings['time_unit_in_seconds'].seconds)
+            phrasesLagDistribution[lag]+=1
+        print phrasesLagDistribution
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsEstimation)
