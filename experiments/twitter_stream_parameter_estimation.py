@@ -122,7 +122,7 @@ class ParameterEstimation:
         x1, y1 = [], []; [(x1.append(k), y1.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution)]
         print self.twitter_stream_settings['plot_label'], max(zip(x1,y1),key=itemgetter(1))
         plt.subplot(311)
-        plt.plot(x,y,'-', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
+        plt.semilogx(x,y,'-', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
         if self.twitter_stream_settings['stream_id']=='experts_twitter_stream': plt.subplot(312)
         else: plt.subplot(313)
         plt.semilogx(x1,y1,'-', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
@@ -193,12 +193,19 @@ class ParameterEstimation:
                 if currentMessageTime-key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
     @staticmethod
     def dimensionInActivityTimeEstimation(estimationObject, currentMessageTime):
-        print estimationObject.lagBetweenMessagesDistribution
         phrasesLagDistribution = defaultdict(int)
         for phraseObject in estimationObject.phraseTextToPhraseObjectMap.itervalues():
             lag=DateTimeAirthematic.getDifferenceInTimeUnits(currentMessageTime, phraseObject.latestOccuranceTime, estimationObject.twitter_stream_settings['time_unit_in_seconds'].seconds)
             phrasesLagDistribution[lag]+=1
-        print phrasesLagDistribution
+        print currentMessageTime
+        iterationData = {
+                         'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
+                         'settings': pprint.pformat(estimationObject.twitter_stream_settings),
+                         ParameterEstimation.dimensionInActivityTimeId:estimationObject.lagBetweenMessagesDistribution,
+                         'phrases_lag_distribution': phrasesLagDistribution
+                         }
+        FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionInActivityTimeFile)
+        
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsEstimation)
@@ -220,6 +227,7 @@ def dimensionInActivityEstimation():
                 lag=DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, phraseObject.latestOccuranceTime, estimationObject.twitter_stream_settings['time_unit_in_seconds'].seconds)
                 estimationObject.lagBetweenMessagesDistribution[lag]+=1
     ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
+#    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 
 if __name__ == '__main__':
 #    dimensionsEstimation()
