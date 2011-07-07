@@ -28,9 +28,6 @@ numberOfTimeUnits=10*24*12
 xlabelTimeUnits = 'Time units'
 
 class ParameterEstimation:
-    '''
-    '''
-    dimensionsEstimationId = 'dimensions_estimation'
     dimensionsUpdateFrequencyId = 'dimensions_update_frequency_id'
     dimensionInActivityTimeId = 'dimension_inactivity_time_id'
     def __init__(self, **stream_settings):
