@@ -3,6 +3,8 @@ Created on Jun 22, 2011
 
 @author: kykamath
 '''
+import matplotlib
+matplotlib.use('TkAgg')
 from library.classes import Settings
 from datetime import timedelta
 from library.math_modified import getLargestPrimeLesserThan

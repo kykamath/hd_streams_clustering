@@ -21,6 +21,7 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 from datetime import timedelta
 from operator import itemgetter
+import numpy as np
 
 experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
 '''
@@ -171,6 +172,23 @@ class ParameterEstimation:
         plt.ylim((0, 1.2))
         plt.legend(loc=4)
         if returnAxisValuesOnly: plt.show()
+    def plotDimensionsLagDistribution(self, returnAxisValuesOnly=True):
+#        data = list(FileIO.iterateJsonFromFile(self.dimensionInActivityTimeFile))[-1]
+        data = list(FileIO.iterateJsonFromFile('/users/kykamath/temp/dimension_inactivity_time'))[-1]
+        dataDistribution = defaultdict(list)
+        for k, v in data['phrases_lag_distribution'].iteritems():
+            k=int(k)
+            dataDistribution[k].append(v)
+        x = sorted(dataDistribution)
+        y = [np.mean(dataDistribution[k]) for k in x]
+        xerr = [np.var(dataDistribution[k]) for k in x]
+        print x
+        print y
+        print xerr
+        plt.errorbar(x, y, marker='o', xerr=xerr)
+        plt.show()
+            
+        
     @staticmethod
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
     @staticmethod
@@ -264,9 +282,9 @@ def dimensionInActivityEstimation():
                 estimationObject.lagBetweenMessagesDistribution[str(lag)]+=1
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
-#    ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime()
-    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionInActivityTime])
+    ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsLagDistribution()
+#    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionInActivityTime])
 if __name__ == '__main__':
 #    dimensionsEstimation()
-    dimensionsUpdateFrequencyEstimation()
-#    dimensionInActivityEstimation()
+#    dimensionsUpdateFrequencyEstimation()
+    dimensionInActivityEstimation()
