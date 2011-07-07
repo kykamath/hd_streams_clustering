@@ -87,6 +87,12 @@ class ParameterEstimation:
         plt.legend(loc=4)
         if returnAxisValuesOnly: plt.show()
     def plotDimensionsEstimation(self, returnAxisValuesOnly=True, numberOfTimeUnits=10*24*12):
+        def calculateDimensionsFor(params, percentageOfNewDimensions): 
+            '''
+            Experts stream [  1.17707899e+03   1.03794580e+00] 76819
+            Houston stream [  2.73913900e+03   1.02758516e+00] 195731
+            '''
+            print getSmallestPrimeNumberGreaterThan(int(CurveFit.inverseExponentialFunction(params, percentageOfNewDimensions)))
         dataDistribution = defaultdict(list)
         for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile):
             for k, v in line[ParameterEstimation.dimensionsEstimationId].iteritems():
@@ -96,7 +102,7 @@ class ParameterEstimation:
         x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution) if k>1000]
         x,y=x[:numberOfTimeUnits], y[:numberOfTimeUnits]
         exponentialCurveParams = CurveFit.getParamsForExponentialFitting(x, y)
-#        print self.twitter_stream_settings['plot_label'], exponentialCurveParams, ParameterEstimation.calculateDimensionsFor(exponentialCurveParams, 0.01) 
+#        print self.twitter_stream_settings['plot_label'], exponentialCurveParams, calculateDimensionsFor(exponentialCurveParams, 0.01) 
         plt.ylabel(getLatexForString('\% of new dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
         plt.semilogy(x,y,'o', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{-%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
         plt.semilogy(x,CurveFit.getYValuesForExponential(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
@@ -128,13 +134,33 @@ class ParameterEstimation:
         plt.semilogx(x1,y1,'-', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
 #        plt.legend()
         if returnAxisValuesOnly: plt.show()
-    @staticmethod
-    def calculateDimensionsFor(params, percentageOfNewDimensions): 
+    def plotDimensionInActivityTime(self, returnAxisValuesOnly=True):
         '''
-        Experts stream [  1.17707899e+03   1.03794580e+00] 76819
-        Houston stream [  2.73913900e+03   1.02758516e+00] 195731
+        Inactivity time is the time after which there is a high probability that a
+        dimension will not appear. Find time_unit that gives this probability. 
+        
+        Cumulative distribution function (http://en.wikipedia.org/wiki/Cumulative_distribution_function)
+        lag = time betweeen occurance of two dimensions (similar to inactivty_time)
+        
+        F(time_unit) = P(lag<=time_unit)
+        time_unit = F_inv(P(lag<=time_unit))
+        
+        Given P(inactivty_time>time_unit) determine time_unit as shown:
+        P(inactivty_time<=time_unit) = 1 - P(inactivty_time>time_unit)
+        inactivty_time = F_inv(P(inactivty_time<=time_unit))
         '''
-        print getSmallestPrimeNumberGreaterThan(int(CurveFit.inverseExponentialFunction(params, percentageOfNewDimensions)))
+        data = list(FileIO.iterateJsonFromFile(self.dimensionInActivityTimeFile))[-1]
+        print data[ParameterEstimation.dimensionInActivityTimeId]
+        print data['phrases_lag_distribution']
+        total = float(sum(data[ParameterEstimation.dimensionInActivityTimeId].values()))
+        x = sorted(map(int, data[ParameterEstimation.dimensionInActivityTimeId].keys()))
+#        y = [data[ParameterEstimation.dimensionInActivityTimeId][str(i)]/total for i in x]
+        y, cumulative_value = [], 0
+        for i in x: 
+            y.append(cumulative_value+data[ParameterEstimation.dimensionInActivityTimeId][str(i)]/total)
+            cumulative_value+=data[ParameterEstimation.dimensionInActivityTimeId][str(i)]/total
+        plt.plot(x,y, 'o', color='m')
+        plt.show()
     @staticmethod
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
     @staticmethod
@@ -227,8 +253,8 @@ def dimensionInActivityEstimation():
                 lag=DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, phraseObject.latestOccuranceTime, estimationObject.twitter_stream_settings['time_unit_in_seconds'].seconds)
                 estimationObject.lagBetweenMessagesDistribution[str(lag)]+=1
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
-    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
-
+#    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
+    ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime()
 if __name__ == '__main__':
 #    dimensionsEstimation()
 #    dimensionsUpdateFrequencyEstimation()
