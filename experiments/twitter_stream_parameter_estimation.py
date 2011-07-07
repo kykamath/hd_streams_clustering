@@ -92,7 +92,7 @@ class ParameterEstimation:
             Experts stream [  1.17707899e+03   1.03794580e+00] 76819
             Houston stream [  2.73913900e+03   1.02758516e+00] 195731
             '''
-            print getSmallestPrimeNumberGreaterThan(int(CurveFit.inverseExponentialFunction(params, percentageOfNewDimensions)))
+            print getSmallestPrimeNumberGreaterThan(int(CurveFit.inverseOfDecreasingExponentialFunction(params, percentageOfNewDimensions)))
         dataDistribution = defaultdict(list)
         for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile):
             for k, v in line[ParameterEstimation.dimensionsEstimationId].iteritems():
@@ -101,11 +101,11 @@ class ParameterEstimation:
                 dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
         x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution) if k>1000]
         x,y=x[:numberOfTimeUnits], y[:numberOfTimeUnits]
-        exponentialCurveParams = CurveFit.getParamsForExponentialFitting(x, y)
+        exponentialCurveParams = CurveFit.getParamsForDecreasingExponentialFitting(x, y)
 #        print self.twitter_stream_settings['plot_label'], exponentialCurveParams, calculateDimensionsFor(exponentialCurveParams, 0.01) 
         plt.ylabel(getLatexForString('\% of new dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
         plt.semilogy(x,y,'o', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{-%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
-        plt.semilogy(x,CurveFit.getYValuesForExponential(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
+        plt.semilogy(x,CurveFit.getYValuesForDecrasingExponentialFunction(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
         plt.legend()
         if returnAxisValuesOnly: plt.show()
     def plotDimensionsUpdateFrequencyEstimation(self, returnAxisValuesOnly=True):
@@ -149,18 +149,28 @@ class ParameterEstimation:
         P(inactivty_time<=time_unit) = 1 - P(inactivty_time>time_unit)
         inactivty_time = F_inv(P(inactivty_time<=time_unit))
         '''
+        def calculateInActivityTimeFor(params, probabilityOfInactivity): 
+            '''
+            Experts stream [  1.17707899e+03   1.03794580e+00] 76819
+            Houston stream [  2.73913900e+03   1.02758516e+00] 195731
+            '''
+            return CurveFit.inverseOfIncreasingExponentialFunction(params, 1-probabilityOfInactivity)
         data = list(FileIO.iterateJsonFromFile(self.dimensionInActivityTimeFile))[-1]
-        print data[ParameterEstimation.dimensionInActivityTimeId]
-        print data['phrases_lag_distribution']
+#        print data[ParameterEstimation.dimensionInActivityTimeId]
+#        print data['phrases_lag_distribution']
         total = float(sum(data[ParameterEstimation.dimensionInActivityTimeId].values()))
         x = sorted(map(int, data[ParameterEstimation.dimensionInActivityTimeId].keys()))
-#        y = [data[ParameterEstimation.dimensionInActivityTimeId][str(i)]/total for i in x]
         y, cumulative_value = [], 0
         for i in x: 
             y.append(cumulative_value+data[ParameterEstimation.dimensionInActivityTimeId][str(i)]/total)
             cumulative_value+=data[ParameterEstimation.dimensionInActivityTimeId][str(i)]/total
-        plt.plot(x,y, 'o', color='m')
-        plt.show()
+        exponentialCurveParams = CurveFit.getParamsForIncreasingExponentialFitting(x, y)
+        print self.twitter_stream_settings['plot_label'], exponentialCurveParams, calculateInActivityTimeFor(exponentialCurveParams, 0.25) 
+        plt.loglog(x,y, 'o', label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), color=self.twitter_stream_settings['plot_color'])
+        plt.loglog(x,CurveFit.getYValuesForIncreasingExponentialFunction(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
+        plt.ylim((0, 1.2))
+        plt.legend(loc=4)
+        if returnAxisValuesOnly: plt.show()
     @staticmethod
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
     @staticmethod
@@ -254,8 +264,9 @@ def dimensionInActivityEstimation():
                 estimationObject.lagBetweenMessagesDistribution[str(lag)]+=1
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
-    ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime()
+#    ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime()
+    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionInActivityTime])
 if __name__ == '__main__':
 #    dimensionsEstimation()
-#    dimensionsUpdateFrequencyEstimation()
-    dimensionInActivityEstimation()
+    dimensionsUpdateFrequencyEstimation()
+#    dimensionInActivityEstimation()
