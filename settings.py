@@ -25,8 +25,10 @@ twitter_stream_settings = Settings(
                                    
                                    time_unit_in_seconds=timedelta(seconds=5*60), # This value will be used to determine the length of unit time intervals.
                                    
-                                   dimension_update_frequency_in_seconds=timedelta(seconds=15*60), # Every these many seconds, old phrases are pruned and new dimensions are created.
-                                   max_phrase_inactivity_time_in_seconds=timedelta(seconds=30*60), # Time after which a phrase can be considered old and need not be tracked.
+#                                   dimension_update_frequency_in_seconds=timedelta(seconds=15*60)
+                                   dimension_update_frequency_in_seconds=None, # Every these many seconds, old phrases are pruned and new dimensions are created.
+#                                   max_phrase_inactivity_time_in_seconds=timedelta(seconds=30*60)
+                                   max_phrase_inactivity_time_in_seconds=None, # Time after which a phrase can be considered old and need not be tracked.
                                    
                                    # Cluster pruning properties.
                                    cluster_filter_attribute = 'length', # The attribute based on which stream clusters will be pruned. 'length' => Size of clusters; score => streaming cluster score.
@@ -42,11 +44,6 @@ streaming_lsh_settings=Settings(
                                 )
 twitter_stream_settings.update(streaming_lsh_settings)
 
-# Settings for trends specific streams.
-#trends_twitter_stream_settings = Settings()
-#trends_twitter_stream_settings.update(twitter_stream_settings)
-#trends_twitter_stream_settings.stream_id = 'trends_twitter_stream'
-
 # Settings for expert specific streams.
 experts_twitter_stream_settings = Settings()
 experts_twitter_stream_settings.update(twitter_stream_settings)
@@ -54,7 +51,8 @@ experts_twitter_stream_settings.dimensions = 76819
 experts_twitter_stream_settings.stream_id = 'experts_twitter_stream'
 experts_twitter_stream_settings.plot_color = '#F28500'
 experts_twitter_stream_settings.plot_label = 'Experts stream'
-experts_twitter_stream_settings.dimension_update_frequency_in_seconds=timedelta(seconds=30*60)
+experts_twitter_stream_settings.dimension_update_frequency_in_seconds=twitter_stream_settings.time_unit_in_seconds*12
+experts_twitter_stream_settings.max_phrase_inactivity_time_in_seconds=twitter_stream_settings.time_unit_in_seconds*107
 experts_twitter_stream_settings.cluster_filter_threshold = 2
 experts_twitter_stream_settings.twitter_users_tweets_folder='%susers/tweets/'%twitterDataFolder
 experts_twitter_stream_settings.users_to_crawl_file='%susers/crawl/users_to_crawl'%twitterDataFolder
@@ -68,6 +66,8 @@ houston_twitter_stream_settings.dimensions = 195731
 houston_twitter_stream_settings.stream_id = 'houston_twitter_stream'
 houston_twitter_stream_settings.plot_color = '#CC00FF'
 houston_twitter_stream_settings.plot_label = 'Houston stream'
+houston_twitter_stream_settings.dimension_update_frequency_in_seconds=twitter_stream_settings.time_unit_in_seconds*2
+houston_twitter_stream_settings.max_phrase_inactivity_time_in_seconds=twitter_stream_settings.time_unit_in_seconds*126
 houston_twitter_stream_settings.twitter_users_tweets_folder='%shouston/'%twitterDataFolder
 houston_twitter_stream_settings.lsh_clusters_folder='%slsh_crowds/houston_stream/clusters/'%twitterDataFolder
 houston_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/houston_stream/parameter_estimation/'%twitterDataFolder
