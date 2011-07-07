@@ -211,7 +211,7 @@ class ParameterEstimation:
                              'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                              'total_number_of_phrases': len(estimationObject.phraseTextToPhraseObjectMap),
                              'settings': pprint.pformat(estimationObject.twitter_stream_settings),
-                             ParameterEstimation.dimensionsUpdateFrequencyId:dimensionsUpdateFrequency
+                              ParameterEstimation.dimensionsUpdateFrequencyId:dimensionsUpdateFrequency
                              }
             FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionsUpdateFrequencyFile)
             estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = newList[:]
