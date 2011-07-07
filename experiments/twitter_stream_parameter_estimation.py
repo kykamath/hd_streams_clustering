@@ -10,7 +10,8 @@ from settings import experts_twitter_stream_settings, houston_twitter_stream_set
 from library.file_io import FileIO
 from library.classes import GeneralMethods
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
-from library.plotting import getLatexForString, CurveFit
+from library.plotting import getLatexForString, CurveFit,\
+    getCumulativeDistribution
 from library.math_modified import getSmallestPrimeNumberGreaterThan,\
     DateTimeAirthematic
 from hd_streams_clustering import DataStreamMethods
@@ -23,6 +24,8 @@ from datetime import timedelta
 from operator import itemgetter
 import numpy as np
 
+numberOfTimeUnits=10*24*12
+xlabelTimeUnits = 'Time units'
 experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
 '''
 Phrase not mentioned in 10 mimiutes probability it will ever get mentioned
@@ -78,18 +81,21 @@ class ParameterEstimation:
         But, if these phrases increase linearly with time, it shows that we have infinte
         dimensions and hence this motivates us to have a way to determine number of 
         dimensions.
+        
+        numberOfTimeUnits=10*24*12
         '''
         x, y = [], []; [(x.append(getDateTimeObjectFromTweetTimestamp(line['time_stamp'])),y.append(line['total_number_of_phrases'])) for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile)]
-#        x=x[:1500]; y=y[:1500]
+        x=x[:numberOfTimeUnits]; y=y[:numberOfTimeUnits]
         plt.subplot(111).yaxis.set_major_formatter(FuncFormatter(lambda x,i: '%0.1f'%(x/10.**6)))
         plt.text(0.0, 1.01, getLatexForString('10^6'), transform = plt.gca().transAxes)
-        plt.ylabel(getLatexForString('\# of dimensions')), plt.xlabel(getLatexForString('Time units')), plt.title(getLatexForString('Growth in dimensions with increasing time.'))
+        plt.ylabel(getLatexForString('\# of dimensions')), plt.xlabel(getLatexForString(xlabelTimeUnits)), plt.title(getLatexForString('Growth in dimensions with increasing time.'))
         plt.plot(y, color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
         plt.legend(loc=4)
         if returnAxisValuesOnly: plt.show()
-    def plotDimensionsEstimation(self, returnAxisValuesOnly=True, numberOfTimeUnits=10*24*12):
+    def plotDimensionsEstimation(self, returnAxisValuesOnly=True):
         def calculateDimensionsFor(params, percentageOfNewDimensions): 
             '''
+            numberOfTimeUnits=10*24*12
             Experts stream [  1.17707899e+03   1.03794580e+00] 76819
             Houston stream [  2.73913900e+03   1.02758516e+00] 195731
             '''
@@ -102,38 +108,47 @@ class ParameterEstimation:
                 dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
         x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution) if k>1000]
         x,y=x[:numberOfTimeUnits], y[:numberOfTimeUnits]
-        exponentialCurveParams = CurveFit.getParamsForDecreasingExponentialFitting(x, y)
+        exponentialCurveParams = CurveFit.getParamsAfterFittingData(x, y, CurveFit.decreasingExponentialFunction, [1.,1.])
 #        print self.twitter_stream_settings['plot_label'], exponentialCurveParams, calculateDimensionsFor(exponentialCurveParams, 0.01) 
         plt.ylabel(getLatexForString('\% of new dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
         plt.semilogy(x,y,'o', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{-%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
-        plt.semilogy(x,CurveFit.getYValuesForDecrasingExponentialFunction(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
+        plt.semilogy(x,CurveFit.getYValues(CurveFit.decreasingExponentialFunction, exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
         plt.legend()
         if returnAxisValuesOnly: plt.show()
     def plotDimensionsUpdateFrequencyEstimation(self, returnAxisValuesOnly=True):
         '''
-        Number of time units:  1321
-        Experts stream (12, 781.97497249724972)
-        Number of time units:  762
-        Houston stream (34, 1503.7962647869065)
+        numberOfTimeUnits=10*24*12
+        Experts stream 12
+        Houston stream 2
         '''
         dataDistribution = defaultdict(list)
-        i = 0
         for line in FileIO.iterateJsonFromFile(self.dimensionsUpdateFrequencyFile):
-            i+=1
             for k, v in line[ParameterEstimation.dimensionsUpdateFrequencyId].iteritems():
                 k=int(k)/self.timeUnitInSeconds.seconds
                 if k not in dataDistribution: dataDistribution[k]=[0.,0.]
                 dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
-        print 'Number of time units: ', i
         x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1]))) for k in sorted(dataDistribution)]
         x1, y1 = [], []; [(x1.append(k), y1.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution)]
-        print self.twitter_stream_settings['plot_label'], max(zip(x1,y1),key=itemgetter(1))
+        x=x[:numberOfTimeUnits]; y=y[:numberOfTimeUnits]; x1=x1[:numberOfTimeUnits]; y1=y1[:numberOfTimeUnits]
+        def subPlot(id):
+            plt.subplot(id)
+            inactivityCorordinates = max(zip(x1,y1),key=itemgetter(1))
+            plt.semilogx(x1,y1,'-', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label'] + ' (Update frequency=%d TU)'%inactivityCorordinates[0]), lw=2)
+            plt.subplot(id).yaxis.set_major_formatter(FuncFormatter(lambda x,i: '%0.1f'%(x/10.**3)))
+            plt.semilogx([inactivityCorordinates[0]], [inactivityCorordinates[1]], 'o', alpha=0.7, color='r')
+            plt.subplot(id).yaxis.set_major_formatter(FuncFormatter(lambda x,i: '%0.1f'%(x/10.**3)))
+            plt.yticks((min(y1), max(y1)))
+            print self.twitter_stream_settings['plot_label'], inactivityCorordinates[0]
         plt.subplot(311)
+        plt.title(getLatexForString('Dimensions update frequency estimation'))
         plt.semilogx(x,y,'-', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
-        if self.twitter_stream_settings['stream_id']=='experts_twitter_stream': plt.subplot(312)
-        else: plt.subplot(313)
-        plt.semilogx(x1,y1,'-', color=self.twitter_stream_settings['plot_color'], label=getLatexForString(self.twitter_stream_settings['plot_label']), lw=2)
-#        plt.legend()
+        plt.subplot(311).yaxis.set_major_formatter(FuncFormatter(lambda x,i: '%0.1f'%(x/10.**5)))
+        plt.text(0.0, 1.01, getLatexForString('10^5'), transform = plt.gca().transAxes)
+        plt.ylabel(getLatexForString('\# of decayed dimensions'))
+        if self.twitter_stream_settings['stream_id']=='experts_twitter_stream': subPlot(312)
+        else: subPlot(313); plt.xlabel(getLatexForString(xlabelTimeUnits))
+        plt.ylabel(getLatexForString('Rate of DD (10^3)'))
+        plt.legend(loc=3)
         if returnAxisValuesOnly: plt.show()
     def plotDimensionInActivityTime(self, returnAxisValuesOnly=True):
         '''
@@ -149,46 +164,77 @@ class ParameterEstimation:
         Given P(inactivty_time>time_unit) determine time_unit as shown:
         P(inactivty_time<=time_unit) = 1 - P(inactivty_time>time_unit)
         inactivty_time = F_inv(P(inactivty_time<=time_unit))
+        
+        numberOfTimeUnits=10*24*12
+        
+        Experts stream [ 0.23250341  0.250209  ] 0.25 107
+        Houston stream [ 0.16948096  0.30751358] 0.25 126
+        
+        Experts stream [ 0.23250341  0.250209  ] 0.1, 223
+        Houston stream [ 0.16948096  0.30751358] 0.1, 228
+        
+        Compared to other vaues these values are pretty close to each
+        other. This is expected. Irrespective of size of the streams,
+        the phrases have the same lifetime and hence decay close to each other.
         '''
-        def calculateInActivityTimeFor(params, probabilityOfInactivity): 
-            '''
-            Experts stream [  1.17707899e+03   1.03794580e+00] 76819
-            Houston stream [  2.73913900e+03   1.02758516e+00] 195731
-            '''
-            return CurveFit.inverseOfIncreasingExponentialFunction(params, 1-probabilityOfInactivity)
-        data = list(FileIO.iterateJsonFromFile(self.dimensionInActivityTimeFile))[-1]
-#        print data[ParameterEstimation.dimensionInActivityTimeId]
-#        print data['phrases_lag_distribution']
+        def calculateInActivityTimeFor(params, probabilityOfInactivity): return int(CurveFit.inverseOfIncreasingExponentialFunction(params, 1-probabilityOfInactivity))
+        data = list(FileIO.iterateJsonFromFile(self.dimensionInActivityTimeFile))[numberOfTimeUnits]
         total = float(sum(data[ParameterEstimation.dimensionInActivityTimeId].values()))
         x = sorted(map(int, data[ParameterEstimation.dimensionInActivityTimeId].keys()))
-        y, cumulative_value = [], 0
-        for i in x: 
-            y.append(cumulative_value+data[ParameterEstimation.dimensionInActivityTimeId][str(i)]/total)
-            cumulative_value+=data[ParameterEstimation.dimensionInActivityTimeId][str(i)]/total
-        exponentialCurveParams = CurveFit.getParamsForIncreasingExponentialFitting(x, y)
-        print self.twitter_stream_settings['plot_label'], exponentialCurveParams, calculateInActivityTimeFor(exponentialCurveParams, 0.25) 
+        y = getCumulativeDistribution([data[ParameterEstimation.dimensionInActivityTimeId][str(i)]/total for i in x])
+        print len(x)
+        exponentialCurveParams = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1., 1.])
+        print self.twitter_stream_settings['plot_label'], exponentialCurveParams, calculateInActivityTimeFor(exponentialCurveParams, 0.1) 
         plt.loglog(x,y, 'o', label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), color=self.twitter_stream_settings['plot_color'])
-        plt.loglog(x,CurveFit.getYValuesForIncreasingExponentialFunction(exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
+        plt.loglog(x,CurveFit.getYValues(CurveFit.increasingExponentialFunction, exponentialCurveParams, x), color=self.twitter_stream_settings['plot_color'], lw=2)
+        plt.ylabel(r'$P\ (\ lag\ \leq\ TU\ )$'), plt.xlabel(getLatexForString(xlabelTimeUnits)), plt.title(getLatexForString('CDF for lag distribution.'))
         plt.ylim((0, 1.2))
         plt.legend(loc=4)
         if returnAxisValuesOnly: plt.show()
+    
     def plotDimensionsLagDistribution(self, returnAxisValuesOnly=True):
-#        data = list(FileIO.iterateJsonFromFile(self.dimensionInActivityTimeFile))[-1]
-        data = list(FileIO.iterateJsonFromFile('/users/kykamath/temp/dimension_inactivity_time'))[-1]
-        dataDistribution = defaultdict(list)
-        for k, v in data['phrases_lag_distribution'].iteritems():
-            k=int(k)
-            dataDistribution[k].append(v)
-        x = sorted(dataDistribution)
-        y = [np.mean(dataDistribution[k]) for k in x]
-        xerr = [np.var(dataDistribution[k]) for k in x]
-        print x
-        print y
-        print xerr
-        plt.errorbar(x, y, marker='o', xerr=xerr)
-        plt.show()
-            
+        '''
+        This gives us the percentage of phrases we can loose everytime we prune phrases.
         
+        Measures the percentage of dimensions having lag less than TU.
+        
+        So at the end of 10th day, almost y% of phrases can be removed. With some probabiity
+        that it will not occure again.
+        
+        numberOfTimeUnits=10*24*12
+        With 75% probability.
+        Experts stream [ 0.0097055   0.81888514] 107 0.554497397565
+        Houston stream [ 0.00943499  0.825918  ] 126 0.487757815615
+        With 90% probability.
+        Experts stream [ 0.0097055   0.81888514] 223 0.187150798756
+        Houston stream [ 0.00943499  0.825918  ] 228 0.164007589276
+        '''
+        def calculatePercentageOfDecayedPhrasesFor(params, timeUnit): return 1- CurveFit.increasingExponentialFunction(params, timeUnit)
+        dataDistribution = {}
+        currentTimeUnit = 0
+        for data in list(FileIO.iterateJsonFromFile(self.dimensionInActivityTimeFile))[:numberOfTimeUnits]:
+            totalDimensions=float(sum(data['phrases_lag_distribution'].values()))
+            tempArray = []
+            for k, v in data['phrases_lag_distribution'].iteritems():
+                k=int(k)
+                if k not in dataDistribution: dataDistribution[k]=[0]*numberOfTimeUnits
+                dataDistribution[k][currentTimeUnit] = v/totalDimensions
+                tempArray.append(v/totalDimensions)
+            currentTimeUnit+=1
+        x = sorted(dataDistribution)
+        y = getCumulativeDistribution([np.mean(dataDistribution[k]) for k in x])
+        params = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1.,1.])
+        print self.twitter_stream_settings['plot_label'], params, 
+        def subPlot(id, timeUnit):
+            plt.subplot(id)
+            print timeUnit, calculatePercentageOfDecayedPhrasesFor(params, timeUnit)
+            plt.plot(x,y, 'o', label=getLatexForString(self.twitter_stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{%0.2f})')%(params[0], params[1]), color=self.twitter_stream_settings['plot_color'])
+            plt.plot(x, CurveFit.getYValues(CurveFit.increasingExponentialFunction, params, x), color=self.twitter_stream_settings['plot_color'], lw=2)
+        if self.twitter_stream_settings['stream_id']=='experts_twitter_stream': subPlot(211, 107); plt.title(getLatexForString('Dimension lag distribution'))
+        else: subPlot(212, 126); plt.xlabel(getLatexForString(xlabelTimeUnits))
+        plt.ylabel(r'$\%\ of\ phrases\ with\ lag\ \leq\ TU$')
+        plt.legend(loc=4)
+        if returnAxisValuesOnly: plt.show()
     @staticmethod
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
     @staticmethod
@@ -263,14 +309,12 @@ class ParameterEstimation:
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsEstimation)
-#    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotGrowthOfPhrasesInTime, ParameterEstimation(**houston_twitter_stream_settings).plotGrowthOfPhrasesInTime])
-    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsEstimation, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsEstimation])
+    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotGrowthOfPhrasesInTime, ParameterEstimation(**houston_twitter_stream_settings).plotGrowthOfPhrasesInTime])
+#    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsEstimation, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsEstimation])
 
 def dimensionsUpdateFrequencyEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)
-#    ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation()
-#    ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation()
     ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsUpdateFrequencyEstimation])
 
 def dimensionInActivityEstimation():
@@ -282,9 +326,9 @@ def dimensionInActivityEstimation():
                 estimationObject.lagBetweenMessagesDistribution[str(lag)]+=1
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
-    ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsLagDistribution()
 #    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionInActivityTime])
+    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsLagDistribution, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsLagDistribution])
 if __name__ == '__main__':
-#    dimensionsEstimation()
+    dimensionsEstimation()
 #    dimensionsUpdateFrequencyEstimation()
-    dimensionInActivityEstimation()
+#    dimensionInActivityEstimation()
