@@ -296,9 +296,13 @@ class ParameterEstimation:
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
     
 class ClusteringParametersEstimation():
+    clusterLagDistributionId = 'cluster_lag_distribution'
     def __init__(self, **stream_settings):
         self.stream_settings = stream_settings
         self.hdsClustering = HDStreaminClustering(**self.stream_settings)
+        self.clusterLagDistributionFile = stream_settings['parameter_estimation_folder']+ ClusteringParametersEstimation.clusterLagDistributionId
+        print self.clusterLagDistributionFile
+        
     def run(self, iterator):
         self.hdsClustering.cluster(iterator)
     @staticmethod
