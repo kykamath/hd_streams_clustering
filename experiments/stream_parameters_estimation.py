@@ -314,8 +314,7 @@ class ClusteringParametersEstimation():
                          'settings': pprint.pformat(hdStreamClusteringObject.stream_settings),
                          ClusteringParametersEstimation.clusterLagDistributionId: lagDistribution
                          }
-        print iterationData
-#        FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId])
+        FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId])
             
     @staticmethod
     def emptyClusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass
