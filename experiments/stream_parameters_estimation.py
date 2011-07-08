@@ -312,10 +312,10 @@ class ClusteringParametersEstimation():
         iterationData = {
                          'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                          'settings': pprint.pformat(hdStreamClusteringObject.stream_settings),
-                         ClusteringParametersEstimation.clusterLagDistributionId: lagDistribution
+                         ClusteringParametersEstimation.clusterLagDistributionId: lagDistribution,
+                         'lag_between_streams_added_to_cluster': hdStreamClusteringObject.stream_settings['lag_between_streams_added_to_cluster']
                          }
-        print hdStreamClusteringObject.stream_settings['lag_between_streams_added_to_cluster']
-#        FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId])
+        FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId])
             
     @staticmethod
     def emptyClusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass
