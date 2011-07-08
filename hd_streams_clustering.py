@@ -63,7 +63,7 @@ class HDStreaminClustering(StreamingLSHClustering):
                 self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 i+=1
-                print i, streamObject.lastMessageTime
+#                print i, streamObject.lastMessageTime
                 self.getClusterAndUpdateExistingClusters(streamObject)
     def getClusterAndUpdateExistingClusters(self, stream):
         predictedCluster = self.getClusterForDocument(stream)
