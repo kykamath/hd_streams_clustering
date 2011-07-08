@@ -14,15 +14,19 @@ class DataStreamMethods:
         if DataStreamMethods.messageInOrderVariable==None or DataStreamMethods.messageInOrderVariable <= messageTime: DataStreamMethods.messageInOrderVariable = messageTime; return True
         else: return False
     @staticmethod
-    def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
-        # Update dimensions.
-        UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
-        # Reset signature permutations.
+    def _resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime):
+        '''    This method clears the tries and puts current clusters into it. Do this everytime clusters or the dimensions change.    '''
+        # Reset signature tries.
         for permutation in hdStreamClusteringObject.signaturePermutations: permutation.resetSignatureTrie()
-        # Reset clusters.
+        # Put current clusters into tries.
         for cluster in hdStreamClusteringObject.clusters.itervalues(): 
             cluster.setSignatureUsingVectorPermutations(hdStreamClusteringObject.unitVector, hdStreamClusteringObject.vectorPermutations, hdStreamClusteringObject.phraseTextAndDimensionMap)
             for permutation in hdStreamClusteringObject.signaturePermutations: permutation.addDocument(cluster)
+    @staticmethod
+    def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
+        # Update dimensions.
+        UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
+        DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
 #        if hdStreamClusteringObject.analyzeIterationDataMethod!=None: hdStreamClusteringObject.analyzeIterationDataMethod(hdStreamClusteringObject, currentMessageTime)
     @staticmethod
     def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime):
@@ -30,6 +34,7 @@ class DataStreamMethods:
                                                                   hdStreamClusteringObject.stream_settings['cluster_filter_attribute'], 
                                                                   hdStreamClusteringObject.stream_settings['cluster_filter_threshold'], StreamCluster.BELOW_THRESHOLD): del hdStreamClusteringObject.clusters[cluster.clusterId]
         if hdStreamClusteringObject.combineClustersMethod!=None: hdStreamClusteringObject.clusters=hdStreamClusteringObject.combineClustersMethod(hdStreamClusteringObject.clusters, **hdStreamClusteringObject.stream_settings)
+        DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
     @staticmethod
     def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): pass
 
