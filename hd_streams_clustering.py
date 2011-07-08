@@ -24,7 +24,6 @@ class DataStreamMethods:
             for permutation in hdStreamClusteringObject.signaturePermutations: permutation.addDocument(cluster)
     @staticmethod
     def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
-        print 'shouldnt come here'
         # Update dimensions.
         UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
         DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
@@ -67,12 +66,11 @@ class HDStreaminClustering(StreamingLSHClustering):
                 else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
                 streamObject=self.streamIdToStreamObjectMap[message.streamId]
                 self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-#                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-#                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 i+=1
-                print 'comes out'
-                print i, streamObject.lastMessageTime
-#                self.getClusterAndUpdateExistingClusters(streamObject)
+#                print i, streamObject.lastMessageTime
+                self.getClusterAndUpdateExistingClusters(streamObject)
     def getClusterAndUpdateExistingClusters(self, stream):
         predictedCluster = self.getClusterForDocument(stream)
         '''

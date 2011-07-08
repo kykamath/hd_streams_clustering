@@ -102,7 +102,7 @@ class StreamCluster(Cluster):
     def addDocument(self, stream, **stream_settings):
         super(StreamCluster, self).addDocument(stream)
         # Adding this next line to analyze cluster lag distributions. Remove this code if experiments are not needed.
-        if 'lag_between_streams' in stream_settings: stream_settings['lag_between_streams'](self, stream)
+        if 'lag_between_streams' in stream_settings: stream_settings['lag_between_streams'](self, stream, **stream_settings)
         self.lastStreamAddedTime = stream.lastMessageTime
 #        self.updateScore(stream.lastMessageTime, scoreToUpdate=1, **stream_settings)
 #    def updateScore(self, currentOccuranceTime, scoreToUpdate, **stream_settings):
