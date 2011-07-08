@@ -300,22 +300,25 @@ class ClusteringParametersEstimation():
     def __init__(self, **stream_settings):
         self.stream_settings = stream_settings
         self.hdsClustering = HDStreaminClustering(**self.stream_settings)
-        self.clusterLagDistributionFile = stream_settings['parameter_estimation_folder']+ ClusteringParametersEstimation.clusterLagDistributionId
-        print self.clusterLagDistributionFile
-        
+        self.clusterLagDistributionFile = stream_settings['parameter_estimation_folder']+ClusteringParametersEstimation.clusterLagDistributionId
     def run(self, iterator):
         self.hdsClustering.cluster(iterator)
     @staticmethod
-    def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
-        print currentMessageTime, len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
+    def clusterLagDistributionMethod(hdStreamClusteringObject, currentMessageTime):
+        lagDistribution = defaultdict(int)
+        for cluster in hdStreamClusteringObject.clusters.values():
+            lag=DateTimeAirthematic.getDifferenceInTimeUnits(currentMessageTime, cluster.lastStreamAddedTime, hdStreamClusteringObject.stream_settings['time_unit_in_seconds'].seconds)
+            lagDistribution[str(lag)]+=1
+        print lagDistribution
+            
     @staticmethod
-    def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass
+    def emptyClusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass
 
 
 '''    Experiments of Twitter streams starts here.    '''
 experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-experts_twitter_stream_settings['cluster_analysis_method'] = ClusteringParametersEstimation.clusterAnalysisMethod
-experts_twitter_stream_settings['cluster_filtering_method'] = ClusteringParametersEstimation.clusterFilteringMethod
+#experts_twitter_stream_settings['cluster_analysis_method'] = ClusteringParametersEstimation.clusterAnalysisMethod
+experts_twitter_stream_settings['cluster_filtering_method'] = ClusteringParametersEstimation.emptyClusterFilteringMethod
 
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
