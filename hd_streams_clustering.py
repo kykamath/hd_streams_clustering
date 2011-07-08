@@ -65,12 +65,12 @@ class HDStreaminClustering(StreamingLSHClustering):
                 if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
                 else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
                 streamObject=self.streamIdToStreamObjectMap[message.streamId]
-                self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+#                self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+#                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+#                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 i+=1
                 print i, streamObject.lastMessageTime
-                self.getClusterAndUpdateExistingClusters(streamObject)
+#                self.getClusterAndUpdateExistingClusters(streamObject)
     def getClusterAndUpdateExistingClusters(self, stream):
         predictedCluster = self.getClusterForDocument(stream)
         '''
