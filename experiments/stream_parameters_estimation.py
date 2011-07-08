@@ -298,11 +298,9 @@ class ParameterEstimation:
 class ClusteringParametersEstimation():
     @staticmethod
     def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
-        print 'Cluster analysis', currentMessageTime
+        print currentMessageTime, len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
     @staticmethod
-    def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime):
-        print 'Cluster filtering', currentMessageTime
-        print
+    def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass
 
 
 '''    Experiments of Twitter streams starts here.    '''
