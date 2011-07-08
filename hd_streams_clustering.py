@@ -24,6 +24,7 @@ class DataStreamMethods:
             for permutation in hdStreamClusteringObject.signaturePermutations: permutation.addDocument(cluster)
     @staticmethod
     def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
+        print 'shouldnt come here'
         # Update dimensions.
         UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
         DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
