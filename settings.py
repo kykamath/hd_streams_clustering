@@ -32,7 +32,8 @@ twitter_stream_settings = Settings(
                                    max_phrase_inactivity_time_in_seconds=None, # Time after which a phrase can be considered old and need not be tracked.
 
                                    cluster_analysis_frequency_in_seconds=time_unit_in_seconds*3, # Every these many seconds current clusters will be analyzed.
-                                   cluster_filtering_frequency_in_seconds=time_unit_in_seconds*3,
+                                   cluster_filtering_frequency_in_seconds=time_unit_in_seconds*3, # Every these many seconds current clusters will be filtered.
+                                   cluster_inactivity_time_in_seconds=time_unit_in_seconds*6, # Clusters that have not added users below this are removed.
                                    # Cluster pruning properties.
                                    cluster_filter_attribute = 'length', # The attribute based on which stream clusters will be pruned. 'length' => Size of clusters; score => streaming cluster score.
                                    cluster_filter_threshold = 5, # Value for the cluster filter threshold. All clusters with attribute values below this will be pruned.

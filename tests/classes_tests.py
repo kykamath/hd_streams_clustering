@@ -204,7 +204,14 @@ class StreamClusterTests(unittest.TestCase):
         self.assertEqual(3, self.cluster1.vectorWeights)
         self.assertEqual({1:2/3.,2:8/3.,3:4/3.}, self.cluster1)
         self.assertEqual({1:2,2:8,3:4}, self.cluster1.aggregateVector)
-
+    def test_clustersIteration(self):
+        clusters = [self.cluster1, self.cluster2, self.cluster3]
+        self.assertEqual([self.cluster1],
+                          [cluster for cluster in StreamCluster.getClustersByAttributeAndThreshold(clusters, 'lastStreamAddedTime', test_time ,StreamCluster.BELOW_THRESHOLD)]
+                        )
+        self.assertEqual([self.cluster1, self.cluster2],
+                          [cluster for cluster in StreamCluster.getClustersByAttributeAndThreshold(clusters, 'lastStreamAddedTime', test_time+timedelta(seconds=60) ,StreamCluster.BELOW_THRESHOLD)]
+                        )
 class CrowdTests(unittest.TestCase):
     def setUp(self):
         self.m1 = Message(1, 'sdf', 'A project to cluster high-dimensional streams.', test_time-timedelta(seconds=60))
