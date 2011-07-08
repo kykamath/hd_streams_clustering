@@ -306,7 +306,7 @@ class ClusteringParametersEstimation():
 '''    Experiments of Twitter streams starts here.    '''
 experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
 experts_twitter_stream_settings['cluster_analysis_method'] = ClusteringParametersEstimation.clusterAnalysisMethod
-experts_twitter_stream_settings['cluster_filtering_method'] = ClusteringParametersEstimation.clusterFilteringMethod
+#experts_twitter_stream_settings['cluster_filtering_method'] = ClusteringParametersEstimation.clusterFilteringMethod
 
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
