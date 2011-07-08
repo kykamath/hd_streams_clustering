@@ -8,13 +8,13 @@ sys.path.append('../')
 import pprint
 from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
 from library.file_io import FileIO
-from library.classes import GeneralMethods
+from library.classes import GeneralMethods, FixedIntervalMethod
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
 from library.plotting import getLatexForString, CurveFit,\
     getCumulativeDistribution
 from library.math_modified import getSmallestPrimeNumberGreaterThan,\
     DateTimeAirthematic
-from hd_streams_clustering import DataStreamMethods
+from hd_streams_clustering import DataStreamMethods, HDStreaminClustering
 from classes import UtilityMethods, Phrase
 from matplotlib.ticker import FuncFormatter
 from twitter_streams_clustering import TwitterIterators, TwitterCrowdsSpecificMethods
@@ -45,17 +45,13 @@ class ParameterEstimation:
         self.lagBetweenMessagesDistribution = defaultdict(int)
         
     def run(self, dataIterator, estimationMethod, parameterSpecificDataCollectionMethod=None):
+        estimationMethod = FixedIntervalMethod(estimationMethod, self.timeUnitInSeconds)
         for data in dataIterator:
             message = self.convertDataToMessageMethod(data, **self.stream_settings)
             if DataStreamMethods.messageInOrder(message.timeStamp):
-                if parameterSpecificDataCollectionMethod!=None: parameterSpecificDataCollectionMethod(
-                                                                                                      estimationObject=self,
-                                                                                                      message=message
-                                                                                                      )
+                if parameterSpecificDataCollectionMethod!=None: parameterSpecificDataCollectionMethod(estimationObject=self, message=message)
                 UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
-                GeneralMethods.callMethodEveryInterval(estimationMethod, self.timeUnitInSeconds, message.timeStamp, 
-                                                       estimationObject=self,
-                                                       currentMessageTime=message.timeStamp)
+                estimationMethod.call(message.timeStamp, estimationObject=self, currentMessageTime=message.timeStamp)
     @staticmethod
     def dimensionsEstimation(estimationObject, currentMessageTime):
         '''
@@ -298,8 +294,21 @@ class ParameterEstimation:
         if returnAxisValuesOnly: plt.show()
     @staticmethod
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
+    
+class ClusteringParametersEstimation():
+    @staticmethod
+    def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
+        print 'Cluster analysis', currentMessageTime
+    @staticmethod
+    def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime):
+        print 'Cluster filtering', currentMessageTime
 
+
+'''    Experiments of Twitter streams starts here.    '''
 experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+experts_twitter_stream_settings['cluster_analysis_method'] = ClusteringParametersEstimation.clusterAnalysisMethod
+experts_twitter_stream_settings['cluster_filtering_method'] = ClusteringParametersEstimation.clusterFilteringMethod
+
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
 #    ParameterEstimation(**houston_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsEstimation)
@@ -322,7 +331,13 @@ def dimensionInActivityEstimation():
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 #    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionInActivityTime])
     ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsLagDistribution, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsLagDistribution])
+    
+def clusterDecayEstimation():
+    hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
+    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts())
+
 if __name__ == '__main__':
-    dimensionsEstimation()
+#    dimensionsEstimation()
 #    dimensionsUpdateFrequencyEstimation()
 #    dimensionInActivityEstimation()
+    clusterDecayEstimation()

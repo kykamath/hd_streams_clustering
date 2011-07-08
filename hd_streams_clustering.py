@@ -25,7 +25,7 @@ class DataStreamMethods:
             for permutation in hdStreamClusteringObject.signaturePermutations: permutation.addDocument(cluster)
 #        if hdStreamClusteringObject.analyzeIterationDataMethod!=None: hdStreamClusteringObject.analyzeIterationDataMethod(hdStreamClusteringObject, currentMessageTime)
     @staticmethod
-    def filterClusters(hdStreamClusteringObject, currentMessageTime):
+    def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime):
         for cluster in StreamCluster.getClustersByAttributeAndThreshold(hdStreamClusteringObject.clusters.values(), 
                                                                   hdStreamClusteringObject.stream_settings['cluster_filter_attribute'], 
                                                                   hdStreamClusteringObject.stream_settings['cluster_filter_threshold'], StreamCluster.BELOW_THRESHOLD): del hdStreamClusteringObject.clusters[cluster.clusterId]
@@ -45,7 +45,7 @@ class HDStreaminClustering(StreamingLSHClustering):
 
         self.updateDimensionsMethod = FixedIntervalMethod(DataStreamMethods.updateDimensions, self.dimensionsUpdatingFrequency)
         self.clusterAnalysisMethod = FixedIntervalMethod(stream_settings.get('cluster_analysis_method', DataStreamMethods.clusterAnalysisMethod), self.clustersAnalysisFrequency)
-        self.filterClustersMethod = FixedIntervalMethod(stream_settings.get('filter_cluster_method', DataStreamMethods.filterClusters), self.clustersFilteringFrequency)
+        self.clusterFilteringMethod = FixedIntervalMethod(stream_settings.get('cluster_filtering_method', DataStreamMethods.clusterFilteringMethod), self.clustersFilteringFrequency)
         
         self.combineClustersMethod=stream_settings.get('combine_clusters_method',None)
         self.convertDataToMessageMethod=stream_settings['convert_data_to_message_method']
@@ -61,7 +61,7 @@ class HDStreaminClustering(StreamingLSHClustering):
                 streamObject=self.streamIdToStreamObjectMap[message.streamId]
                 self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-                self.filterClustersMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 i+=1
                 print i, streamObject.lastMessageTime
                 self.getClusterAndUpdateExistingClusters(streamObject)
