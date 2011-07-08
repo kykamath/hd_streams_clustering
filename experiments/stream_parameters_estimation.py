@@ -298,18 +298,24 @@ class ParameterEstimation:
 class ClusteringParametersEstimation():
     clusterLagDistributionId = 'cluster_lag_distribution'
     def __init__(self, **stream_settings):
+        stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId] = stream_settings['parameter_estimation_folder']+ClusteringParametersEstimation.clusterLagDistributionId
         self.stream_settings = stream_settings
         self.hdsClustering = HDStreaminClustering(**self.stream_settings)
-        self.clusterLagDistributionFile = stream_settings['parameter_estimation_folder']+ClusteringParametersEstimation.clusterLagDistributionId
-    def run(self, iterator):
-        self.hdsClustering.cluster(iterator)
+    def run(self, iterator): self.hdsClustering.cluster(iterator)
     @staticmethod
     def clusterLagDistributionMethod(hdStreamClusteringObject, currentMessageTime):
         lagDistribution = defaultdict(int)
         for cluster in hdStreamClusteringObject.clusters.values():
             lag=DateTimeAirthematic.getDifferenceInTimeUnits(currentMessageTime, cluster.lastStreamAddedTime, hdStreamClusteringObject.stream_settings['time_unit_in_seconds'].seconds)
             lagDistribution[str(lag)]+=1
-        print currentMessageTime, lagDistribution
+        print currentMessageTime, len(hdStreamClusteringObject.clusters)
+        iterationData = {
+                         'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
+                         'settings': pprint.pformat(hdStreamClusteringObject.stream_settings),
+                         ClusteringParametersEstimation.clusterLagDistributionId: lagDistribution
+                         }
+        print iterationData
+#        FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId])
             
     @staticmethod
     def emptyClusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass
