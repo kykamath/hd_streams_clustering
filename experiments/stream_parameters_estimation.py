@@ -356,8 +356,8 @@ def clusterDecayEstimation():
     experts_twitter_stream_settings['cluster_analysis_method'] = houston_twitter_stream_settings['cluster_analysis_method'] = ClusteringParametersEstimation.clusterLagDistributionMethod
     experts_twitter_stream_settings['lag_between_streams'] = houston_twitter_stream_settings['lag_between_streams'] = analyzeClusterLag
     experts_twitter_stream_settings['lag_between_streams_added_to_cluster']=houston_twitter_stream_settings['lag_between_streams_added_to_cluster']=defaultdict(int)
-    ClusteringParametersEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
-#    ClusteringParametersEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston())
+#    ClusteringParametersEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
+    ClusteringParametersEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston())
 
 if __name__ == '__main__':
 #    dimensionsEstimation()
