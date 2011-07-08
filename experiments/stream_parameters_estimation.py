@@ -243,9 +243,9 @@ class ParameterEstimation:
         print len(x)
         exponentialCurveParams = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1., 1.])
         print self.stream_settings['plot_label'], exponentialCurveParams, calculateInActivityTimeFor(exponentialCurveParams, 0.1) 
-        plt.loglog(x,y, 'o', label=getLatexForString(self.stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), color=self.stream_settings['plot_color'])
-        plt.loglog(x,CurveFit.getYValues(CurveFit.increasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
-        plt.ylabel(r'$P\ (\ lag\ \leq\ TU\ )$'), plt.xlabel(getLatexForString(xlabelTimeUnits)), plt.title(getLatexForString('CDF for lag distribution.'))
+        plt.plot(x,y, 'o', label=getLatexForString(self.stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), color=self.stream_settings['plot_color'])
+        plt.plot(x,CurveFit.getYValues(CurveFit.increasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
+        plt.ylabel(r'$P\ (\ lag\ \leq\ TU\ )$'), plt.xlabel(getLatexForString(xlabelTimeUnits)), plt.title(getLatexForString('CDF for dimension lag distribution.'))
         plt.ylim((0, 1.2))
         plt.legend(loc=4)
         if returnAxisValuesOnly: plt.show()
@@ -303,6 +303,8 @@ class ClusteringParametersEstimation():
         self.hdsClustering = HDStreaminClustering(**self.stream_settings)
     def run(self, iterator): self.hdsClustering.cluster(iterator)
     @staticmethod
+    def emptyClusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass
+    @staticmethod
     def clusterLagDistributionMethod(hdStreamClusteringObject, currentMessageTime):
         lagDistribution = defaultdict(int)
         for cluster in hdStreamClusteringObject.clusters.values():
@@ -317,10 +319,62 @@ class ClusteringParametersEstimation():
                          }
 #        print hdStreamClusteringObject.stream_settings['lag_between_streams_added_to_cluster']
         FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId])
-            
-    @staticmethod
-    def emptyClusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass
-
+    def plotClusterInactivityTime(self, returnAxisValuesOnly=True):
+        '''
+        This determines the time after which a cluster can be considered 
+        decayed and hence removed.
+        
+        Experts stream [ 0.66002386  0.07035227] 0.1 82
+        Houston stream [ 0.73800037  0.05890473] 0.1 29
+        
+        458 (# of time units) Experts stream [ 0.66002386  0.07035227] 0.2 15
+        71 (# of time units) Houston stream [ 0.73756656  0.05883258] 0.2 3
+        
+        '''
+        def calculateInActivityTimeFor(params, probabilityOfInactivity): return int(CurveFit.inverseOfIncreasingExponentialFunction(params, 1-probabilityOfInactivity))
+        data = list(FileIO.iterateJsonFromFile(self.hdsClustering.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId]))[-1]
+        total = float(sum(data['lag_between_streams_added_to_cluster'].values()))
+        x = sorted(map(int, data['lag_between_streams_added_to_cluster'].keys()))
+        y = getCumulativeDistribution([data['lag_between_streams_added_to_cluster'][str(i)]/total for i in x])
+        exponentialCurveParams = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1., 1.])
+        print self.stream_settings['plot_label'], exponentialCurveParams, calculateInActivityTimeFor(exponentialCurveParams, 0.2) 
+        plt.plot(x,y, 'o', label=getLatexForString(self.stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), color=self.stream_settings['plot_color'])
+        plt.plot(x,CurveFit.getYValues(CurveFit.increasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
+        plt.ylabel(r'$P\ (\ lag\ \leq\ TU\ )$'), plt.xlabel(getLatexForString(xlabelTimeUnits)), plt.title(getLatexForString('CDF for clusters lag distribution.'))
+        plt.ylim((0, 1.2))
+        plt.legend(loc=4)
+        if returnAxisValuesOnly: plt.show()
+    def plotClusterLagDistribution(self, returnAxisValuesOnly=True):
+        '''
+        458 (# of time units) Experts stream [ 0.00295834  0.70639136] 15 0.979963183376
+        72 (# of time units) Houston stream [ 0.00193631  0.48973162] 3 0.996683831232
+        '''
+        def calculatePercentageOfDecayedPhrasesFor(params, timeUnit): return 1- CurveFit.increasingExponentialFunction(params, timeUnit)
+        dataDistribution = {}
+        currentTimeUnit = 0
+        for data in list(FileIO.iterateJsonFromFile(self.hdsClustering.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId]))[:numberOfTimeUnits]:
+            totalDimensions=float(sum(data[ClusteringParametersEstimation.clusterLagDistributionId].values()))
+            tempArray = []
+            for k, v in data[ClusteringParametersEstimation.clusterLagDistributionId].iteritems():
+                k=int(k)
+                if k not in dataDistribution: dataDistribution[k]=[0]*numberOfTimeUnits
+                dataDistribution[k][currentTimeUnit] = v/totalDimensions
+                tempArray.append(v/totalDimensions)
+            currentTimeUnit+=1
+        x = sorted(dataDistribution)
+        y = getCumulativeDistribution([np.mean(dataDistribution[k]) for k in x])
+        params = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1.,1.])
+        print self.stream_settings['plot_label'], params, 
+        def subPlot(id, timeUnit):
+            plt.subplot(id)
+            print timeUnit, calculatePercentageOfDecayedPhrasesFor(params, timeUnit)
+            plt.plot(x,y, 'o', label=getLatexForString(self.stream_settings['plot_label'])+getLatexForString(' (%0.3fx^{%0.2f})')%(params[0], params[1]), color=self.stream_settings['plot_color'])
+            plt.plot(x, CurveFit.getYValues(CurveFit.increasingExponentialFunction, params, x), color=self.stream_settings['plot_color'], lw=2)
+        if self.stream_settings['stream_id']=='experts_twitter_stream': subPlot(211, 15); plt.title(getLatexForString('Clusters lag distribution'))
+        else: subPlot(212, 3); plt.xlabel(getLatexForString(xlabelTimeUnits))
+        plt.ylabel(r'$\%\ of\ clusters\ with\ lag\ \leq\ TU$')
+        plt.legend(loc=4)
+        if returnAxisValuesOnly: plt.show()
 
 '''    Experiments of Twitter streams starts here.    '''
 experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
@@ -345,8 +399,8 @@ def dimensionInActivityEstimation():
                 estimationObject.lagBetweenMessagesDistribution[str(lag)]+=1
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
-#    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionInActivityTime])
-    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsLagDistribution, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsLagDistribution])
+    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionInActivityTime])
+#    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsLagDistribution, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsLagDistribution])
 
 experts_twitter_stream_settings['cluster_filtering_method']=houston_twitter_stream_settings['cluster_filtering_method']=ClusteringParametersEstimation.emptyClusterFilteringMethod
 def clusterDecayEstimation():
@@ -357,7 +411,9 @@ def clusterDecayEstimation():
     experts_twitter_stream_settings['lag_between_streams'] = houston_twitter_stream_settings['lag_between_streams'] = analyzeClusterLag
     experts_twitter_stream_settings['lag_between_streams_added_to_cluster']=houston_twitter_stream_settings['lag_between_streams_added_to_cluster']=defaultdict(int)
 #    ClusteringParametersEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
-    ClusteringParametersEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston())
+#    ClusteringParametersEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston())
+#    ParameterEstimation.plotMethods([ClusteringParametersEstimation(**experts_twitter_stream_settings).plotClusterInactivityTime, ClusteringParametersEstimation(**houston_twitter_stream_settings).plotClusterInactivityTime])
+    ParameterEstimation.plotMethods([ClusteringParametersEstimation(**experts_twitter_stream_settings).plotClusterLagDistribution, ClusteringParametersEstimation(**houston_twitter_stream_settings).plotClusterLagDistribution])
 
 if __name__ == '__main__':
 #    dimensionsEstimation()
