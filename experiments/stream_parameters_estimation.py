@@ -324,7 +324,6 @@ class ClusteringParametersEstimation():
 
 '''    Experiments of Twitter streams starts here.    '''
 experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-experts_twitter_stream_settings['cluster_filtering_method']=houston_twitter_stream_settings['cluster_filtering_method']=ClusteringParametersEstimation.emptyClusterFilteringMethod
 
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
@@ -348,7 +347,8 @@ def dimensionInActivityEstimation():
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 #    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionInActivityTime, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionInActivityTime])
     ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsLagDistribution, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsLagDistribution])
-    
+
+experts_twitter_stream_settings['cluster_filtering_method']=houston_twitter_stream_settings['cluster_filtering_method']=ClusteringParametersEstimation.emptyClusterFilteringMethod
 def clusterDecayEstimation():
     def analyzeClusterLag(streamCluster, stream, **stream_settings):
         lag=DateTimeAirthematic.getDifferenceInTimeUnits(streamCluster.lastStreamAddedTime, stream.lastMessageTime, stream_settings['time_unit_in_seconds'].seconds)
