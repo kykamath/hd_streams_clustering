@@ -191,7 +191,9 @@ class StreamClusterTests(unittest.TestCase):
         message2 = Message(4, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
         message2.vector=Vector({2:4})
         stream2 = Stream(4, message2)
+        self.assertNotEqual(test_time, self.cluster1.lastStreamAddedTime)
         self.cluster1.addDocument(stream1)
+        self.assertEqual(test_time, self.cluster1.lastStreamAddedTime)
         # Test if cluster id is set.
         self.assertEqual(self.cluster1.clusterId, stream1.clusterId)
         # Test that cluster mean is updated.

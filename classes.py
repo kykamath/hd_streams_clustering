@@ -99,8 +99,11 @@ class StreamCluster(Cluster):
     def __init__(self, stream, **kwargs):
         super(StreamCluster, self).__init__(stream, **kwargs)
         self.lastStreamAddedTime = stream.lastMessageTime
-#    def addDocument(self, stream, **stream_settings):
-#        super(StreamCluster, self).addDocument(stream)
+    def addDocument(self, stream, **stream_settings):
+        super(StreamCluster, self).addDocument(stream)
+        self.lastStreamAddedTime = stream.lastMessageTime
+        # Adding this method to analyze cluster lag distributions. Remove this code if experiments are not needed.
+        if 'lag_between_streams' in stream_settings: stream_settings['lag_between_streams'](self, stream)
 #        self.updateScore(stream.lastMessageTime, scoreToUpdate=1, **stream_settings)
 #    def updateScore(self, currentOccuranceTime, scoreToUpdate, **stream_settings):
 #        timeDifference = DateTimeAirthematic.getDifferenceInTimeUnits(currentOccuranceTime, self.lastStreamAddedTime, stream_settings['time_unit_in_seconds'].seconds)
