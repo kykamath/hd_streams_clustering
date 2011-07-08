@@ -296,6 +296,11 @@ class ParameterEstimation:
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
     
 class ClusteringParametersEstimation():
+    def __init__(self, **stream_settings):
+        self.stream_settings = stream_settings
+        self.hdsClustering = HDStreaminClustering(**self.stream_settings)
+    def run(self, iterator):
+        self.hdsClustering.cluster(iterator)
     @staticmethod
     def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
         print currentMessageTime, len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
@@ -332,8 +337,7 @@ def dimensionInActivityEstimation():
     ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsLagDistribution, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsLagDistribution])
     
 def clusterDecayEstimation():
-    hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
-    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts())
+    ClusteringParametersEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
 
 if __name__ == '__main__':
 #    dimensionsEstimation()
