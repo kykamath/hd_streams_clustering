@@ -77,7 +77,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         Do not remove this comment. Might need this if StreamCluster is used again in future.
         if predictedCluster!=None: self.clusters[predictedCluster].addStream(stream, **self.stream_settings)
         '''
-        if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream)
+        if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream, **self.stream_settings)
         else:
             newCluster = StreamCluster(stream)
             newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
