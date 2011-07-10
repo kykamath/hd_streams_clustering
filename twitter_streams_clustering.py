@@ -63,7 +63,7 @@ class TwitterCrowdsSpecificMethods:
         print 'combine'
 #        def getHashtagSet(vector): return set([word for dimension in vector for word in dimension.split() if word.startswith('#')])
 #        def getClusterInt(id): return int(id.split('_')[1])
-#        mergedClustersMap = {}
+        mergedClustersMap = {}
 #        for cluster in [clusters[v] for v in sorted(clusters, key=getClusterInt)]:
 #            mergedClusterId = None
 #            for mergedCluster in mergedClustersMap.itervalues():
@@ -76,7 +76,7 @@ class TwitterCrowdsSpecificMethods:
 #                mergedCluster = StreamCluster.getClusterObjectToMergeFrom(cluster)
 #                mergedCluster.mergedClustersList = [cluster.clusterId]
 #                mergedClustersMap[mergedCluster.clusterId]=mergedCluster
-#        return mergedClustersMap
+        return mergedClustersMap
     @staticmethod
     def getClusterInMapFormat(cluster, numberOfMaxDimensionsToRepresent=20): 
         return {'clusterId': cluster.clusterId, 'mergedClustersList': cluster.mergedClustersList, 'lastStreamAddedTime': cluster.lastStreamAddedTime,
