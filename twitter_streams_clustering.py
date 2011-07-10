@@ -94,7 +94,7 @@ class TwitterCrowdsSpecificMethods:
         for k,v in clusterMap['dimensions'].iteritems(): cluster[k]=v
         return cluster
     @staticmethod
-    def emptyClusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): print
+    def emptyClusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass
     @staticmethod
     def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
         print currentMessageTime
