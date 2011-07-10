@@ -5,7 +5,7 @@ Created on Jun 30, 2011
 '''
 import sys, os
 sys.path.append('../')
-from settings import experts_twitter_stream_settings
+from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
 os.environ["PATH"] = os.environ["PATH"]+os.pathsep+'/opt/local/bin'
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods,\
     TwitterIterators, getExperts
@@ -53,7 +53,8 @@ class TwitterStreamAnalysis:
         print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
 
 def generateClusters():
-    TwitterStreamAnalysis(**experts_twitter_stream_settings).generateClusters(TwitterIterators.iterateTweetsFromExperts())
+#    TwitterStreamAnalysis(**experts_twitter_stream_settings).generateClusters(TwitterIterators.iterateTweetsFromExperts())
+    TwitterStreamAnalysis(**houston_twitter_stream_settings).generateClusters(TwitterIterators.iterateTweetsFromHouston())
 
 #class GenerateData:
 #    @staticmethod
