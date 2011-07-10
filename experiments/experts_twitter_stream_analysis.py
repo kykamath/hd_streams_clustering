@@ -5,8 +5,8 @@ Created on Jun 30, 2011
 '''
 import sys, os
 sys.path.append('../')
-os.environ["PATH"] = os.environ["PATH"]+os.pathsep+'/opt/local/bin'
 from settings import experts_twitter_stream_settings
+os.environ["PATH"] = os.environ["PATH"]+os.pathsep+'/opt/local/bin'
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods,\
     TwitterIterators, getExperts
 from hd_streams_clustering import HDStreaminClustering
@@ -44,7 +44,13 @@ class TwitterStreamAnalysis:
         HDStreaminClustering(**self.stream_settings).cluster(iterator)
     @staticmethod
     def writeClusters(hdStreamClusteringObject, currentMessageTime):
-        print currentMessageTime, len(hdStreamClusteringObject.clusters)
+        print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
+        iterationData = {'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
+                         'clusters': map(TwitterCrowdsSpecificMethods.getClusterInMapFormat, [cluster for cluster, _ in sorted(StreamCluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)]),
+                         'settings': hdStreamClusteringObject.stream_settings.convertToSerializableObject()
+                         }
+        FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings.lsh_clusters_folder+FileIO.getFileByDay(currentMessageTime))
+        print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
 
 def generateClusters():
     TwitterStreamAnalysis(**experts_twitter_stream_settings).generateClusters(TwitterIterators.iterateTweetsFromExperts())
@@ -161,8 +167,8 @@ def generateClusters():
 #                plt.show()
         
 if __name__ == '__main__':
-#    GenerateData.expertClusters()
     generateClusters()
+#    GenerateData.expertClusters()
 #    AnalyzeData.constructCrowdDataStructures(iterateExpertClusters)
 #    AnalyzeData.getCrowdsPurity()
 
