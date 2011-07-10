@@ -46,7 +46,8 @@ class GenerateData:
             print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         
         experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-        experts_twitter_stream_settings['cluster_filtering_method']=TwitterCrowdsSpecificMethods.clusterFilteringMethod
+#        experts_twitter_stream_settings['cluster_filtering_method']=TwitterCrowdsSpecificMethods.clusterFilteringMethod
+        experts_twitter_stream_settings['combine_clusters_method'] = TwitterCrowdsSpecificMethods.combineClusters
         experts_twitter_stream_settings['cluster_analysis_method'] = TwitterCrowdsSpecificMethods.clusterAnalysisMethod
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts())
 

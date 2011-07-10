@@ -60,22 +60,23 @@ class TwitterCrowdsSpecificMethods:
         return message
     @staticmethod
     def combineClusters(clusters, **twitter_stream_settings):
-        def getHashtagSet(vector): return set([word for dimension in vector for word in dimension.split() if word.startswith('#')])
-        def getClusterInt(id): return int(id.split('_')[1])
-        mergedClustersMap = {}
-        for cluster in [clusters[v] for v in sorted(clusters, key=getClusterInt)]:
-            mergedClusterId = None
-            for mergedCluster in mergedClustersMap.itervalues():
-                clusterHashtags, mergedClusterHashtags = getHashtagSet(cluster), getHashtagSet(mergedCluster)
-                if len(clusterHashtags.union(mergedClusterHashtags)) and jaccard_distance(clusterHashtags, mergedClusterHashtags) <= 1-twitter_stream_settings['cluster_merging_jaccard_distance_threshold']: 
-                    mergedCluster.mergeCluster(cluster), mergedCluster.mergedClustersList.append(cluster.clusterId)
-                    mergedClusterId = mergedCluster.clusterId
-                    break
-            if mergedClusterId==None:
-                mergedCluster = StreamCluster.getClusterObjectToMergeFrom(cluster)
-                mergedCluster.mergedClustersList = [cluster.clusterId]
-                mergedClustersMap[mergedCluster.clusterId]=mergedCluster
-        return mergedClustersMap
+        print 'combine'
+#        def getHashtagSet(vector): return set([word for dimension in vector for word in dimension.split() if word.startswith('#')])
+#        def getClusterInt(id): return int(id.split('_')[1])
+#        mergedClustersMap = {}
+#        for cluster in [clusters[v] for v in sorted(clusters, key=getClusterInt)]:
+#            mergedClusterId = None
+#            for mergedCluster in mergedClustersMap.itervalues():
+#                clusterHashtags, mergedClusterHashtags = getHashtagSet(cluster), getHashtagSet(mergedCluster)
+#                if len(clusterHashtags.union(mergedClusterHashtags)) and jaccard_distance(clusterHashtags, mergedClusterHashtags) <= 1-twitter_stream_settings['cluster_merging_jaccard_distance_threshold']: 
+#                    mergedCluster.mergeCluster(cluster), mergedCluster.mergedClustersList.append(cluster.clusterId)
+#                    mergedClusterId = mergedCluster.clusterId
+#                    break
+#            if mergedClusterId==None:
+#                mergedCluster = StreamCluster.getClusterObjectToMergeFrom(cluster)
+#                mergedCluster.mergedClustersList = [cluster.clusterId]
+#                mergedClustersMap[mergedCluster.clusterId]=mergedCluster
+#        return mergedClustersMap
     @staticmethod
     def getClusterInMapFormat(cluster, numberOfMaxDimensionsToRepresent=20): 
         return {'clusterId': cluster.clusterId, 'mergedClustersList': cluster.mergedClustersList, 'lastStreamAddedTime': cluster.lastStreamAddedTime,
@@ -94,9 +95,9 @@ class TwitterCrowdsSpecificMethods:
         for k,v in clusterMap['dimensions'].iteritems(): cluster[k]=v
         return cluster
     @staticmethod
-    def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): print ' *** ', currentMessageTime
+    def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): print 'filtering', currentMessageTime
     @staticmethod
-    def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): print currentMessageTime
+    def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): print 'analysis', currentMessageTime
 #    @staticmethod
 #    def analyzeIterationData(hdStreamClusteringObject, currentMessageTime):
 #        print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
