@@ -38,10 +38,9 @@ class TwitterStreamAnalysis:
         self.stream_settings = stream_settings
         self.stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
         self.stream_settings['combine_clusters_method'] = TwitterCrowdsSpecificMethods.combineClusters
-        self.hdStreaminClustering = HDStreaminClustering(**self.stream_settings)
     def generateClusters(self, iterator):
         self.stream_settings['cluster_analysis_method'] = TwitterStreamAnalysis.writeClusters
-        self.hdStreaminClustering.cluster(iterator)
+        HDStreaminClustering(**self.stream_settings).cluster(iterator)
     @staticmethod
     def writeClusters(hdStreamClusteringObject, currentMessageTime):
         print currentMessageTime, len(hdStreamClusteringObject.clusters)

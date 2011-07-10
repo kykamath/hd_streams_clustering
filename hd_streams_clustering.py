@@ -37,9 +37,7 @@ class DataStreamMethods:
         if hdStreamClusteringObject.combineClustersMethod!=None: hdStreamClusteringObject.clusters=hdStreamClusteringObject.combineClustersMethod(hdStreamClusteringObject.clusters, **hdStreamClusteringObject.stream_settings)
         DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
     @staticmethod
-    def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): 
-        print 'shdnt come here'
-        pass
+    def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): print 'shdnt come here'
 
 class HDStreaminClustering(StreamingLSHClustering):
     def __init__(self, **stream_settings):
@@ -71,7 +69,7 @@ class HDStreaminClustering(StreamingLSHClustering):
                 self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 i+=1
-                print i, streamObject.lastMessageTime, 
+                print i, streamObject.lastMessageTime
                 self.getClusterAndUpdateExistingClusters(streamObject)
     def getClusterAndUpdateExistingClusters(self, stream):
         predictedCluster = self.getClusterForDocument(stream)
