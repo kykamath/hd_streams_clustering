@@ -4,7 +4,6 @@ Created on Jun 30, 2011
 @author: kykamath
 '''
 import sys, os
-from library.plotting import getLatexForString
 sys.path.append('../')
 os.environ["PATH"] = os.environ["PATH"]+os.pathsep+'/opt/local/bin'
 from settings import experts_twitter_stream_settings
@@ -15,6 +14,7 @@ from datetime import datetime, timedelta
 from library.file_io import FileIO
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
 from library.classes import GeneralMethods
+from library.plotting import getLatexForString
 from library.clustering import EvaluationMetrics
 from operator import itemgetter
 from classes import Crowd, StreamCluster
