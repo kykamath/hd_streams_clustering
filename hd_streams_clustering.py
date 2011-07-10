@@ -30,7 +30,6 @@ class DataStreamMethods:
 #        if hdStreamClusteringObject.analyzeIterationDataMethod!=None: hdStreamClusteringObject.analyzeIterationDataMethod(hdStreamClusteringObject, currentMessageTime)
     @staticmethod
     def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime):
-        print 'filtering', hdStreamClusteringObject.stream_settings['cluster_inactivity_time_in_seconds']
         for cluster in StreamCluster.getClustersByAttributeAndThreshold(hdStreamClusteringObject.clusters.values(), hdStreamClusteringObject.stream_settings['cluster_filter_attribute'], 
                                                                   hdStreamClusteringObject.stream_settings['cluster_filter_threshold'], StreamCluster.BELOW_THRESHOLD): del hdStreamClusteringObject.clusters[cluster.clusterId]
         for cluster in StreamCluster.getClustersByAttributeAndThreshold(hdStreamClusteringObject.clusters.values(), 'lastStreamAddedTime', 
