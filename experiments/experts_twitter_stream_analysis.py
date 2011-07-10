@@ -13,7 +13,7 @@ from hd_streams_clustering import HDStreaminClustering
 from datetime import datetime, timedelta
 from library.file_io import FileIO
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
-from library.classes import GeneralMethods
+from library.classes import GeneralMethods, Settings
 from library.plotting import getLatexForString
 from library.clustering import EvaluationMetrics
 from operator import itemgetter
@@ -47,7 +47,7 @@ class TwitterStreamAnalysis:
         print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         iterationData = {'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                          'clusters': map(TwitterCrowdsSpecificMethods.getClusterInMapFormat, [cluster for cluster, _ in sorted(StreamCluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)]),
-                         'settings': hdStreamClusteringObject.stream_settings.convertToSerializableObject()
+                         'settings': Settings.getSerialzedObject(hdStreamClusteringObject.stream_settings)
                          }
         FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings.lsh_clusters_folder+FileIO.getFileByDay(currentMessageTime))
         print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
