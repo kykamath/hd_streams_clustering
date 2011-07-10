@@ -49,7 +49,7 @@ class TwitterStreamAnalysis:
                          'clusters': map(TwitterCrowdsSpecificMethods.getClusterInMapFormat, [cluster for cluster, _ in sorted(StreamCluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)]),
                          'settings': Settings.getSerialzedObject(hdStreamClusteringObject.stream_settings)
                          }
-        FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings.lsh_clusters_folder+FileIO.getFileByDay(currentMessageTime))
+        FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings['lsh_clusters_folder']+FileIO.getFileByDay(currentMessageTime))
         print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
 
 def generateClusters():
