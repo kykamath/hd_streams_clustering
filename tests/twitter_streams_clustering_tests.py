@@ -4,10 +4,11 @@ Created on Jun 23, 2011
 @author: kykamath
 '''
 import unittest, sys
-from streaming_lsh.classes import Document
+sys.path.append('../')
 from library.vector import Vector
 from classes import StreamCluster, Message, Stream
-sys.path.append('../')
+from library.twitter import getStringRepresentationForTweetTimestamp,\
+    getDateTimeObjectFromTweetTimestamp
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods
 from settings import twitter_stream_settings
 from datetime import datetime
@@ -52,14 +53,15 @@ class TwitterCrowdsSpecificMethodsTests(unittest.TestCase):
         mergedCluster = StreamCluster.getClusterObjectToMergeFrom(self.cluster1)
         mergedCluster.mergedClustersList = [self.cluster1.clusterId]
         mergedCluster.lastStreamAddedTime = test_time
-        mapReresentation = {'clusterId': mergedCluster.clusterId, 'lastStreamAddedTime':mergedCluster.lastStreamAddedTime, 'mergedClustersList': [self.cluster1.clusterId], 'streams': [self.doc1.docId], 'dimensions': {'#tcot':2, 'dsf':2}}
+        mapReresentation = {'clusterId': mergedCluster.clusterId, 'lastStreamAddedTime':getStringRepresentationForTweetTimestamp(mergedCluster.lastStreamAddedTime), 'mergedClustersList': [self.cluster1.clusterId], 'streams': [self.doc1.docId], 'dimensions': {'#tcot':2, 'dsf':2}}
         self.assertEqual(mapReresentation, TwitterCrowdsSpecificMethods.getClusterInMapFormat(mergedCluster))
     def test_getClusterFromMapFormat(self):
-        mapReresentation = {'clusterId': 1, 'mergedClustersList': [self.cluster1.clusterId], 'lastStreamAddedTime': test_time, 'streams': [self.doc1.docId], 'dimensions': {'#tcot':2, 'dsf':2}}
+        mapReresentation = {'clusterId': 1, 'mergedClustersList': [self.cluster1.clusterId], 'lastStreamAddedTime': getStringRepresentationForTweetTimestamp(test_time), 'streams': [self.doc1.docId], 'dimensions': {'#tcot':2, 'dsf':2}}
         cluster = TwitterCrowdsSpecificMethods.getClusterFromMapFormat(mapReresentation)
         self.assertEqual(1, cluster.clusterId)
         self.assertEqual([self.cluster1.clusterId], cluster.mergedClustersList)
         self.assertEqual([self.doc1.docId], cluster.documentsInCluster)
         self.assertEqual({'#tcot':2, 'dsf':2}, cluster)
+        self.assertEqual(getStringRepresentationForTweetTimestamp(test_time), getStringRepresentationForTweetTimestamp(cluster.lastStreamAddedTime))
 if __name__ == '__main__':
     unittest.main()

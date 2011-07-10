@@ -1,26 +1,26 @@
 #!/usr/bin/env python
-import numpy as np
-import matplotlib.pyplot as plt
-
-# example data
-x = np.arange(0.1, 4, 0.5)
-y = np.exp(-x)
-
-# example variable error bar values
-yerr = 0.1 + 0.2*np.sqrt(x)
-xerr = 0.1 + yerr
-
-print x
-print y
-print yerr
-print xerr
-
-# First illustrate basic pyplot interface, using defaults where possible.
-plt.figure()
-plt.errorbar(x, y, marker='-', xerr=0.2, yerr=0.4)
-plt.title("Simplest errorbars, 0.2 in x, 0.4 in y")
-
-plt.show()
+#import numpy as np
+#import matplotlib.pyplot as plt
+#
+## example data
+#x = np.arange(0.1, 4, 0.5)
+#y = np.exp(-x)
+#
+## example variable error bar values
+#yerr = 0.1 + 0.2*np.sqrt(x)
+#xerr = 0.1 + yerr
+#
+#print x
+#print y
+#print yerr
+#print xerr
+#
+## First illustrate basic pyplot interface, using defaults where possible.
+#plt.figure()
+#plt.errorbar(x, y, marker='-', xerr=0.2, yerr=0.4)
+#plt.title("Simplest errorbars, 0.2 in x, 0.4 in y")
+#
+#plt.show()
 
 ## Now switch to a more OO interface to exercise more features.
 #fig, axs = plt.subplots(nrows=2, ncols=2, sharex=True)

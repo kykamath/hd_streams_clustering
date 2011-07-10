@@ -4,7 +4,8 @@ Created on Jun 22, 2011
 @author: kykamath
 '''
 from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
-from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
+from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp,\
+    getStringRepresentationForTweetTimestamp
 from classes import Message, StreamCluster, Stream
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -78,7 +79,7 @@ class TwitterCrowdsSpecificMethods:
         return mergedClustersMap
     @staticmethod
     def getClusterInMapFormat(cluster, numberOfMaxDimensionsToRepresent=20): 
-        return {'clusterId': cluster.clusterId, 'mergedClustersList': cluster.mergedClustersList, 'lastStreamAddedTime': cluster.lastStreamAddedTime,
+        return {'clusterId': cluster.clusterId, 'mergedClustersList': cluster.mergedClustersList, 'lastStreamAddedTime': getStringRepresentationForTweetTimestamp(cluster.lastStreamAddedTime),
                'streams': [stream.docId for stream in cluster.iterateDocumentsInCluster()],
                'dimensions': cluster.getTopDimensions(numberOfFeatures=numberOfMaxDimensionsToRepresent)}
     @staticmethod
@@ -88,7 +89,7 @@ class TwitterCrowdsSpecificMethods:
         dummyStream=Stream(1, dummyMessage)
         cluster = StreamCluster(dummyStream)
         cluster.clusterId = clusterMap['clusterId']
-        cluster.lastStreamAddedTime = clusterMap['lastStreamAddedTime']
+        cluster.lastStreamAddedTime = getDateTimeObjectFromTweetTimestamp(clusterMap['lastStreamAddedTime'])
         cluster.mergedClustersList = clusterMap['mergedClustersList']
         cluster.documentsInCluster = clusterMap['streams']
         for k,v in clusterMap['dimensions'].iteritems(): cluster[k]=v
