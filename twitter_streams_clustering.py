@@ -93,6 +93,10 @@ class TwitterCrowdsSpecificMethods:
         cluster.documentsInCluster = clusterMap['streams']
         for k,v in clusterMap['dimensions'].iteritems(): cluster[k]=v
         return cluster
+    @staticmethod
+    def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): print ' *** ', currentMessageTime
+    @staticmethod
+    def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): print currentMessageTime
 #    @staticmethod
 #    def analyzeIterationData(hdStreamClusteringObject, currentMessageTime):
 #        print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
@@ -101,11 +105,13 @@ class TwitterCrowdsSpecificMethods:
 #        print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         
 def clusterTwitterStreams():
-    experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-    experts_twitter_stream_settings['combine_clusters_method'] = TwitterCrowdsSpecificMethods.combineClusters
+    pass
+    
+#    experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+#    experts_twitter_stream_settings['combine_clusters_method'] = TwitterCrowdsSpecificMethods.combineClusters
 #    experts_twitter_stream_settings['analyze_iteration_data_method'] = TwitterCrowdsSpecificMethods.analyzeIterationData
-    hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
-    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts())
+#    hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
+#    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts())
 
 #    trends_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
 #    trends_twitter_stream_settings['combine_clusters_method'] = TwitterCrowdsSpecificMethods.combineClusters
