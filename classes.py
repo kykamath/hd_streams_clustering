@@ -36,36 +36,31 @@ class UtilityMethods:
         topPhrasesList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in phraseTextToPhraseObjectMap.itervalues()), reverse=True)[:stream_settings['dimensions']]]
         newPhraseIterator = getNextNewPhrase(topPhrasesList)
         availableIds = set(list(range(stream_settings['dimensions'])))
+#        @timeit
+#        def meth1():
+#            for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
+#                availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+#                if phrase not in topPhrasesList:
+#                    try:
+#                        newPhrase = newPhraseIterator.next()
+#                        phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+#                    except StopIteration: continue
+#                    finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
+        phrasesNotInTopPhrasesList = []
         @timeit
-        def meth1():
+        def modifiedMeth1():
             for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
                 availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                if phrase not in topPhrasesList:
-                    try:
-                        newPhrase = newPhraseIterator.next()
-                        phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                    except StopIteration: continue
-                    finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
-        
-        def modifiedMeth1():
-            phrasesNotInTopPhrasesList = []
-            @timeit
-            def m1():
-                for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
-                    availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                    if phrase not in topPhrasesList: phrasesNotInTopPhrasesList.append(phrase)
-            @timeit
-            def m2():
-                for phrase in phrasesNotInTopPhrasesList:
-                    try:
-                        newPhrase = newPhraseIterator.next()
-                        phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                    except StopIteration: pass
-                    phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
-            m1(), m2()
+                if phrase not in topPhrasesList: phrasesNotInTopPhrasesList.append(phrase)
         print len(phraseTextAndDimensionMap), len(topPhrasesList)
         modifiedMeth1()
         print len(phraseTextAndDimensionMap), len(topPhrasesList)
+        for phrase in phrasesNotInTopPhrasesList:
+            try:
+                newPhrase = newPhraseIterator.next()
+                phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+            except StopIteration: pass
+            phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
         availableIdsIterator = getNextAvailableId(availableIds)
         while True: 
             try:
