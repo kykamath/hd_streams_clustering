@@ -49,9 +49,10 @@ class UtilityMethods:
         phrasesNotInTopPhrasesList = []
         @timeit
         def modifiedMeth1():
-            for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
+            for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys():
                 availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
                 if phrase not in topPhrasesList: phrasesNotInTopPhrasesList.append(phrase)
+        
         print len(phraseTextAndDimensionMap), len(topPhrasesList)
         modifiedMeth1()
         print len(phraseTextAndDimensionMap), len(topPhrasesList)
