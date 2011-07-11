@@ -46,6 +46,7 @@ class UtilityMethods:
                         phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
                     except StopIteration: continue
                     finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
+        @timeit
         def modifiedMeth1():
             def processPhrase(phrase):
                 availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
