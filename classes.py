@@ -46,18 +46,23 @@ class UtilityMethods:
                         phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
                     except StopIteration: continue
                     finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
-        @timeit
+        
         def modifiedMeth1():
             phrasesNotInTopPhrasesList = []
-            for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
-                availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                if phrase not in topPhrasesList: phrasesNotInTopPhrasesList.append(phrase)
-            for phrase in phrasesNotInTopPhrasesList:
-                try:
-                    newPhrase = newPhraseIterator.next()
-                    phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                except StopIteration: pass
-                phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
+            @timeit
+            def m1():
+                for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
+                    availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+                    if phrase not in topPhrasesList: phrasesNotInTopPhrasesList.append(phrase)
+            @timeit
+            def m2():
+                for phrase in phrasesNotInTopPhrasesList:
+                    try:
+                        newPhrase = newPhraseIterator.next()
+                        phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+                    except StopIteration: pass
+                    phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
+            m1(), m2()
         print len(phraseTextAndDimensionMap), len(topPhrasesList)
         modifiedMeth1()
         print len(phraseTextAndDimensionMap), len(topPhrasesList)
