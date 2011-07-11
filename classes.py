@@ -37,21 +37,27 @@ class UtilityMethods:
         topPhrasesList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in phraseTextToPhraseObjectMap.itervalues()), reverse=True)[:stream_settings['dimensions']]]
         newPhraseIterator = getNextNewPhrase(topPhrasesList)
         availableIds = set(list(range(stream_settings['dimensions'])))
-        for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
-            availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-            if phrase not in topPhrasesList:
+        @timeit
+        def meth1():
+            for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
+                availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+                if phrase not in topPhrasesList:
+                    try:
+                        newPhrase = newPhraseIterator.next()
+                        phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+                    except StopIteration: continue
+                    finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
+        meth1()
+        @timeit
+        def meth2():
+            availableIdsIterator = getNextAvailableId(availableIds)
+            while True: 
                 try:
-                    newPhrase = newPhraseIterator.next()
-                    phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                except StopIteration: continue
-                finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
-        availableIdsIterator = getNextAvailableId(availableIds)
-        while True: 
-            try:
-                p = newPhraseIterator.next()
-                i = availableIdsIterator.next()
-                phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, p, i)
-            except StopIteration: break
+                    p = newPhraseIterator.next()
+                    i = availableIdsIterator.next()
+                    phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, p, i)
+                except StopIteration: break
+        meth2()
         UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap(phraseTextAndDimensionMap, **stream_settings)
     @staticmethod
     def checkCriticalErrorsInPhraseTextToIdMap(phraseTextAndDimensionMap, **stream_settings):
@@ -166,6 +172,7 @@ class Phrase:
         self.score=exponentialDecay(self.score, stream_settings['phrase_decay_coefficient'], timeDifference)+scoreToUpdate
         self.latestOccuranceTime=currentOccuranceTime
     @staticmethod
+    @timeit
     def sort(phraseIterator, reverse=False): return sorted(phraseIterator, key=lambda phrase:phrase.score, reverse=reverse)
 
 if __name__ == '__main__':
