@@ -20,7 +20,6 @@ class UtilityMethods:
     def updatePhraseTextToPhraseObject(phraseVector, occuranceTime, phraseTextToPhraseObjectMap, **stream_settings): 
         [UtilityMethods.createOrAddNewPhraseObject(phrase, phraseTextToPhraseObjectMap, occuranceTime, **stream_settings) for phrase in phraseVector]
     @staticmethod
-    @timeit
     def updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentTime, **stream_settings):
         '''
         Update phraseTextAndDimensionMap with new dimensions.
@@ -48,22 +47,18 @@ class UtilityMethods:
                     except StopIteration: continue
                     finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
         meth1()
-        @timeit
-        def meth2():
-            availableIdsIterator = getNextAvailableId(availableIds)
-            while True: 
-                try:
-                    p = newPhraseIterator.next()
-                    i = availableIdsIterator.next()
-                    phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, p, i)
-                except StopIteration: break
-        meth2()
+        availableIdsIterator = getNextAvailableId(availableIds)
+        while True: 
+            try:
+                p = newPhraseIterator.next()
+                i = availableIdsIterator.next()
+                phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, p, i)
+            except StopIteration: break
         UtilityMethods.checkCriticalErrorsInPhraseTextToIdMap(phraseTextAndDimensionMap, **stream_settings)
     @staticmethod
     def checkCriticalErrorsInPhraseTextToIdMap(phraseTextAndDimensionMap, **stream_settings):
         if len(phraseTextAndDimensionMap)>stream_settings['dimensions']: print 'Illegal number of dimensions.', exit()
     @staticmethod
-    @timeit
     def pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, currentTime, pruningMethod, **stream_settings):
         def prune(phraseText): 
             if pruningMethod(phraseTextToPhraseObjectMap[phraseText], currentTime, **stream_settings): del phraseTextToPhraseObjectMap[phraseText]
@@ -172,7 +167,6 @@ class Phrase:
         self.score=exponentialDecay(self.score, stream_settings['phrase_decay_coefficient'], timeDifference)+scoreToUpdate
         self.latestOccuranceTime=currentOccuranceTime
     @staticmethod
-    @timeit
     def sort(phraseIterator, reverse=False): return sorted(phraseIterator, key=lambda phrase:phrase.score, reverse=reverse)
 
 if __name__ == '__main__':
