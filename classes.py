@@ -6,7 +6,7 @@ Created on Jun 22, 2011
 import random
 from streaming_lsh.classes import Document, Cluster
 from library.math_modified import exponentialDecay, DateTimeAirthematic
-from library.classes import TwoWayMap, GeneralMethods
+from library.classes import TwoWayMap, GeneralMethods, timeit
 from library.vector import Vector
 from library.clustering import EvaluationMetrics
 from datetime import datetime
@@ -20,6 +20,7 @@ class UtilityMethods:
     def updatePhraseTextToPhraseObject(phraseVector, occuranceTime, phraseTextToPhraseObjectMap, **stream_settings): 
         [UtilityMethods.createOrAddNewPhraseObject(phrase, phraseTextToPhraseObjectMap, occuranceTime, **stream_settings) for phrase in phraseVector]
     @staticmethod
+    @timeit
     def updateDimensions(phraseTextAndDimensionMap, phraseTextToPhraseObjectMap, currentTime, **stream_settings):
         '''
         Update phraseTextAndDimensionMap with new dimensions.
@@ -56,6 +57,7 @@ class UtilityMethods:
     def checkCriticalErrorsInPhraseTextToIdMap(phraseTextAndDimensionMap, **stream_settings):
         if len(phraseTextAndDimensionMap)>stream_settings['dimensions']: print 'Illegal number of dimensions.', exit()
     @staticmethod
+    @timeit
     def pruneUnnecessaryPhrases(phraseTextToPhraseObjectMap, currentTime, pruningMethod, **stream_settings):
         def prune(phraseText): 
             if pruningMethod(phraseTextToPhraseObjectMap[phraseText], currentTime, **stream_settings): del phraseTextToPhraseObjectMap[phraseText]

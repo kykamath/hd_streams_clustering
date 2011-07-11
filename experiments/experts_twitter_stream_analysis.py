@@ -43,7 +43,6 @@ class TwitterStreamAnalysis:
         self.stream_settings['cluster_analysis_method'] = TwitterStreamAnalysis.writeClusters
         HDStreaminClustering(**self.stream_settings).cluster(iterator)
     @staticmethod
-    @timeit
     def writeClusters(hdStreamClusteringObject, currentMessageTime):
         print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         iterationData = {'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),

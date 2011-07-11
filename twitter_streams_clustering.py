@@ -61,7 +61,6 @@ class TwitterCrowdsSpecificMethods:
             message.vector[phrase]+=1
         return message
     @staticmethod
-    @timeit
     def combineClusters(clusters, **twitter_stream_settings):
         def getHashtagSet(vector): return set([word for dimension in vector for word in dimension.split() if word.startswith('#')])
         def getClusterInt(id): return int(id.split('_')[1])

@@ -23,14 +23,12 @@ class DataStreamMethods:
             cluster.setSignatureUsingVectorPermutations(hdStreamClusteringObject.unitVector, hdStreamClusteringObject.vectorPermutations, hdStreamClusteringObject.phraseTextAndDimensionMap)
             for permutation in hdStreamClusteringObject.signaturePermutations: permutation.addDocument(cluster)
     @staticmethod
-    @timeit
     def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
         # Update dimensions.
         UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
         DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
 #        if hdStreamClusteringObject.analyzeIterationDataMethod!=None: hdStreamClusteringObject.analyzeIterationDataMethod(hdStreamClusteringObject, currentMessageTime)
     @staticmethod
-    @timeit
     def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime):
         for cluster in StreamCluster.getClustersByAttributeAndThreshold(hdStreamClusteringObject.clusters.values(), hdStreamClusteringObject.stream_settings['cluster_filter_attribute'], 
                                                                   hdStreamClusteringObject.stream_settings['cluster_filter_threshold'], StreamCluster.BELOW_THRESHOLD): del hdStreamClusteringObject.clusters[cluster.clusterId]
