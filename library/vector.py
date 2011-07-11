@@ -1,6 +1,6 @@
 '''
 Created on Jun 14, 2011
-
+ 
 @author: kykamath
 '''
 
@@ -41,6 +41,7 @@ class Vector(dict):
     
     def getNormalizedVector(self):
         modValue = self.mod()
+        if modValue==0: return Vector(self)
         normalizedVector = Vector()
         for k, v in self.iteritems(): normalizedVector[k]=v/modValue
         return normalizedVector
