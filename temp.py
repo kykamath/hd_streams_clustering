@@ -52,3 +52,20 @@
 #fig.suptitle('Variable errorbars')
 #
 #plt.show()
+from multiprocessing import Queue, Pool
+
+def innerMeth(arg):
+    print queue.get(), arg, d[arg]
+    
+class C:
+    @staticmethod
+    def meth():
+        queue=Queue()
+        [queue.put('id:%s'%i) for i in xrange(10)]
+#        def it(): yield queue.get()
+        
+        d = dict([(u,u) for u in range(10)])
+        pool = Pool()
+        pool.map(innerMeth, xrange(10))
+
+C.meth()
