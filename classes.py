@@ -24,8 +24,8 @@ class UtilityMethods:
         '''
         Update phraseTextAndDimensionMap with new dimensions.
         '''
-        def getNextNewPhrase(topPhrasesSet):
-            for phrase in topPhrasesSet: 
+        def getNextNewPhrase(topPhrasesList):
+            for phrase in topPhrasesList: 
                 if not phraseTextAndDimensionMap.contains(TwoWayMap.MAP_FORWARD, phrase): yield phrase
         def getNextAvailableId(setOfIds): 
             for id in setOfIds: yield id
@@ -37,39 +37,14 @@ class UtilityMethods:
         newPhraseIterator = getNextNewPhrase(topPhrasesList)
         availableIds = set(list(range(stream_settings['dimensions'])))
         topPhrasesSet = set(topPhrasesList)
-        @timeit
-        def meth1():
-            for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
-                availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                if phrase not in topPhrasesSet:
-                    try:
-                        newPhrase = newPhraseIterator.next()
-                        phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                    except StopIteration: continue
-                    finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
-#        phrasesNotInTopPhrasesList = []
-#        topPhrasesSet = set(topPhrasesList)
-#        def modifiedMeth1():
-#            @timeit
-#            def m1():
-#                for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys():
-#                    availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-#            @timeit
-#            def m2():
-#                for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys():
-#                    if phrase not in topPhrasesSet: phrasesNotInTopPhrasesList.append(phrase)
-#            m1(), m2()
-        
-        print len(phraseTextAndDimensionMap), len(topPhrasesSet)
-#        modifiedMeth1()
-        meth1()
-        print len(phraseTextAndDimensionMap), len(topPhrasesList)
-#        for phrase in phrasesNotInTopPhrasesList:
-#            try:
-#                newPhrase = newPhraseIterator.next()
-#                phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-#            except StopIteration: pass
-#            phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
+        for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
+            availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+            if phrase not in topPhrasesSet:
+                try:
+                    newPhrase = newPhraseIterator.next()
+                    phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+                except StopIteration: continue
+                finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
         availableIdsIterator = getNextAvailableId(availableIds)
         while True: 
             try:

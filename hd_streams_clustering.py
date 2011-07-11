@@ -22,6 +22,7 @@ class DataStreamMethods:
         for cluster in hdStreamClusteringObject.clusters.itervalues(): 
             cluster.setSignatureUsingVectorPermutations(hdStreamClusteringObject.unitVector, hdStreamClusteringObject.vectorPermutations, hdStreamClusteringObject.phraseTextAndDimensionMap)
             for permutation in hdStreamClusteringObject.signaturePermutations: permutation.addDocument(cluster)
+    @timeit
     @staticmethod
     def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
         # Update dimensions.
