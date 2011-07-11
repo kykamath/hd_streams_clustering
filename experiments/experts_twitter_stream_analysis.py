@@ -53,8 +53,8 @@ class TwitterStreamAnalysis:
         print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
 
 def generateClusters():
-#    TwitterStreamAnalysis(**experts_twitter_stream_settings).generateClusters(TwitterIterators.iterateTweetsFromExperts())
-    TwitterStreamAnalysis(**houston_twitter_stream_settings).generateClusters(TwitterIterators.iterateTweetsFromHouston())
+    TwitterStreamAnalysis(**experts_twitter_stream_settings).generateClusters(TwitterIterators.iterateTweetsFromExperts())
+#    TwitterStreamAnalysis(**houston_twitter_stream_settings).generateClusters(TwitterIterators.iterateTweetsFromHouston())
 
 #class GenerateData:
 #    @staticmethod
