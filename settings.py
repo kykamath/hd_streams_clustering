@@ -33,11 +33,11 @@ twitter_stream_settings = Settings(
 
                                    cluster_analysis_frequency_in_seconds=time_unit_in_seconds*3, # Every these many seconds current clusters will be analyzed.
                                    cluster_filtering_frequency_in_seconds=time_unit_in_seconds*3, # Every these many seconds current clusters will be filtered.
-                                   cluster_inactivity_time_in_seconds=time_unit_in_seconds*6, # Clusters that have not added users below this are removed.
+                                   cluster_inactivity_time_in_seconds=None, # Clusters that have not added users below this are removed.
                                    # Cluster pruning properties.
                                    cluster_filter_attribute = 'length', # The attribute based on which stream clusters will be pruned. 'length' => Size of clusters; score => streaming cluster score.
-                                   cluster_filter_threshold = 5, # Value for the cluster filter threshold. All clusters with attribute values below this will be pruned.
-                                   cluster_merging_jaccard_distance_threshold = 0.4 # Clusters are merged if the jaccard threshold is above this value. 
+                                   cluster_filter_threshold = 0, # Value for the cluster filter threshold. All clusters with attribute values below this will be pruned.
+                                   cluster_merging_jaccard_distance_threshold = 0.75 # Clusters are merged if the jaccard similarity is above this value. 
                                    )
 
 # Streaming LSH clustering specific settings.
@@ -58,6 +58,7 @@ experts_twitter_stream_settings.plot_label = 'Experts stream'
 experts_twitter_stream_settings.dimension_update_frequency_in_seconds=time_unit_in_seconds*12
 experts_twitter_stream_settings.max_phrase_inactivity_time_in_seconds=time_unit_in_seconds*107
 experts_twitter_stream_settings.cluster_filter_threshold = 2
+experts_twitter_stream_settings.cluster_inactivity_time_in_seconds=time_unit_in_seconds*15
 experts_twitter_stream_settings.twitter_users_tweets_folder='%susers/tweets/'%twitterDataFolder
 experts_twitter_stream_settings.users_to_crawl_file='%susers/crawl/users_to_crawl'%twitterDataFolder
 experts_twitter_stream_settings.lsh_clusters_folder='%slsh_crowds/experts_stream/clusters/'%twitterDataFolder
@@ -72,6 +73,8 @@ houston_twitter_stream_settings.plot_color = '#CC00FF'
 houston_twitter_stream_settings.plot_label = 'Houston stream'
 houston_twitter_stream_settings.dimension_update_frequency_in_seconds=time_unit_in_seconds*2
 houston_twitter_stream_settings.max_phrase_inactivity_time_in_seconds=time_unit_in_seconds*126
+houston_twitter_stream_settings.cluster_filter_threshold = 5
+houston_twitter_stream_settings.cluster_inactivity_time_in_seconds=time_unit_in_seconds*3
 houston_twitter_stream_settings.twitter_users_tweets_folder='%shouston/'%twitterDataFolder
 houston_twitter_stream_settings.lsh_clusters_folder='%slsh_crowds/houston_stream/clusters/'%twitterDataFolder
 houston_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/houston_stream/parameter_estimation/'%twitterDataFolder

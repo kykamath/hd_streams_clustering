@@ -4,7 +4,8 @@ Created on Jun 22, 2011
 @author: kykamath
 '''
 from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
-from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp
+from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp,\
+    getStringRepresentationForTweetTimestamp
 from classes import Message, StreamCluster, Stream
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -78,7 +79,7 @@ class TwitterCrowdsSpecificMethods:
         return mergedClustersMap
     @staticmethod
     def getClusterInMapFormat(cluster, numberOfMaxDimensionsToRepresent=20): 
-        return {'clusterId': cluster.clusterId, 'mergedClustersList': cluster.mergedClustersList, 'lastStreamAddedTime': cluster.lastStreamAddedTime,
+        return {'clusterId': cluster.clusterId, 'mergedClustersList': cluster.mergedClustersList, 'lastStreamAddedTime': getStringRepresentationForTweetTimestamp(cluster.lastStreamAddedTime),
                'streams': [stream.docId for stream in cluster.iterateDocumentsInCluster()],
                'dimensions': cluster.getTopDimensions(numberOfFeatures=numberOfMaxDimensionsToRepresent)}
     @staticmethod
@@ -88,24 +89,29 @@ class TwitterCrowdsSpecificMethods:
         dummyStream=Stream(1, dummyMessage)
         cluster = StreamCluster(dummyStream)
         cluster.clusterId = clusterMap['clusterId']
-        cluster.lastStreamAddedTime = clusterMap['lastStreamAddedTime']
+        cluster.lastStreamAddedTime = getDateTimeObjectFromTweetTimestamp(clusterMap['lastStreamAddedTime'])
         cluster.mergedClustersList = clusterMap['mergedClustersList']
         cluster.documentsInCluster = clusterMap['streams']
         for k,v in clusterMap['dimensions'].iteritems(): cluster[k]=v
         return cluster
-#    @staticmethod
-#    def analyzeIterationData(hdStreamClusteringObject, currentMessageTime):
-#        print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
-#        for cluster, _ in sorted(StreamCluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:1]:
-#            print cluster.clusterId, cluster.length, [stream.docId for stream in cluster.iterateDocumentsInCluster()][:5], cluster.getTopDimensions(numberOfFeatures=5)
-#        print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
+    @staticmethod
+    def emptyClusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass
+    @staticmethod
+    def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
+        print currentMessageTime
+        print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
+        for cluster, _ in sorted(StreamCluster.iterateByAttribute(hdStreamClusteringObject.clusters.values(), 'length'), key=itemgetter(1), reverse=True)[:1]:
+            print cluster.clusterId, cluster.length, [stream.docId for stream in cluster.iterateDocumentsInCluster()][:5], cluster.getTopDimensions(numberOfFeatures=5)
+        print 'Leaving: ', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         
 def clusterTwitterStreams():
-    experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-    experts_twitter_stream_settings['combine_clusters_method'] = TwitterCrowdsSpecificMethods.combineClusters
+    pass
+    
+#    experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+#    experts_twitter_stream_settings['combine_clusters_method'] = TwitterCrowdsSpecificMethods.combineClusters
 #    experts_twitter_stream_settings['analyze_iteration_data_method'] = TwitterCrowdsSpecificMethods.analyzeIterationData
-    hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
-    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts())
+#    hdsClustering = HDStreaminClustering(**experts_twitter_stream_settings)
+#    hdsClustering.cluster(TwitterIterators.iterateTweetsFromExperts())
 
 #    trends_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
 #    trends_twitter_stream_settings['combine_clusters_method'] = TwitterCrowdsSpecificMethods.combineClusters
