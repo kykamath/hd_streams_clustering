@@ -30,6 +30,7 @@ class DataStreamMethods:
         DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
 #        if hdStreamClusteringObject.analyzeIterationDataMethod!=None: hdStreamClusteringObject.analyzeIterationDataMethod(hdStreamClusteringObject, currentMessageTime)
     @staticmethod
+    @timeit
     def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime):
         for cluster in StreamCluster.getClustersByAttributeAndThreshold(hdStreamClusteringObject.clusters.values(), hdStreamClusteringObject.stream_settings['cluster_filter_attribute'], 
                                                                   hdStreamClusteringObject.stream_settings['cluster_filter_threshold'], StreamCluster.BELOW_THRESHOLD): del hdStreamClusteringObject.clusters[cluster.clusterId]
