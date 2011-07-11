@@ -36,6 +36,7 @@ class UtilityMethods:
         topPhrasesList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in phraseTextToPhraseObjectMap.itervalues()), reverse=True)[:stream_settings['dimensions']]]
         newPhraseIterator = getNextNewPhrase(topPhrasesList)
         availableIds = set(list(range(stream_settings['dimensions'])))
+        print len(phraseTextAndDimensionMap), len(topPhrasesList)
         @timeit
         def meth1():
             for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:]:
