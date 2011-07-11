@@ -47,11 +47,16 @@ class UtilityMethods:
 #                    except StopIteration: continue
 #                    finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
         phrasesNotInTopPhrasesList = []
-        @timeit
         def modifiedMeth1():
-            for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys():
-                availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
-                if phrase not in topPhrasesList: phrasesNotInTopPhrasesList.append(phrase)
+            @timeit
+            def m1():
+                for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys():
+                    availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+            @timeit
+            def m2():
+                for phrase in phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys():
+                    if phrase not in topPhrasesList: phrasesNotInTopPhrasesList.append(phrase)
+            m1(), m2()
         
         print len(phraseTextAndDimensionMap), len(topPhrasesList)
         modifiedMeth1()
