@@ -46,8 +46,18 @@ class UtilityMethods:
                         phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
                     except StopIteration: continue
                     finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
+        def modifiedMeth1():
+            def processPhrase(phrase):
+                availableIds.remove(phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+                if phrase not in topPhrasesList:
+                    try:
+                        newPhrase = newPhraseIterator.next()
+                        phraseTextAndDimensionMap.set(TwoWayMap.MAP_FORWARD, newPhrase, phraseTextAndDimensionMap.get(TwoWayMap.MAP_FORWARD, phrase))
+                    except StopIteration: pass
+                    finally: phraseTextAndDimensionMap.remove(TwoWayMap.MAP_FORWARD, phrase)
+            map(processPhrase, phraseTextAndDimensionMap.getMap(TwoWayMap.MAP_FORWARD).keys()[:])
         print len(phraseTextAndDimensionMap), len(topPhrasesList)
-        meth1()
+        modifiedMeth1()
         print len(phraseTextAndDimensionMap), len(topPhrasesList)
         availableIdsIterator = getNextAvailableId(availableIds)
         while True: 
