@@ -15,6 +15,7 @@ from library.vector import Vector
 from nltk.metrics.distance import jaccard_distance
 from operator import itemgetter
 from library.file_io import FileIO
+from library.classes import timeit
 
 def getExperts(byScreenName=False):
     usersList, usersData = {}, defaultdict(list)
@@ -60,6 +61,7 @@ class TwitterCrowdsSpecificMethods:
             message.vector[phrase]+=1
         return message
     @staticmethod
+    @timeit
     def combineClusters(clusters, **twitter_stream_settings):
         def getHashtagSet(vector): return set([word for dimension in vector for word in dimension.split() if word.startswith('#')])
         def getClusterInt(id): return int(id.split('_')[1])

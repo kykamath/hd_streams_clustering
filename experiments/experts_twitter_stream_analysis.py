@@ -13,7 +13,7 @@ from hd_streams_clustering import HDStreaminClustering
 from datetime import datetime, timedelta
 from library.file_io import FileIO
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
-from library.classes import GeneralMethods, Settings
+from library.classes import GeneralMethods, Settings, timeit
 from library.plotting import getLatexForString
 from library.clustering import EvaluationMetrics
 from operator import itemgetter
@@ -43,6 +43,7 @@ class TwitterStreamAnalysis:
         self.stream_settings['cluster_analysis_method'] = TwitterStreamAnalysis.writeClusters
         HDStreaminClustering(**self.stream_settings).cluster(iterator)
     @staticmethod
+    @timeit
     def writeClusters(hdStreamClusteringObject, currentMessageTime):
         print '\n\n\nEntering:', currentMessageTime, len(hdStreamClusteringObject.phraseTextAndDimensionMap), len(hdStreamClusteringObject.phraseTextToPhraseObjectMap), len(hdStreamClusteringObject.clusters)
         iterationData = {'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
