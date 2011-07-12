@@ -16,21 +16,21 @@ users = mongodb_connection.old_hou.User
 
 houston_data_folder = '/mnt/chevron/kykamath/data/twitter/houston/'
         
-class GenerateData:
+class GenerateHoustonTweetsData:
     userIdToScreenNameMap = {}
     @staticmethod
     def getScreenName(uid):
-        if uid not in GenerateData.userIdToScreenNameMap: 
+        if uid not in GenerateHoustonTweetsData.userIdToScreenNameMap: 
             userObject = users.find_one({'_id': uid}, fields=['sn'])
-            if userObject!=None: GenerateData.userIdToScreenNameMap[uid]=userObject['sn']
-        return GenerateData.userIdToScreenNameMap.get(uid, None)
+            if userObject!=None: GenerateHoustonTweetsData.userIdToScreenNameMap[uid]=userObject['sn']
+        return GenerateHoustonTweetsData.userIdToScreenNameMap.get(uid, None)
     @staticmethod
     def writeTweetsForDay(currentDay):
         fileName = houston_data_folder+FileIO.getFileByDay(currentDay)
         for tweet in tweets.find({'ca': {'$gt':currentDay, '$lt': currentDay+timedelta(seconds=86399)}}, fields=['ca', 'tx', 'uid']):
-            screenName = GenerateData.getScreenName(tweet['uid'])
+            screenName = GenerateHoustonTweetsData.getScreenName(tweet['uid'])
             if screenName!=None: 
-                data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':getStringRepresentationForTweetTimestamp(tweet['ca']), 'user':{'screen_name': GenerateData.getScreenName(tweet['uid'])}}
+                data = {'id': tweet['_id'], 'text': tweet['tx'], 'created_at':getStringRepresentationForTweetTimestamp(tweet['ca']), 'user':{'screen_name': GenerateHoustonTweetsData.getScreenName(tweet['uid'])}}
                 FileIO.writeToFileAsJson(data, fileName) 
         os.system('gzip %s'%fileName)
     @staticmethod
@@ -39,9 +39,9 @@ class GenerateData:
         endingDay = datetime(2011,5,31)
         while currentDay<=endingDay:
             print 'Generating data for: ', currentDay
-            GenerateData.writeTweetsForDay(currentDay)
+            GenerateHoustonTweetsData.writeTweetsForDay(currentDay)
             currentDay+=timedelta(days=1)
         
 if __name__ == '__main__':
-    GenerateData.generateHoustonData()
+    GenerateHoustonTweetsData.generateHoustonData()
     
