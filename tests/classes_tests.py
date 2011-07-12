@@ -230,6 +230,13 @@ class CrowdTests(unittest.TestCase):
         self.assertEqual(2, self.crowd.lifespan)
         self.assertEqual(getStringRepresentationForTweetTimestamp(test_time), getStringRepresentationForTweetTimestamp(self.crowd.startTime))
         self.assertEqual(getStringRepresentationForTweetTimestamp(test_time+timedelta(days=1)), getStringRepresentationForTweetTimestamp(self.crowd.endTime))
+    def test_maxClusterSize(self):
+        self.assertEqual(1, self.crowd.maxClusterSize)
+        message2 = Message(4, 'sdf', 'A project to cluster high-dimensional streams.', test_time)
+        message2.vector=Vector({2:4})
+        stream2 = Stream(4, message2)
+        self.cluster.addDocument(stream2)
+        self.assertEqual(2, self.crowd.maxClusterSize)
         
 class VectorUpdateMethodTests(unittest.TestCase):
     def setUp(self): 

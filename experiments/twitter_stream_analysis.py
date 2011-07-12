@@ -4,6 +4,7 @@ Created on Jun 30, 2011
 @author: kykamath
 '''
 import sys, os
+import matplotlib
 sys.path.append('../')
 from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
 os.environ["PATH"] = os.environ["PATH"]+os.pathsep+'/opt/local/bin'
@@ -26,7 +27,7 @@ from Queue import Queue
 class ClusterIterators():
     ''' Iterator for clusters. '''
     @staticmethod
-    def iterateExpertClusters(startingDay=datetime(2011,3,19), endingDay=datetime(2011,3,21)):
+    def iterateExpertClusters(startingDay=datetime(2011,3,19), endingDay=datetime(2011,3,25)):
         while startingDay<=endingDay:
             for line in FileIO.iterateJsonFromFile(experts_twitter_stream_settings.lsh_clusters_folder+FileIO.getFileByDay(startingDay)): 
                 currentTime = getDateTimeObjectFromTweetTimestamp(line['time_stamp'])
@@ -152,34 +153,64 @@ class Plot:
         if returnAxisValuesOnly: plt.show()
     def sampleCrowds(self):
         AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
-        filteredCrowds = [crowd for crowd in AnalyzeData.crowdMap.itervalues()
-                            if crowd.lifespan>10 and crowd.lifespan<50 and
-                              crowd.startTime>datetime(2011,3,19) and crowd.endTime<datetime(2011,3,22) and
-                                crowd.hashtagDimensions]
-        for crowd in filteredCrowds:
-            x, y = zip(*[(clusterGenerationTime, len(crowd.clusters[clusterGenerationTime].documentsInCluster)) for clusterGenerationTime in sorted(crowd.clusters)])
-            if max(y)<30 and min(y)<5:
-                print crowd.crowdId, crowd.ends, crowd.outGoingCrowd, crowd.startTime, crowd.crowdId, crowd.lifespan, GeneralMethods.getRandomColor(), x, y, list(crowd.hashtagDimensions)[:3]
-                plt.plot(x, y, color=GeneralMethods.getRandomColor(), lw=2, label=' '.join([crowd.crowdId]+list(crowd.hashtagDimensions)[:1]))
+#        filteredCrowds = [crowd for crowd in AnalyzeData.crowdMap.itervalues()
+#                            if crowd.lifespan>10 and crowd.lifespan<50 and
+#                              crowd.startTime>datetime(2011,3,19) and crowd.endTime<datetime(2011,3,22) and
+#                                crowd.hashtagDimensions and crowd.maxClusterSize>10]
+        fig = plt.figure()
+        ax = fig.gca()
+        for crowd in self._filteredCrowdIterator():
+#            clusterId = crowd.clusters[sorted(crowd.clusters.keys())[0]].clusterId
+#        for clusterId in ['cluster_49125','cluster_19973','cluster_34594','cluster_35299', 'cluster_7925']:
+#            crowd = AnalyzeData.crowdMap[AnalyzeData.clusterIdToCrowdIdMap[clusterId]]
+#            print crowd.maxClusterSize
+            expectedTags = set(['#libya'])
+            if expectedTags.intersection(set(list(crowd.hashtagDimensions))):
+#                clusterId = crowd.clusters[sorted(crowd.clusters.keys())[0]].clusterId
+#                self._plotHierarchy(AnalyzeData.getCrowdHierarchy(clusterId))
+#            print self._getCrowdsInAHierarchy(hierarchy)
+                x, y = zip(*[(datetime.fromtimestamp(clusterGenerationTime), len(crowd.clusters[clusterGenerationTime].documentsInCluster)) for clusterGenerationTime in sorted(crowd.clusters)])
+#            if max(y)<30 and min(y)<5:
+#                print crowd.crowdId, crowd.ends, crowd.outGoingCrowd, crowd.startTime, crowd.crowdId, crowd.lifespan, GeneralMethods.getRandomColor(), x, y, list(crowd.hashtagDimensions)[:3]
+                plt.plot_date(x, y, '-', color=GeneralMethods.getRandomColor(), lw=2, label=' '.join([crowd.crowdId]+list(crowd.hashtagDimensions)[:1]))
+#        fig.autofmt_xdate(bottom=0.20000000000000001, rotation=30, ha='right')
+        ax.xaxis.set_major_locator(matplotlib.dates.HourLocator(interval=12))
+        ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%a %d %b'))
         plt.legend()
         plt.show()
+        
     def crowdHierachy(self):
         AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
-        observedClusters = set()
-        for clusterId in AnalyzeData.clusterIdToCrowdIdMap:
-#        for clusterId in ['cluster_9235','cluster_38873','cluster_63568','cluster_76865']:
-            if clusterId not in observedClusters:
-                hierarchy = AnalyzeData.getCrowdHierarchy(clusterId)
-                observedClusters=observedClusters.union(set(hierarchy.keys()+hierarchy.values()))
-                graph, labels = nx.DiGraph(), {}
-                for u,v in hierarchy.iteritems(): 
-                    if u in AnalyzeData.crowdMap: labels[u]=' '.join(list(AnalyzeData.crowdMap[u].hashtagDimensions))
-                    else: labels[u]=''
-                    labels[v]=''
-                    graph.add_edge(u, v)
-                pos=nx.graphviz_layout(graph, prog='dot',args='')
-                nx.draw(graph, pos, alpha=0.3, node_size=1, with_labels=True, labels=labels, font_size=8, arrows=True, node_color='r')
-                plt.show()
+        for crowd in self._filteredCrowdIterator():
+            clusterId = crowd.clusters[sorted(crowd.clusters.keys())[0]].clusterId
+            print clusterId
+            print ' '.join(list(crowd.hashtagDimensions))
+            self._plotHierarchy(AnalyzeData.getCrowdHierarchy(clusterId))
+    def sampleCrowdHierarchy(self):
+        AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
+        clusterId = 'cluster_51958'
+        self._plotHierarchy(AnalyzeData.getCrowdHierarchy(clusterId))
+        
+    def _filteredCrowdIterator(self):
+        for crowd in [crowd for crowd in AnalyzeData.crowdMap.itervalues()
+                                if crowd.lifespan>10 and 
+                                   crowd.lifespan<50 and
+#                                   crowd.startTime>datetime(2011,3,19) and 
+#                                   crowd.endTime<datetime(2011,3,22) and
+                                   crowd.hashtagDimensions and 
+                                   crowd.maxClusterSize>10]: yield crowd
+    def _getCrowdsInAHierarchy(self, hierarchy):
+        return set([AnalyzeData.clusterIdToCrowdIdMap[clusterId] for clusterId in hierarchy.keys()+hierarchy.values() if clusterId in AnalyzeData.clusterIdToCrowdIdMap])
+    def _plotHierarchy(self, hierarchy):
+        graph, labels = nx.DiGraph(), {}
+        for u,v in hierarchy.iteritems(): 
+            if u in AnalyzeData.crowdMap: labels[u]=' '.join(list(AnalyzeData.crowdMap[u].hashtagDimensions))
+            else: labels[u]=''
+            labels[v]=''
+            graph.add_edge(u, v)
+        pos=nx.graphviz_layout(graph, prog='dot',args='')
+        nx.draw(graph, pos, alpha=0.3, node_size=1, with_labels=True, labels=labels, font_size=8, arrows=True, node_color='r')
+        plt.show()
 
 def getPurityValue(): AnalyzeData.getCrowdsPurity()
 
@@ -191,9 +222,14 @@ if __name__ == '__main__':
     
     experts_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateExpertClusters
     houston_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateHoustonClusters
+    
+#    Plot(**experts_twitter_stream_settings).sampleCrowds()
+#    Plot(**experts_twitter_stream_settings).crowdHierachy()
+    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
+    
 #    getPurityValue()
 #    getLifeSpanPlot()
-    Plot(**experts_twitter_stream_settings).crowdHierachy()
+#    Plot(**experts_twitter_stream_settings).crowdHierachy()
 #    AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(experts_twitter_stream_settings['data_iterator'])
 #    print AnalyzeData.getCrowdHierarchy('cluster_23081')
 #    print AnalyzeData.getCrowdHierarchy('cluster_22886')

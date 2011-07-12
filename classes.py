@@ -145,6 +145,8 @@ class Crowd:
     def startTime(self): return datetime.fromtimestamp(sorted(self.clusters)[0])
     @property
     def endTime(self): return datetime.fromtimestamp(sorted(self.clusters)[-1])
+    @property
+    def maxClusterSize(self): return max(len(cluster.documentsInCluster) for cluster in self.clusters.values())
     def append(self, cluster, clusterFormationTime): self.clusters[GeneralMethods.getEpochFromDateTimeObject(clusterFormationTime)]=cluster
     def updateOutGoingCrowd(self, crowdId): self.ends, self.outGoingCrowd = True, crowdId
     def updateInComingCrowd(self, crowdId): self.inComingCrowds.append(crowdId)
