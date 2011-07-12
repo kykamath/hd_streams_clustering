@@ -3,6 +3,8 @@ Created on Jul 12, 2011
 
 @author: kykamath
 '''
+import sys
+sys.path.append('../')
 from twitter_streams_clustering import TwitterIterators
 import os
 from library.file_io import FileIO
