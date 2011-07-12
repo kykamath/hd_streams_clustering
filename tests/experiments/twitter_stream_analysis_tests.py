@@ -5,8 +5,9 @@ Created on Jul 2, 2011
 '''
 import unittest
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods
-from experiments.experts_twitter_stream_analysis import AnalyzeData
+from experiments.twitter_stream_analysis import AnalyzeData
 from datetime import datetime, timedelta
+from library.twitter import getStringRepresentationForTweetTimestamp
 
 test_time = datetime.now()
 
@@ -15,17 +16,17 @@ class AnalyzeDataTests(unittest.TestCase):
         AnalyzeData.crowdMap, AnalyzeData.clusterIdToCrowdIdMap, AnalyzeData.crowdIdToClusterIdMap = {}, {}, {}
         self.clusterMaps = {
                        test_time: [
-                            {'clusterId': 'cluster_4', 'lastStreamAddedTime':test_time, 'mergedClustersList': ['cluster_1'], 'streams': [], 'dimensions': {}},
-                            {'clusterId': 'cluster_5', 'lastStreamAddedTime':test_time, 'mergedClustersList': ['cluster_2'], 'streams': [], 'dimensions': {}},
-                            {'clusterId': 'cluster_6', 'lastStreamAddedTime':test_time, 'mergedClustersList': ['cluster_3'], 'streams': [], 'dimensions': {}},
+                            {'clusterId': 'cluster_4', 'lastStreamAddedTime':getStringRepresentationForTweetTimestamp(test_time), 'mergedClustersList': ['cluster_1'], 'streams': [], 'dimensions': {}},
+                            {'clusterId': 'cluster_5', 'lastStreamAddedTime':getStringRepresentationForTweetTimestamp(test_time), 'mergedClustersList': ['cluster_2'], 'streams': [], 'dimensions': {}},
+                            {'clusterId': 'cluster_6', 'lastStreamAddedTime':getStringRepresentationForTweetTimestamp(test_time), 'mergedClustersList': ['cluster_3'], 'streams': [], 'dimensions': {}},
                             ],
                        test_time+timedelta(seconds=30*60): [
-                            {'clusterId': 'cluster_7', 'lastStreamAddedTime':test_time, 'mergedClustersList': ['cluster_4'], 'streams': [], 'dimensions': {}},
-                            {'clusterId': 'cluster_8', 'lastStreamAddedTime':test_time, 'mergedClustersList': ['cluster_5','cluster_6'], 'streams': [], 'dimensions': {}},
+                            {'clusterId': 'cluster_7', 'lastStreamAddedTime':getStringRepresentationForTweetTimestamp(test_time), 'mergedClustersList': ['cluster_4'], 'streams': [], 'dimensions': {}},
+                            {'clusterId': 'cluster_8', 'lastStreamAddedTime':getStringRepresentationForTweetTimestamp(test_time), 'mergedClustersList': ['cluster_5','cluster_6'], 'streams': [], 'dimensions': {}},
                             ],
                         test_time+2*timedelta(seconds=30*60): [
-                            {'clusterId': 'cluster_9', 'lastStreamAddedTime':test_time, 'mergedClustersList': ['cluster_7'], 'streams': [], 'dimensions': {}},
-                            {'clusterId': 'cluster_10', 'lastStreamAddedTime':test_time, 'mergedClustersList': ['cluster_8'], 'streams': [], 'dimensions': {}},
+                            {'clusterId': 'cluster_9', 'lastStreamAddedTime':getStringRepresentationForTweetTimestamp(test_time), 'mergedClustersList': ['cluster_7'], 'streams': [], 'dimensions': {}},
+                            {'clusterId': 'cluster_10', 'lastStreamAddedTime':getStringRepresentationForTweetTimestamp(test_time), 'mergedClustersList': ['cluster_8'], 'streams': [], 'dimensions': {}},
                             ]
                        }
         AnalyzeData.constructCrowdDataStructures(self.dataIterator)
