@@ -14,8 +14,12 @@ clustering_quality_experts_data_folder = '/mnt/chevron/kykamath/data/twitter/lsh
 class GenerateData:
     @staticmethod
     def forLength(length):
+        i=0
         fileName=clustering_quality_experts_data_folder+str(length)
-        for tweet in TwitterIterators.iterateTweetsFromExperts(): FileIO.writeToFileAsJson(tweet, fileName) 
+        for tweet in TwitterIterators.iterateTweetsFromExperts(): 
+            FileIO.writeToFileAsJson(tweet, fileName)
+            i+=1
+            if i==length: break;
         os.system('gzip %s'%fileName)
 
 if __name__ == '__main__':
