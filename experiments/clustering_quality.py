@@ -16,7 +16,7 @@ from settings import experts_twitter_stream_settings
 from itertools import groupby
 from operator import itemgetter
 
-clustering_quality_experts_data_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/'
+clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
 unique_string = ':ilab:'
 
 experts_twitter_stream_settings['min_phrase_length'] = 1
@@ -35,10 +35,11 @@ experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
 #        os.system('gzip %s'%fileName)
         
 class TweetsFile:
+    stats_file = clustering_quality_experts_folder+'quality_stats'
     def __init__(self, length, forGeneration=False, **stream_settings):
         self.length=length
         self.stream_settings = stream_settings
-        self.fileName = clustering_quality_experts_data_folder+str(length)
+        self.fileName = clustering_quality_experts_folder+'data/'+str(length)
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
         if not forGeneration: self.documents = list(self._tweetIterator())
     def _tweetIterator(self):
@@ -89,18 +90,15 @@ class TweetsFile:
         os.system('gzip %s'%self.fileName)
     @staticmethod
     def generateStatsForClusteringQuality():
-        for i in [10**3, 10**4, 10**5]: 
-            for j in range(1, 10): 
-                tf = TweetsFile(2000, **experts_twitter_stream_settings)
-                iterationData = {'k_means': tf.generateStatsForKMeansClustering(), 'streaming_lsh': tf.generateStatsForStreamingLSHClustering()}
-                
+#        for i in [10**3, 10**4, 10**5]: 
+#            for j in range(1, 10): 
+        tf = TweetsFile(1000*1, **experts_twitter_stream_settings)
+        FileIO.writeToFileAsJson({'k_means': tf.generateStatsForKMeansClustering(), 'streaming_lsh': tf.generateStatsForStreamingLSHClustering()}, TweetsFile.stats_file)
                 
 if __name__ == '__main__':
-#    [GenerateData.forLength(i*j) for i in [10**3, 10**4, 10**5] for j in range(1, 10)]
-
-    print  [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
+#    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
     
 #    tf = TweetsFile(2000, **experts_twitter_stream_settings)
 #    print tf.generateStatsForKMeansClustering()
 #    print tf.generateStatsForStreamingLSHClustering()
-#    TweetsFile.generateStatsForClusteringQuality()
+    TweetsFile.generateStatsForClusteringQuality()
