@@ -8,6 +8,7 @@ from library.clustering import KMeansClustering, EvaluationMetrics
 from library.vector import Vector
 from streaming_lsh.classes import Document
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
+from library.classes import Settings
 sys.path.append('../')
 from twitter_streams_clustering import TwitterIterators, getExperts
 from library.file_io import FileIO
@@ -95,7 +96,10 @@ class TweetsFile:
         i,j = 1000, 1
         print 'Generating stats for: ',i*j
         tf = TweetsFile(i*j, **experts_twitter_stream_settings)
-        FileIO.writeToFileAsJson({'k_means': tf.generateStatsForKMeansClustering(), 'streaming_lsh': tf.generateStatsForStreamingLSHClustering()}, TweetsFile.stats_file)
+        FileIO.writeToFileAsJson({'k_means': tf.generateStatsForKMeansClustering(), 
+                                  'streaming_lsh': tf.generateStatsForStreamingLSHClustering(), 
+                                  'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
+                                  TweetsFile.stats_file)
                 
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
