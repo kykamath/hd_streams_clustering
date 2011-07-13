@@ -43,10 +43,10 @@ class TweetsFile:
                     else: userMap[user]+= ' ' + ' '.join(phrases)
             return userMap.iteritems()
         documents = _getDocumentsFromIterator()
-        print KMeansClustering(documents,self.length).cluster()
+        print KMeansClustering(documents,numberOfClusters).cluster()
         
 if __name__ == '__main__':
 #    [GenerateData.forLength(i*j) for i in [10**3, 10**4, 10**5] for j in range(1, 10)]
     
     tf = TweetsFile(1000, **experts_twitter_stream_settings)
-    tf.generateStatsForKMeansClustering(numberOfClusters=10)
+    tf.generateStatsForKMeansClustering(numberOfClusters=500)
