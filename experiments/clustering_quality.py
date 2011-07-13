@@ -43,7 +43,7 @@ class TweetsFile:
                     else: userMap[user]+= ' ' + ' '.join(phrases)
             return userMap.iteritems()
         documents = _getDocumentsFromIterator()
-        print KMeansClustering(documents,len(numberOfClusters)).cluster()
+        print KMeansClustering(documents,len(documents)).cluster()
         
 if __name__ == '__main__':
 #    [GenerateData.forLength(i*j) for i in [10**3, 10**4, 10**5] for j in range(1, 10)]
