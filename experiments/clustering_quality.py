@@ -92,7 +92,9 @@ class TweetsFile:
     def generateStatsForClusteringQuality():
 #        for i in [10**3, 10**4, 10**5]: 
 #            for j in range(1, 10): 
-        tf = TweetsFile(1000*1, **experts_twitter_stream_settings)
+        i,j = 1000, 1
+        print 'Generating stats for: ',i*j
+        tf = TweetsFile(i*j, **experts_twitter_stream_settings)
         FileIO.writeToFileAsJson({'k_means': tf.generateStatsForKMeansClustering(), 'streaming_lsh': tf.generateStatsForStreamingLSHClustering()}, TweetsFile.stats_file)
                 
 if __name__ == '__main__':
