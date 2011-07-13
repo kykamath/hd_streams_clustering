@@ -34,7 +34,7 @@ class TweetsFile:
         self.fileName = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_data_folder/'+str(length)
     def iterator(self):
         for tweet in TwitterIterators.iterateFromFile(self.fileName+'.gz'): yield tweet
-    def generateStatsForKMeansClustering(self, numberOfClusters):
+    def generateStatsForKMeansClustering(self):
         ts = time.time()
         def _getDocumentsFromIterator():
             userMap = {}
@@ -66,4 +66,4 @@ if __name__ == '__main__':
 #    [GenerateData.forLength(i*j) for i in [10**3, 10**4, 10**5] for j in range(1, 10)]
     
     tf = TweetsFile(4000, **experts_twitter_stream_settings)
-    tf.generateStatsForKMeansClustering(numberOfClusters=2)
+    print tf.generateStatsForKMeansClustering()
