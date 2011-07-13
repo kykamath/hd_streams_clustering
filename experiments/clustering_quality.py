@@ -91,15 +91,14 @@ class TweetsFile:
         os.system('gzip %s'%self.fileName)
     @staticmethod
     def generateStatsForClusteringQuality():
-#        for i in [10**3, 10**4, 10**5]: 
-#            for j in range(1, 10): 
-        i,j = 1000, 1
-        print 'Generating stats for: ',i*j
-        tf = TweetsFile(i*j, **experts_twitter_stream_settings)
-        FileIO.writeToFileAsJson({'k_means': tf.generateStatsForKMeansClustering(), 
-                                  'streaming_lsh': tf.generateStatsForStreamingLSHClustering(), 
-                                  'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
-                                  TweetsFile.stats_file)
+        for i in [10**3, 10**4, 10**5]: 
+            for j in range(1, 10): 
+                print 'Generating stats for: ',i*j
+                tf = TweetsFile(i*j, **experts_twitter_stream_settings)
+                FileIO.writeToFileAsJson({'k_means': tf.generateStatsForKMeansClustering(), 
+                                          'streaming_lsh': tf.generateStatsForStreamingLSHClustering(), 
+                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
+                                          TweetsFile.stats_file)
                 
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
