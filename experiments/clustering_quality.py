@@ -60,7 +60,7 @@ class TweetsFile:
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
     def generateStatsForStreamingLSHClustering(self):
-        
+        pass
     
 if __name__ == '__main__':
 #    [GenerateData.forLength(i*j) for i in [10**3, 10**4, 10**5] for j in range(1, 10)]
