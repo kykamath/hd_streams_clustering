@@ -60,7 +60,7 @@ class GenerateHoustonTweetsData:
 class ClusterIterators():
     ''' Iterator for clusters. '''
     @staticmethod
-    def iterateExpertClusters(startingDay=datetime(2011,3,19), endingDay=datetime(2011,3,25)):
+    def iterateExpertClusters(startingDay=datetime(2011,3,19), endingDay=datetime(2011,3,20)):
         while startingDay<=endingDay:
             for line in FileIO.iterateJsonFromFile(experts_twitter_stream_settings.lsh_clusters_folder+FileIO.getFileByDay(startingDay)): 
                 currentTime = getDateTimeObjectFromTweetTimestamp(line['time_stamp'])
@@ -145,10 +145,10 @@ class AnalyzeData:
             if v not in AnalyzeData.crowdIdToClusterIdMap: AnalyzeData.crowdIdToClusterIdMap[v]=[]
             AnalyzeData.crowdIdToClusterIdMap[v].append(k)
     @staticmethod
-    def getCrowdsPurity():
+    def getCrowdsQuality(evaluationMetric):
         if not AnalyzeData.crowdMap: AnalyzeData.constructCrowdDataStructures(ClusterIterators.iterateExpertClusters)
         expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
-        print np.mean(map(lambda crowd: crowd.getCrowdQuality(EvaluationMetrics.purity, expertsToClassMap), AnalyzeData.crowdMap.itervalues()))
+        print np.mean(map(lambda crowd: crowd.getCrowdQuality(evaluationMetric, expertsToClassMap), AnalyzeData.crowdMap.itervalues()))
     @staticmethod
     def getCrowdHierarchy(clusterId): 
 #        AnalyzeData.constructCrowdIdToClusterIdMap()
@@ -243,7 +243,7 @@ class Plot:
         nx.draw(graph, pos, alpha=0.3, node_size=10, with_labels=True, labels=labels, font_size=8, arrows=True, node_color='r')
         plt.show()
 
-def getPurityValue(): AnalyzeData.getCrowdsPurity()
+#def getPurityValue(evalutionMetric): AnalyzeData.getCrowdsQuality(evalutionMetric)
 
 def getLifeSpanPlot(): 
     plotMethods([Plot(**experts_twitter_stream_settings).lifeSpanDistribution, Plot(**houston_twitter_stream_settings).lifeSpanDistribution])
@@ -255,9 +255,9 @@ if __name__ == '__main__':
     experts_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateExpertClusters
     houston_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateHoustonClusters
     
-#    getPurityValue()
+    AnalyzeData.getCrowdsQuality(EvaluationMetrics.nmi)
 #    getLifeSpanPlot()
 #    Plot(**experts_twitter_stream_settings).sampleCrowds()
 #    Plot(**experts_twitter_stream_settings).crowdHierachy()
-    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
+#    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
     
