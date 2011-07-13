@@ -4,7 +4,7 @@ Created on Jul 12, 2011
 @author: kykamath
 '''
 import sys, os
-from library.clustering import EMTextClustering
+from library.clustering import KMeansClustering
 sys.path.append('../')
 from twitter_streams_clustering import TwitterIterators
 from library.file_io import FileIO
@@ -32,7 +32,7 @@ class TweetsFile:
         self.fileName = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_data_folder/'+str(length)
     def iterator(self):
         for tweet in TwitterIterators.iterateFromFile(self.fileName+'.gz'): yield tweet
-    def generateStatsForEMClustering(self, numberOfClusters):
+    def generateStatsForKMeansClustering(self, numberOfClusters):
         def _getDocumentsFromIterator():
             userMap = {}
             for tweet in self.iterator():
@@ -43,10 +43,10 @@ class TweetsFile:
                     else: userMap[user]+= ' ' + ' '.join(phrases)
             return userMap.iteritems()
         documents = _getDocumentsFromIterator()
-        print EMTextClustering(documents,numberOfClusters).cluster()
+        print KMeansClustering(documents,numberOfClusters).cluster()
         
 if __name__ == '__main__':
 #    [GenerateData.forLength(i*j) for i in [10**3, 10**4, 10**5] for j in range(1, 10)]
     
     tf = TweetsFile(1000, **experts_twitter_stream_settings)
-    tf.generateStatsForEMClustering(numberOfClusters=10)
+    tf.generateStatsForKMeansClustering(numberOfClusters=10)
