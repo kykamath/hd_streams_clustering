@@ -27,17 +27,6 @@ experts_twitter_stream_settings['min_phrase_length'] = 1
 experts_twitter_stream_settings['max_phrase_length'] = 1
 experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
 
-#class GenerateData:
-#    @staticmethod
-#    def forLength(length):
-#        i=0
-#        fileName=clustering_quality_experts_data_folder+str(length)
-#        for tweet in TwitterIterators.iterateTweetsFromExperts(): 
-#            FileIO.writeToFileAsJson(tweet, fileName)
-#            i+=1
-#            if i==length: break;
-#        os.system('gzip %s'%fileName)
-
 plotSettings = {
                  'k_means':{'label': 'k-Means', 'color': '#FF1800'}, 
                  'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#00C322'}
@@ -149,6 +138,7 @@ class TweetsFile:
         plt.xticks(ind+width, ('$F$', '$Precision$', '$Recall$', '$Purity$', '$NMI$') )
         plt.legend( (rects1[0], rects2[0]), (plotSettings[plotSettings.keys()[0]]['label'], plotSettings[plotSettings.keys()[1]]['label']), loc=4 )
         plt.show()
+        
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
