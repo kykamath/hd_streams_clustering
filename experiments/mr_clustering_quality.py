@@ -20,10 +20,13 @@ def extractArraysFromFile(file, percentage=1.0):
 length=10000
 localFileName = clustering_quality_experts_mr_folder+'%s'%length
 hdfsFileName = hdfsPath+'%s'%length
-clusters = list(KMeans.cluster(hdfsFileName, extractArraysFromFile(localFileName,0.9), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
+clusters = list(KMeans.cluster(hdfsFileName, extractArraysFromFile(localFileName,0.9), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':100}))
 print clusters
 distribution = defaultdict(int)
 for clusterId, cluster in clusters:
     distribution[len(cluster)]+=1
 for k in sorted(distribution):
     print k, distribution[k]
+    
+#iterationData =  {'no_of_documents':self.length, 'no_of_clusters': len(documentClusters), 'iteration_time': te-ts, 'clusters': documentClusters}
+#self.getEvaluationMetrics([self._getExpertClasses(cluster) for cluster in documentClusters], iterationData)

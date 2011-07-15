@@ -151,18 +151,7 @@ class TweetsFile:
                 
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
-#    TweetsFile.generateStatsForClusteringQuality()
+    TweetsFile.generateStatsForClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-    def extractArraysFromFile(file, numberOfArrays=float('+inf')):
-        arraysToReturn = []
-        for line in FileIO.iterateJsonFromFile(file):
-            if numberOfArrays==0: break;
-            else: numberOfArrays-=1
-            arraysToReturn.append(np.array(line['vector']))
-        return arraysToReturn
-    fileName = clustering_quality_experts_mr_folder+'100'
-#    print fileName
-    print list(KMeans.cluster(fileName, extractArraysFromFile(fileName), mrArgs='-r hadoop', iterations=5))
-    
