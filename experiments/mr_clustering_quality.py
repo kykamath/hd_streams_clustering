@@ -10,13 +10,15 @@ from collections import defaultdict
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
 clustering_quality_experts_mr_folder = clustering_quality_experts_folder+'mr_data/'
+hdfsPath='hdfs:///user/kykamath/lsh_experts_data/'
 
 def extractArraysFromFile(file, percentage=1.0):
         arraysToReturn = []
         for line in FileIO.iterateJsonFromFile(file): arraysToReturn.append(np.array(line['vector']))
         return arraysToReturn[:int(len(arraysToReturn)*percentage)]
 
-fileName = clustering_quality_experts_mr_folder+'10000'
+#fileName = clustering_quality_experts_mr_folder+'10000'
+fileName = hdfsPath+'100'
 clusters = list(KMeans.cluster(fileName, extractArraysFromFile(fileName,0.9), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
 print clusters
 distribution = defaultdict(int)
