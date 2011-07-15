@@ -42,6 +42,7 @@ def extractArraysFromFile(file, percentage=1.0):
 
 class TweetsFile:
     stats_file = clustering_quality_experts_folder+'quality_stats'
+    mr_stats_file = clustering_quality_experts_folder+'mr_quality_stats'
     def __init__(self, length, forGeneration=False, **stream_settings):
         self.length=length
         self.stream_settings = stream_settings
@@ -118,6 +119,16 @@ class TweetsFile:
                                           'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
                                           TweetsFile.stats_file)
     @staticmethod
+    def generateStatsForMRKMeansClusteringQuality():
+        for i in [10**3, 10**4, 10**5]: 
+            for j in range(1, 10): 
+                print 'Generating stats for: ',i*j
+                tf = TweetsFile(i*j, **experts_twitter_stream_settings)
+                print TweetsFile.mr_stats_file, tf.length
+#                FileIO.writeToFileAsJson({'mr_k_means': tf.generateStatsForKMeansMRClustering(), 
+#                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
+#                                          TweetsFile.mr_stats_file)
+    @staticmethod
     def plotClusteringSpeed():
         dataToPlot = {'k_means': {'x': [], 'y': []}, 'streaming_lsh': {'x': [], 'y': []}}
         for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
@@ -163,13 +174,10 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
+    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-    tf = TweetsFile(100, **experts_twitter_stream_settings)
-    print tf.generateStatsForKMeansMRClustering()
-    print tf.generateStatsForKMeansClustering()
-    print tf.generateStatsForStreamingLSHClustering()
     
     
     
