@@ -124,10 +124,9 @@ class TweetsFile:
             for j in range(1, 10): 
                 print 'Generating stats for: ',i*j
                 tf = TweetsFile(i*j, **experts_twitter_stream_settings)
-                print TweetsFile.mr_stats_file, tf.length
-#                FileIO.writeToFileAsJson({'mr_k_means': tf.generateStatsForKMeansMRClustering(), 
-#                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
-#                                          TweetsFile.mr_stats_file)
+                FileIO.writeToFileAsJson({'mr_k_means': tf.generateStatsForKMeansMRClustering(), 
+                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
+                                          TweetsFile.mr_stats_file)
     @staticmethod
     def plotClusteringSpeed():
         dataToPlot = {'k_means': {'x': [], 'y': []}, 'streaming_lsh': {'x': [], 'y': []}}
