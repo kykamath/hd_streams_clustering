@@ -17,7 +17,7 @@ def extractArraysFromFile(file, percentage=1.0):
         for line in FileIO.iterateJsonFromFile(file): arraysToReturn.append(np.array(line['vector']))
         return arraysToReturn[:int(len(arraysToReturn)*percentage)]
 
-length=100
+length=10000
 localFileName = clustering_quality_experts_mr_folder+'%s'%length
 hdfsFileName = hdfsPath+'%s'%length
 clusters = list(KMeans.cluster(hdfsFileName, extractArraysFromFile(localFileName,0.9), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
