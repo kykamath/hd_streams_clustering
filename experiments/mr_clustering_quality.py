@@ -17,6 +17,6 @@ def extractArraysFromFile(file, numberOfArrays=float('+inf')):
             else: numberOfArrays-=1
             arraysToReturn.append(np.array(line['vector']))
         return arraysToReturn
-fileName = clustering_quality_experts_mr_folder+'100'
+fileName = clustering_quality_experts_mr_folder+'1000'
 #    print fileName
 print list(KMeans.cluster(fileName, extractArraysFromFile(fileName), mrArgs='-r hadoop', iterations=5))
