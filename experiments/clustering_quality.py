@@ -23,6 +23,7 @@ import numpy as np
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
 clustering_quality_experts_mr_folder = clustering_quality_experts_folder+'mr_data/'
+hdfsPath='hdfs:///user/kykamath/lsh_experts_data/'
 unique_string = ':ilab:'
 
 experts_twitter_stream_settings['min_phrase_length'] = 1
@@ -33,6 +34,11 @@ plotSettings = {
                  'k_means':{'label': 'k-Means', 'color': '#FF1800'}, 
                  'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#00C322'}
                  }
+
+def extractArraysFromFile(file, percentage=1.0):
+    arraysToReturn = []
+    for line in FileIO.iterateJsonFromFile(file): arraysToReturn.append(np.array(line['vector']))
+    return arraysToReturn[:int(len(arraysToReturn)*percentage)]
 
 class TweetsFile:
     stats_file = clustering_quality_experts_folder+'quality_stats'
@@ -52,10 +58,13 @@ class TweetsFile:
                     else: userMap[user]+= ' ' + ' '.join(phrases)
             return userMap.iteritems()
     def _getExpertClasses(self, cluster): return [self.expertsToClassMap[user.lower()] for user in cluster if user.lower() in self.expertsToClassMap]
-    def getEvaluationMetrics(self, clustersForEvaluation, iterationData):
+    def getEvaluationMetrics(self, documentClusters, timeDifference):
+        iterationData =  {'no_of_documents':self.length, 'no_of_clusters': len(documentClusters), 'iteration_time': timeDifference, 'clusters': documentClusters}
+        clustersForEvaluation = [self._getExpertClasses(cluster) for cluster in documentClusters]
         iterationData['nmi'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.nmi)
         iterationData['purity'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.purity)
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
+        return iterationData
     def generateStatsForKMeansClustering(self):
         ts = time.time()
         clusters = KMeansClustering(self.documents,len(self.documents)).cluster()
@@ -63,9 +72,7 @@ class TweetsFile:
         documentClusters = []
         for a in [ (k, list(set(list(v)))) for k,v in groupby(sorted((a[0], a[1][0]) for a in zip(clusters, self.documents)), key=itemgetter(0))]:
             if len(a[1]) >= self.stream_settings['cluster_filter_threshold']: documentClusters.append(zip(*a[1])[1])
-        iterationData =  {'no_of_documents':self.length, 'no_of_clusters': len(documentClusters), 'iteration_time': te-ts, 'clusters': documentClusters}
-        self.getEvaluationMetrics([self._getExpertClasses(cluster) for cluster in documentClusters], iterationData)
-        return iterationData
+        return self.getEvaluationMetrics(documentClusters, te-ts)
     def generateStatsForStreamingLSHClustering(self):
         def _getDocumentFromTuple((user, text)):
             vector, words = Vector(), text.split()
@@ -78,9 +85,13 @@ class TweetsFile:
         for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
         te = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
-        iterationData =  {'no_of_documents':self.length, 'no_of_clusters': len(documentClusters), 'iteration_time': te-ts, 'clusters': documentClusters}
-        self.getEvaluationMetrics([self._getExpertClasses(cluster) for cluster in documentClusters], iterationData)
-        return iterationData
+        return self.getEvaluationMetrics(documentClusters, te-ts)
+    def generateStatsForKMeansMRClustering(self):
+        ts = time.time()
+        documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.9), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':100}))
+        documentClusters = [cluster for cluster in documentClusters if len(cluster)>=self.stream_settings['cluster_filter_threshold']]
+        te = time.time()
+        return self.getEvaluationMetrics(documentClusters, te-ts)
     def generate(self):
         i=0
         for tweet in TwitterIterators.iterateTweetsFromExperts(): 
@@ -151,7 +162,14 @@ class TweetsFile:
                 
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
-    TweetsFile.generateStatsForClusteringQuality()
+#    TweetsFile.generateStatsForClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
+    tf = TweetsFile(100, **experts_twitter_stream_settings)
+    print tf.generateStatsForKMeansMRClustering()
+    print tf.generateStatsForKMeansClustering()
+    print tf.generateStatsForStreamingLSHClustering()
+    
+    
+    
