@@ -141,8 +141,7 @@ class TweetsFile:
         plt.show()
     @staticmethod
     def generateDocumentForMRClustering():
-        for i in [10**2]: 
-#        for i in [10**3, 10**4, 10**5]: 
+        for i in [10**3, 10**4, 10**5]: 
             for j in range(1, 10): 
                 print 'Generating file for: ',i*j
                 tf = TweetsFile(i*j, **experts_twitter_stream_settings)
