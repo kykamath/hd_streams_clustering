@@ -146,6 +146,7 @@ class TweetsFile:
                 print 'Generating file for: ',i*j
                 tf = TweetsFile(i*j, **experts_twitter_stream_settings)
                 outputFile = clustering_quality_experts_mr_folder+tf.fileName.split('/')[-1]
+                print outputFile
         
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
