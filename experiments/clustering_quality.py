@@ -4,13 +4,13 @@ Created on Jul 12, 2011
 @author: kykamath
 '''
 import sys, os, time
+sys.path.append('../')
 from library.clustering import KMeansClustering, EvaluationMetrics
 from library.vector import Vector
 from streaming_lsh.classes import Document
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
 from library.classes import Settings
 from library.plotting import getLatexForString
-sys.path.append('../')
 from twitter_streams_clustering import TwitterIterators, getExperts
 from library.file_io import FileIO
 from library.nlp import getWordsFromRawEnglishMessage, getPhrases
@@ -138,10 +138,18 @@ class TweetsFile:
         plt.xticks(ind+width, ('$F$', '$Precision$', '$Recall$', '$Purity$', '$NMI$') )
         plt.legend( (rects1[0], rects2[0]), (plotSettings[plotSettings.keys()[0]]['label'], plotSettings[plotSettings.keys()[1]]['label']), loc=4 )
         plt.show()
+    @staticmethod
+    def generateDocumentForMRClustering():
+        for i in [10**3, 10**4, 10**5]: 
+            for j in range(1, 10): 
+                print 'Generating file for: ',i*j
+                tf = TweetsFile(i*j, **experts_twitter_stream_settings)
+                print tf.fileName
         
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
-    TweetsFile.getClusteringQuality()
+#    TweetsFile.getClusteringQuality()
+    TweetsFile.generateDocumentForMRClustering()
     
