@@ -17,7 +17,7 @@ def extractArraysFromFile(file, percentage=1.0):
         return arraysToReturn[:int(len(arraysToReturn)*percentage)]
 
 fileName = clustering_quality_experts_mr_folder+'10000'
-clusters = list(KMeans.cluster(fileName, extractArraysFromFile(fileName,0.9), mrArgs='-r hadoop', iterations=5))
+clusters = list(KMeans.cluster(fileName, extractArraysFromFile(fileName,0.9), mrArgs='-r hadoop', iterations=1))
 print clusters
 distribution = defaultdict(int)
 for clusterId, cluster in clusters:
