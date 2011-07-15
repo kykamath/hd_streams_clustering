@@ -16,7 +16,7 @@ def extractArraysFromFile(file, percentage=1.0):
         for line in FileIO.iterateJsonFromFile(file): arraysToReturn.append(np.array(line['vector']))
         return arraysToReturn[:int(len(arraysToReturn)*percentage)]
 
-fileName = clustering_quality_experts_mr_folder+'1000'
+fileName = clustering_quality_experts_mr_folder+'10000'
 clusters = list(KMeans.cluster(fileName, extractArraysFromFile(fileName,0.9), mrArgs='-r hadoop', iterations=5))
 print clusters
 distribution = defaultdict(int)
