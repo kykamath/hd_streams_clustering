@@ -4,15 +4,15 @@ Created on Jul 12, 2011
 @author: kykamath
 '''
 import sys, os, time
-from library.mr_algorithms.kmeans import KMeans
 sys.path.append('../')
+from twitter_streams_clustering import TwitterIterators, getExperts
+from library.mr_algorithms.kmeans import KMeans
 from library.clustering import KMeansClustering, EvaluationMetrics, Clustering
 from library.vector import Vector
 from streaming_lsh.classes import Document
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
 from library.classes import Settings
 from library.plotting import getLatexForString
-from twitter_streams_clustering import TwitterIterators, getExperts
 from library.file_io import FileIO
 from library.nlp import getWordsFromRawEnglishMessage, getPhrases
 from settings import experts_twitter_stream_settings

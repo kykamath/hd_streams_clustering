@@ -9,13 +9,11 @@ from library.twitter import TweetFiles, getDateTimeObjectFromTweetTimestamp,\
 from classes import Message, StreamCluster, Stream
 from collections import defaultdict
 from datetime import datetime, timedelta
-from hd_streams_clustering import HDStreaminClustering
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from library.vector import Vector
 from nltk.metrics.distance import jaccard_distance
 from operator import itemgetter
 from library.file_io import FileIO
-from library.classes import timeit
 
 def getExperts(byScreenName=False):
     usersList, usersData = {}, defaultdict(list)
