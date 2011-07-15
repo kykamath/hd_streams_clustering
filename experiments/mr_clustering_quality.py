@@ -22,4 +22,5 @@ print clusters
 distribution = defaultdict(int)
 for clusterId, cluster in clusters:
     distribution[len(cluster)]+=1
-print sorted(distribution)
+for k in sorted(distribution):
+    print k, distribution[k]
