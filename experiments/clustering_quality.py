@@ -5,7 +5,7 @@ Created on Jul 12, 2011
 '''
 import sys, os, time
 sys.path.append('../')
-from library.clustering import KMeansClustering, EvaluationMetrics
+from library.clustering import KMeansClustering, EvaluationMetrics, Clustering
 from library.vector import Vector
 from streaming_lsh.classes import Document
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
@@ -21,7 +21,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
-clustering_quality_experts_mr_folder = clustering_quality_experts_folder+'/mr_data/'
+clustering_quality_experts_mr_folder = clustering_quality_experts_folder+'mr_data/'
 unique_string = ':ilab:'
 
 experts_twitter_stream_settings['min_phrase_length'] = 1
@@ -141,12 +141,13 @@ class TweetsFile:
         plt.show()
     @staticmethod
     def generateDocumentForMRClustering():
-        for i in [10**3, 10**4, 10**5]: 
+        for i in [10**2]: 
+#        for i in [10**3, 10**4, 10**5]: 
             for j in range(1, 10): 
                 print 'Generating file for: ',i*j
                 tf = TweetsFile(i*j, **experts_twitter_stream_settings)
                 outputFile = clustering_quality_experts_mr_folder+tf.fileName.split('/')[-1]
-                print outputFile
+                Clustering(tf.documents,len(tf.documents)).dumpDocumentVectorsToFile(outputFile)
         
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
