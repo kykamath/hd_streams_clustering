@@ -19,7 +19,7 @@ def extractArraysFromFile(file, percentage=1.0):
 
 length=100
 localFileName = clustering_quality_experts_mr_folder+'%s'%length
-hdfsFileName = hdfsPath++'%s'%length
+hdfsFileName = hdfsPath+'%s'%length
 clusters = list(KMeans.cluster(hdfsFileName, extractArraysFromFile(localFileName,0.9), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
 print clusters
 distribution = defaultdict(int)
