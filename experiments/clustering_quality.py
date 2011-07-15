@@ -4,6 +4,7 @@ Created on Jul 12, 2011
 @author: kykamath
 '''
 import sys, os, time
+from library.mr_algorithms.kmeans import KMeans
 sys.path.append('../')
 from library.clustering import KMeansClustering, EvaluationMetrics, Clustering
 from library.vector import Vector
@@ -88,6 +89,14 @@ class TweetsFile:
             if i==self.length: break;
         os.system('gzip %s'%self.fileName)
     @staticmethod
+    def generateDocumentForMRClustering():
+        for i in [10**3, 10**4, 10**5]: 
+            for j in range(1, 10): 
+                print 'Generating file for: ',i*j
+                tf = TweetsFile(i*j, **experts_twitter_stream_settings)
+                outputFile = clustering_quality_experts_mr_folder+tf.fileName.split('/')[-1]
+                Clustering(tf.documents,len(tf.documents)).dumpDocumentVectorsToFile(outputFile)
+    @staticmethod
     def generateStatsForClusteringQuality():
         for i in [10**3, 10**4, 10**5]: 
             for j in range(1, 10): 
@@ -139,19 +148,21 @@ class TweetsFile:
         plt.xticks(ind+width, ('$F$', '$Precision$', '$Recall$', '$Purity$', '$NMI$') )
         plt.legend( (rects1[0], rects2[0]), (plotSettings[plotSettings.keys()[0]]['label'], plotSettings[plotSettings.keys()[1]]['label']), loc=4 )
         plt.show()
-    @staticmethod
-    def generateDocumentForMRClustering():
-        for i in [10**3, 10**4, 10**5]: 
-            for j in range(1, 10): 
-                print 'Generating file for: ',i*j
-                tf = TweetsFile(i*j, **experts_twitter_stream_settings)
-                outputFile = clustering_quality_experts_mr_folder+tf.fileName.split('/')[-1]
-                Clustering(tf.documents,len(tf.documents)).dumpDocumentVectorsToFile(outputFile)
-        
+                
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
-    TweetsFile.generateDocumentForMRClustering()
+#    TweetsFile.generateDocumentForMRClustering()
+    def extractArraysFromFile(file, numberOfArrays=float('+inf')):
+        arraysToReturn = []
+        for line in FileIO.iterateJsonFromFile(file):
+            if numberOfArrays==0: break;
+            else: numberOfArrays-=1
+            arraysToReturn.append(np.array(line['vector']))
+        return arraysToReturn
+    fileName = clustering_quality_experts_mr_folder+'100'
+#    print fileName
+    print list(KMeans.cluster(fileName, extractArraysFromFile(fileName), mrArgs='-r hadoop', iterations=5))
     
