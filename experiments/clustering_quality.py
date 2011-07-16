@@ -90,7 +90,7 @@ class TweetsFile:
         return self.getEvaluationMetrics(documentClusters, te-ts)
     def generateStatsForKMeansMRClustering(self):
         ts = time.time()
-        documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.2), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':250}))
+        documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.7), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
         documentClusters = [cluster for cluster in documentClusters if len(cluster)>=self.stream_settings['cluster_filter_threshold']]
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
@@ -121,8 +121,8 @@ class TweetsFile:
                                           TweetsFile.stats_file)
     @staticmethod
     def generateStatsForMRKMeansClusteringQuality():
-        for i in [10**4, 10**5]: 
-            for j in range(2, 10): 
+        for i in [10**3, 10**4, 10**5]: 
+            for j in range(1, 10): 
                 print 'Generating stats for: ',i*j
                 tf = TweetsFile(i*j, **experts_twitter_stream_settings)
                 FileIO.writeToFileAsJson({'mr_k_means': tf.generateStatsForKMeansMRClustering(), 
@@ -181,19 +181,19 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
-#    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-    
+#    
 #    TweetsFile.combineStatsFile()
-    from collections import defaultdict
-    length = 100
-    documentClusters = list(KMeans.cluster(hdfsPath+'%s'%length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%length, 0.2), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
-    clusters = len([cluster for cluster in documentClusters if len(cluster)>=2])
-    distribution = defaultdict(int)
-    for cluster in clusters:
-        distribution[len(cluster)]+=1
-    for k in sorted(distribution): print k, distribution[k]
+#    from collections import defaultdict
+#    length = 100
+#    documentClusters = list(KMeans.cluster(hdfsPath+'%s'%length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%length, 0.2), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
+#    clusters = [cluster for cluster in documentClusters if len(cluster)>=2]
+#    distribution = defaultdict(int)
+#    for cluster in clusters:
+#        distribution[len(cluster)]+=1
+#    for k in sorted(distribution): print k, distribution[k]
     
     
