@@ -30,9 +30,16 @@ experts_twitter_stream_settings['min_phrase_length'] = 1
 experts_twitter_stream_settings['max_phrase_length'] = 1
 experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
 
+#plotSettings = {
+#                 'k_means':{'label': 'k-Means', 'color': '#FF1800'}, 
+#                 'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#00C322'},
+#                 'mr_kmeans': {'label': 'MR k-Means', 'color': '#00C322'}
+#                 }
+
 plotSettings = {
-                 'k_means':{'label': 'k-Means', 'color': '#FF1800'}, 
-                 'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#00C322'}
+                 'k_means':{'label': 'k-Means', 'color': '#FD0006'}, 
+                 'mr_k_means': {'label': 'MR k-Means', 'color': '#FFF400'},
+                 'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#1435AD'},
                  }
 
 def extractArraysFromFile(file, percentage=1.0):
@@ -44,6 +51,7 @@ def extractArraysFromFile(file, percentage=1.0):
 class TweetsFile:
     stats_file = clustering_quality_experts_folder+'quality_stats'
     mr_stats_file = clustering_quality_experts_folder+'mr_quality_stats'
+    combined_stats_file = clustering_quality_experts_folder+'combined_stats_file'
     def __init__(self, length, forGeneration=False, **stream_settings):
         self.length=length
         self.stream_settings = stream_settings
@@ -90,7 +98,10 @@ class TweetsFile:
         return self.getEvaluationMetrics(documentClusters, te-ts)
     def generateStatsForKMeansMRClustering(self):
         ts = time.time()
-        documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.7), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
+        documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, 
+                                               extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.7), 
+                                               mrArgs='-r hadoop', iterations=1, 
+                                               jobconf={'mapred.map.tasks':10, 'mapred.task.timeout': 7200000}))
         documentClusters = [cluster for cluster in documentClusters if len(cluster)>=self.stream_settings['cluster_filter_threshold']]
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
@@ -130,8 +141,8 @@ class TweetsFile:
                                           TweetsFile.mr_stats_file)
     @staticmethod
     def plotClusteringSpeed():
-        dataToPlot = {'k_means': {'x': [], 'y': []}, 'streaming_lsh': {'x': [], 'y': []}}
-        for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
+        dataToPlot = {'k_means': {'x': [], 'y': []}, 'mr_k_means': {'x': [], 'y': []}, 'streaming_lsh': {'x': [], 'y': []}}
+        for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
             for k in plotSettings: dataToPlot[k]['x'].append(data[k]['no_of_documents']); dataToPlot[k]['y'].append(data[k]['iteration_time'])
         for k in plotSettings: plt.loglog(dataToPlot[k]['x'], dataToPlot[k]['y'], label=plotSettings[k]['label'], color=plotSettings[k]['color'], lw=2)
         plt.legend(loc=4); 
@@ -172,22 +183,19 @@ class TweetsFile:
         plt.show()
     @staticmethod
     def combineStatsFile():
-        i = 0
-        for normalData, mrData in zip(FileIO.iterateJsonFromFile(TweetsFile.stats_file), FileIO.iterateJsonFromFile(TweetsFile.stats_file)):
-            print i, normalData.keys()
-            print i, mrData.keys()
-            i+=1
+        for normalData, mrData in zip(FileIO.iterateJsonFromFile(TweetsFile.stats_file), FileIO.iterateJsonFromFile(TweetsFile.mr_stats_file)):
+            normalData['mr_k_means'] = mrData['mr_k_means']
+            FileIO.writeToFileAsJson(normalData, TweetsFile.combined_stats_file)
                 
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
     TweetsFile.generateStatsForMRKMeansClusteringQuality()
-#    TweetsFile.combineStatsFile()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-#    
 #    TweetsFile.combineStatsFile()
+
 #    from collections import defaultdict
 #    length = 100
 #    documentClusters = list(KMeans.cluster(hdfsPath+'%s'%length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%length, 0.2), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
