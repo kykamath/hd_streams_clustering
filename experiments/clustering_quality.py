@@ -190,14 +190,14 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
-    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+#    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.combineStatsFile()
     
 #for i in range(1,10):
-#     TweetsFile(1000, **experts_twitter_stream_settings).generateStatsForKMeansClustering(svd_dimensions=250)
+     TweetsFile(1000, **experts_twitter_stream_settings).generateStatsForKMeansClustering(svd_dimensions=250)
 
 #    from collections import defaultdict
 #    length = 100
