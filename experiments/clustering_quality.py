@@ -89,7 +89,7 @@ class TweetsFile:
         return self.getEvaluationMetrics(documentClusters, te-ts)
     def generateStatsForKMeansMRClustering(self):
         ts = time.time()
-        documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.9), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':250}))
+        documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.2), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':250}))
         documentClusters = [cluster for cluster in documentClusters if len(cluster)>=self.stream_settings['cluster_filter_threshold']]
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
