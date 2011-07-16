@@ -75,9 +75,9 @@ class TweetsFile:
         iterationData['purity'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.purity)
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
-    def generateStatsForKMeansClustering(self):
+    def generateStatsForKMeansClustering(self, **kwargs):
         ts = time.time()
-        clusters = KMeansClustering(self.documents,len(self.documents)).cluster()
+        clusters = KMeansClustering(self.documents,len(self.documents)).cluster(**kwargs)
         te = time.time()
         documentClusters = []
         for a in [ (k, list(set(list(v)))) for k,v in groupby(sorted((a[0], a[1][0]) for a in zip(clusters, self.documents)), key=itemgetter(0))]:
@@ -99,7 +99,7 @@ class TweetsFile:
     def generateStatsForKMeansMRClustering(self):
         ts = time.time()
         documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, 
-                                               extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.7), 
+                                               extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.5), 
                                                mrArgs='-r hadoop', iterations=1, 
                                                jobconf={'mapred.map.tasks':10, 'mapred.task.timeout': 7200000}))
         documentClusters = [cluster for cluster in documentClusters if len(cluster)>=self.stream_settings['cluster_filter_threshold']]
@@ -190,11 +190,14 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
-    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+#    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.combineStatsFile()
+    
+#for i in range(1,10):
+     TweetsFile(1000, **experts_twitter_stream_settings).generateStatsForKMeansClustering(svd_dimensions=250)
 
 #    from collections import defaultdict
 #    length = 100
