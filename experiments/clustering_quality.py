@@ -189,7 +189,7 @@ if __name__ == '__main__':
 #    TweetsFile.combineStatsFile()
     from collections import defaultdict
     length = 100
-    documentClusters = list(KMeans.cluster(hdfsPath+'%s'%length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%length, 0.2), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':2}))
+    documentClusters = list(KMeans.cluster(hdfsPath+'%s'%length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%length, 0.2), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
     clusters = len([cluster for cluster in documentClusters if len(cluster)>=2])
     distribution = defaultdict(int)
     for cluster in clusters:
