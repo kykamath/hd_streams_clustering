@@ -121,7 +121,7 @@ class TweetsFile:
                                           TweetsFile.stats_file)
     @staticmethod
     def generateStatsForMRKMeansClusteringQuality():
-        for i in [10**3, 10**4, 10**5]: 
+        for i in [10**4, 10**5]: 
             for j in range(1, 10): 
                 print 'Generating stats for: ',i*j
                 tf = TweetsFile(i*j, **experts_twitter_stream_settings)
@@ -181,8 +181,8 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
-#    TweetsFile.generateStatsForMRKMeansClusteringQuality()
-    TweetsFile.combineStatsFile()
+    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+#    TweetsFile.combineStatsFile()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
