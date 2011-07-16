@@ -101,7 +101,7 @@ class TweetsFile:
         documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, 
                                                extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.5), 
                                                mrArgs='-r hadoop', iterations=1, 
-                                               jobconf={'mapred.map.tasks':50, 'mapred.task.timeout': 7200000}))
+                                               jobconf={'mapred.map.tasks':25, 'mapred.task.timeout': 7200000}))
         documentClusters = [cluster for cluster in documentClusters if len(cluster)>=self.stream_settings['cluster_filter_threshold']]
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
@@ -132,13 +132,12 @@ class TweetsFile:
                                           TweetsFile.stats_file)
     @staticmethod
     def generateStatsForMRKMeansClusteringQuality():
-        for i in [10**5]: 
-            for j in range(1, 10): 
-                print 'Generating stats for: ',i*j
-                tf = TweetsFile(i*j, **experts_twitter_stream_settings)
-                FileIO.writeToFileAsJson({'mr_k_means': tf.generateStatsForKMeansMRClustering(), 
-                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
-                                          TweetsFile.mr_stats_file)
+        for i in [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000]: 
+            print 'Generating stats for: ',i
+            tf = TweetsFile(i, **experts_twitter_stream_settings)
+            FileIO.writeToFileAsJson({'mr_k_means': tf.generateStatsForKMeansMRClustering(), 
+                                      'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
+                                      TweetsFile.mr_stats_file)
     @staticmethod
     def plotClusteringSpeed():
         dataToPlot = {'k_means': {'x': [], 'y': []}, 'mr_k_means': {'x': [], 'y': []}, 'streaming_lsh': {'x': [], 'y': []}}
@@ -190,14 +189,14 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
-#    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.combineStatsFile()
     
 #for i in range(1,10):
-     TweetsFile(1000, **experts_twitter_stream_settings).generateStatsForKMeansClustering(svd_dimensions=250)
+#     TweetsFile(1000, **experts_twitter_stream_settings).generateStatsForKMeansClustering(svd_dimensions=250)
 
 #    from collections import defaultdict
 #    length = 100
