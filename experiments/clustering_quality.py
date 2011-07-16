@@ -38,6 +38,7 @@ plotSettings = {
 def extractArraysFromFile(file, percentage=1.0):
     arraysToReturn = []
     for line in FileIO.iterateJsonFromFile(file): arraysToReturn.append(np.array(line['vector']))
+    print len(arraysToReturn[:int(len(arraysToReturn)*percentage)])
     return arraysToReturn[:int(len(arraysToReturn)*percentage)]
 
 class TweetsFile:
@@ -180,11 +181,15 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
-    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+#    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
     
 #    TweetsFile.combineStatsFile()
+
+    length = 100
+    documentClusters = list(KMeans.cluster(hdfsPath+'%s'%length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%length, 0.2), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':250}))
+    print documentClusters = [cluster for cluster in documentClusters if len(cluster)>=2]
     
     
