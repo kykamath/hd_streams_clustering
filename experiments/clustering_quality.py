@@ -181,7 +181,8 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
-    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+#    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+    TweetsFile.combineStatsFile()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
