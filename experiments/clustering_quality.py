@@ -101,7 +101,7 @@ class TweetsFile:
         documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, 
                                                extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%self.length, 0.5), 
                                                mrArgs='-r hadoop', iterations=1, 
-                                               jobconf={'mapred.map.tasks':10, 'mapred.task.timeout': 7200000}))
+                                               jobconf={'mapred.map.tasks':50, 'mapred.task.timeout': 7200000}))
         documentClusters = [cluster for cluster in documentClusters if len(cluster)>=self.stream_settings['cluster_filter_threshold']]
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
@@ -190,14 +190,14 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
-#    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.combineStatsFile()
     
 #for i in range(1,10):
-     TweetsFile(1000, **experts_twitter_stream_settings).generateStatsForKMeansClustering(svd_dimensions=250)
+#     TweetsFile(1000, **experts_twitter_stream_settings).generateStatsForKMeansClustering(svd_dimensions=250)
 
 #    from collections import defaultdict
 #    length = 100
