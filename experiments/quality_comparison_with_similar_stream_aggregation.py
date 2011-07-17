@@ -58,7 +58,8 @@ class TweetsFile:
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
     def getStatsForSST(self):
         for tweet in TweetFiles.iterateTweetsFromGzip(self.rawDataFileName):
-            print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings)
+            print tweet['text']
+            print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).items()
     
 if __name__ == '__main__':
     TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
