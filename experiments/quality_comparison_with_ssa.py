@@ -35,6 +35,7 @@ class TweetsFile:
         self.rawDataFileName = clustering_quality_experts_folder+'data/%s.gz'%str(length)
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
         self.hdfsFile = hdfsPath+'%s.gz'%length
+        self.hdfsUnzippedFile = hdfsUnzippedPath+'%s'%length
     def _iterateUserDocuments(self):
         dataForAggregation = defaultdict(Vector)
         textToIdMap = defaultdict(int)
@@ -66,7 +67,7 @@ class TweetsFile:
         print 'SSA-MR'
         ts = time.time()
         documentClusters = list(StreamSimilarityAggregationMR.estimate(
-                                                                       self.hdfsFile, args='-r hadoop'.split(), 
+                                                                       self.hdfsUnzippedFile, args='-r hadoop'.split(), 
                                                                        jobconf={'mapred.map.tasks':25, 'mapred.task.timeout': 7200000, 'mapred.reduce.tasks':25}))
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
@@ -90,7 +91,7 @@ class TweetsFile:
 class QualityComparisonWithSSA:
     @staticmethod
     def generateStatsForQualityComparisonWithSSA():
-        for length in [5000, 6000, 7000, 8000, 9000]+[i*j for i in 10**4, 10**5 for j in range(1, 10)]:
+        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
             print 'Generating stats for: ',length
             tf = TweetsFile(length, **experts_twitter_stream_settings)
             stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
@@ -98,8 +99,8 @@ class QualityComparisonWithSSA:
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    TweetsFile.generateDocsForSSAMR()
-    TweetsFile.copyUnzippedSSADataToHadoop()
-#    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
+#    TweetsFile.copyUnzippedSSADataToHadoop()
+    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
 #    tf = TweetsFile(5000, **experts_twitter_stream_settings)
 #    tf.getStatsForSSAMR()
     
