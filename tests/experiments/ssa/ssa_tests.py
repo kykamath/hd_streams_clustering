@@ -14,17 +14,17 @@ from experiments.ssa.ssa import StreamSimilarityAggregationMR, ItemsClusterer,\
 test_file = 'ssa_test.dat.gz'
 test_ssa_threshold = 0.75
 
+vectors =  {
+            '1': Vector({'1':4, '2':8}), 
+            '2': Vector({'1':4, '2':8}), 
+            '3': Vector({'1':4, '2':8}), 
+            '4': Vector({'2':8}), 
+            '5': Vector({'3':4, '4':8}), 
+            '6': Vector({'4':8}), 
+            '7': Vector({'3':4, '4':8}), 
+            '8': Vector({'3':4}) 
+        }
 def createTestFile():
-    vectors = {
-                    '1': Vector({'1':4, '2':8}), 
-                    '2': Vector({'1':4, '2':8}), 
-                    '3': Vector({'1':4, '2':8}), 
-                    '4': Vector({'2':8}), 
-                    '5': Vector({'3':4, '4':8}), 
-                    '6': Vector({'4':8}), 
-                    '7': Vector({'3':4, '4':8}), 
-                    '8': Vector({'3':4}) 
-                }
     with open(test_file, 'w') as f:
         for v1, v2 in combinations(vectors.iteritems(),2): f.write('%s\t%s\n'%(cjson.encode(['x']), cjson.encode([(v1[0], v1[1]), (v2[0], v2[1])])))
 
@@ -53,21 +53,22 @@ class ItemsClustererTests(unittest.TestCase):
         self.assertEqual(1, len(set([self.clusterer.itemToClusterMap[i] for i in items1.union(items2).union(items3)])))
 
 class SimilarStreamAggregationTests(unittest.TestCase):
-    def setUp(self):
-        self.vectors = {
-                            1: Vector({1:4, 2:8}), 
-                            2: Vector({1:4, 2:8}),
-                            3: Vector({1:4, 2:8}), 
-                            4: Vector({2:8}),
-                            5: Vector({3:4, 4:8}), 
-                            6: Vector({4:8}),
-                            7: Vector({3:4, 4:8}), 
-                            8: Vector({3:4})
-                        }
+#    def setUp(self):
+#        self.vectors = {
+#                            1: Vector({1:4, 2:8}), 
+#                            2: Vector({1:4, 2:8}),
+#                            3: Vector({1:4, 2:8}), 
+#                            4: Vector({2:8}),
+#                            5: Vector({3:4, 4:8}), 
+#                            6: Vector({4:8}),
+#                            7: Vector({3:4, 4:8}), 
+#                            8: Vector({3:4})
+#                        }
     def test_estimate(self):
-        nn = SimilarStreamAggregation(self.vectors, 0.99)
+        nn = SimilarStreamAggregation(vectors, 0.99)
         nn.estimate()
-        self.assertEqual(2, len(list(nn.iterateClusters())))
+        self.assertEqual([['1', '3', '2'], ['5', '7']], list(nn.iterateClusters()))
+        
 
 class SSASimilarityMRTests(unittest.TestCase):
     def setUp(self):

@@ -44,7 +44,8 @@ class SimilarStreamAggregation:
     def estimate(self):
         similarVectorMap = self._getVectorsWithinEpsilon()
         for k, v in similarVectorMap.iteritems(): self.clusterer.add(set([k]).union(v))
-    def iterateClusters(self): return self.clusterer.iterateClusters()
+    def iterateClusters(self): 
+        for c in self.clusterer.iterateClusters(): yield list(c)
     def _getVectorsWithinEpsilon(self):
         vectorsWithinEpsilon = defaultdict(set)
         for id1, id2 in combinations(self.vectors,2):
