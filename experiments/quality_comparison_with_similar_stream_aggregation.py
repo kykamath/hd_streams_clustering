@@ -4,12 +4,13 @@ Created on Jul 16, 2011
 @author: kykamath
 '''
 import sys
-from library.twitter import TweetFiles
 sys.path.append('../')
 from itertools import combinations
 from collections import defaultdict
 from twitter_streams_clustering import getExperts, TwitterCrowdsSpecificMethods
 from settings import experts_twitter_stream_settings
+from library.twitter import TweetFiles
+from library.vector import Vector
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
 clustering_quality_experts_sst_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
@@ -61,9 +62,10 @@ class TweetsFile:
             yield tweet['user']['screen_name'], TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).vector
             
     def getStatsForSST(self):
-        dataForAggregation = dict(self._iterateRawTweetsData())
-        for k, v in dataForAggregation.iteritems():
-            print k, v
+        dataForAggregation = defaultdict(Vector)
+        for id, tweetVector in self._iterateRawTweetsData(): dataForAggregation[id]+=tweetVector
+        for k, v in dataForAggregation.items(): print k,v
+        print len(dataForAggregation)
     
 if __name__ == '__main__':
     TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
