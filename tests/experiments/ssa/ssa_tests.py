@@ -31,12 +31,12 @@ class SSASimilarityMRTests(unittest.TestCase):
     def setUp(self):
         self.job = SSASimilarityMR(args='-r local'.split())
     def test_runJob(self):
-        testResult = {1: {'s': [2, 3, 4], 'cid': 1}, 2: {'s': [3, 4], 'cid': 2}, 3: {'s': [4], 'cid': 3}, 5: {'s': [6, 7], 'cid': 5}, 6: {'s': [7], 'cid': 6}}
+        testResult = {'stream_in_multiple_clusters': [], 1: {'s': [2, 3, 4], 'cid': None}, 2: {'s': [3, 4], 'cid': None}, 3: {'s': [4], 'cid': None}, 5: {'s': [6, 7], 'cid': None}, 6: {'s': [7], 'cid': None}}
         self.assertEqual(testResult, dict(list(self.job.runJob(inputFileList=[test_file]))))
 
-#class StreamSimilarityAggregationMRTests(unittest.TestCase):
-#    def test_estimate(self):
-#        StreamSimilarityAggregationMR.estimate(test_file, ssa_threshold)
+class StreamSimilarityAggregationMRTests(unittest.TestCase):
+    def test_estimate(self):
+        StreamSimilarityAggregationMR.estimate(test_file)
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,9 +3,28 @@ Created on Jul 17, 2011
 
 @author: kykamath
 '''
+from experiments.ssa.ssa_sim_mr import SSASimilarityMR
+from library.mrjobwrapper import CJSONProtocol
+from experiments.ssa.ssa_agg_mr import SSAAggrigationMR
+
+stream_in_multiple_clusters = 'stream_in_multiple_clusters'
+iteration_file = '/tmp/ssa_iteration'
+
+
+def createFileForNextIteration(data):
+    with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write(k, v)+'\n') for k, v in data.iteritems()]
+    
 
 class StreamSimilarityAggregationMR:
     @staticmethod
-    def estimate(fileName, ssa_threshold):
-        pass
+    def estimate(fileName, args='-r inline'.split(), **kwargs):
+        similarityJob = SSASimilarityMR(args=args)
+        dataFromIteration = dict(list(similarityJob.runJob(inputFileList=[fileName], **kwargs)))
+        if stream_in_multiple_clusters in dataFromIteration:
+            del dataFromIteration[stream_in_multiple_clusters]
+            createFileForNextIteration(dataFromIteration)
+            aggrigationJob = SSAAggrigationMR(args=args)
+            dataFromIteration = aggrigationJob.runJob(inputFileList=[iteration_file], **kwargs)
+            print list(dataFromIteration)                    
+
         
