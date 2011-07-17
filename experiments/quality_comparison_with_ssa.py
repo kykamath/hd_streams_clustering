@@ -25,6 +25,7 @@ clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clus
 clustering_quality_experts_ssa_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
 clustering_quality_experts_ssa_mr_folder = clustering_quality_experts_ssa_folder+'mr_data/'
 hdfsPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_folder/'
+hdfsUnzippedPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_unzipped_folder/'
 
 class TweetsFile:
     stats_file = clustering_quality_experts_ssa_folder+'quality_stats'
@@ -78,6 +79,13 @@ class TweetsFile:
             with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(tf._iterateUserDocuments(),2)]
             os.system('gzip %s'%iteration_file)
             os.system('hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath))
+    @staticmethod
+    def copyUnzippedSSADataToHadoop():
+        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+            iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
+            print 'Copying file for %s'%length
+            os.system('gunzip %s.gz'%iteration_file)
+            os.system('hadoop fs -put %s %s'%(iteration_file, hdfsUnzippedPath))
 
 class QualityComparisonWithSSA:
     @staticmethod
@@ -90,7 +98,8 @@ class QualityComparisonWithSSA:
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    TweetsFile.generateDocsForSSAMR()
-    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
+    TweetsFile.copyUnzippedSSADataToHadoop()
+#    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
 #    tf = TweetsFile(5000, **experts_twitter_stream_settings)
 #    tf.getStatsForSSAMR()
     
