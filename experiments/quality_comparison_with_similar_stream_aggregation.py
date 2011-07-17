@@ -59,12 +59,19 @@ class TweetsFile:
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
     def _iterateUserDocuments(self):
         dataForAggregation = defaultdict(Vector)
+        textToIdMap = defaultdict(int)
         for tweet in TweetFiles.iterateTweetsFromGzip(self.rawDataFileName):
-            dataForAggregation[tweet['user']['screen_name']]+=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).vector
+            textVector = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).vector
+            textIdVector = Vector()
+            for phrase in textVector: 
+                if phrase not in textToIdMap: textToIdMap[phrase]=len(textToIdMap)
+                textIdVector[textToIdMap[phrase]]=textVector[phrase]
+            dataForAggregation[tweet['user']['screen_name']]+=textIdVector
         for k, v in dataForAggregation.iteritems(): yield k, v
     def getStatsForSST(self):
-        documents = list(self._iterateUserDocuments())
-        print len(documents)
+#        documents = list(self._iterateUserDocuments())
+#        print len(documents)
+        for k,v in self._iterateUserDocuments(): print k,v
 
 if __name__ == '__main__':
     TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
