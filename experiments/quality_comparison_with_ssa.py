@@ -92,5 +92,5 @@ if __name__ == '__main__':
 #    TweetsFile.generateDocsForSSAMR()
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
     tf = TweetsFile(5000, **experts_twitter_stream_settings)
-    tf.getStatsForSSAMR
+    tf.getStatsForSSAMR()
     
