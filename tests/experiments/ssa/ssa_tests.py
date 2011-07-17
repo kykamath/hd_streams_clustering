@@ -11,7 +11,7 @@ from experiments.ssa.ssa_sim_mr import SSASimilarityMR
 from experiments.ssa.ssa import StreamSimilarityAggregationMR, ItemsClusterer,\
     SimilarStreamAggregation
 
-test_file = 'ssa_test.dat'
+test_file = 'ssa_test.dat.gz'
 test_ssa_threshold = 0.75
 
 def createTestFile():
