@@ -69,7 +69,9 @@ class TweetsFile:
             dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
         for k, v in dataForAggregation.iteritems(): yield k, v
     def getStatsForSST(self):
-        print SimilarStreamAggregation(dict(self._iterateUserDocuments()), self.stream_settings['sst_threshold']).estimate()
+        sstObject = SimilarStreamAggregation(dict(self._iterateUserDocuments()), self.stream_settings['sst_threshold'])
+        sstObject.estimate()
+        print list(sstObject.iterateClusters())
         
 
 if __name__ == '__main__':
