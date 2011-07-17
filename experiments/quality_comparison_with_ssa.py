@@ -35,7 +35,7 @@ class TweetsFile:
             textVector = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).vector
             textIdVector = Vector()
             for phrase in textVector: 
-                if phrase not in textToIdMap: textToIdMap[phrase]=len(textToIdMap)
+                if phrase not in textToIdMap: textToIdMap[phrase]=str(len(textToIdMap))
                 textIdVector[textToIdMap[phrase]]=textVector[phrase]
             dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
         for k, v in dataForAggregation.iteritems(): yield k, v
@@ -70,7 +70,7 @@ class TweetsFile:
         print iteration_file
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
-#    print TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSSA()
     TweetsFile.generateDocsForSSAMR()
+    print TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSSA()
         
     
