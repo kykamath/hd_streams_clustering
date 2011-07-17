@@ -37,7 +37,7 @@ class SSASimilarityMRTests(unittest.TestCase):
 
 class StreamSimilarityAggregationMRTests(unittest.TestCase):
     def test_estimate(self):
-        args = '-r local' if os.uname()[1]=='spock' else '-r local'
+        args = '-r hadoop' if os.uname()[1]=='spock' else '-r local'
         self.assertEqual([[1, 2, 3, 4], [5, 6, 7]], list(StreamSimilarityAggregationMR.estimate(test_file, args.split())))
 
 if __name__ == '__main__':
