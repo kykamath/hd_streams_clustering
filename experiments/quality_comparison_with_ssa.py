@@ -28,6 +28,7 @@ class TweetsFile:
         self.stream_settings = stream_settings
         self.rawDataFileName = clustering_quality_experts_folder+'data/%s.gz'%str(length)
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
+        self.hdfsFile = hdfsPath+'%s.gz'%length
     def _iterateUserDocuments(self):
         dataForAggregation = defaultdict(Vector)
         textToIdMap = defaultdict(int)
@@ -54,8 +55,9 @@ class TweetsFile:
         documentClusters = list(sstObject.iterateClusters())
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
-#    def getStatsForSSAMR(self):
-#        ts = time.time()
+    def getStatsForSSAMR(self):
+        ts = time.time()
+        print self.hdfsFile
 #        documentClusters = StreamSimilarityAggregationMR.estimate(test_file, '-r hadoop'.split(), jobconf={'mapred.reduce.tasks':2})
 #        te = time.time()
 #        return self.getEvaluationMetrics(documentClusters, te-ts)
@@ -70,7 +72,8 @@ class TweetsFile:
         os.system('hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath))
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
-    TweetsFile.generateDocsForSSAMR()
-#    print TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSSA()
-        
+#    TweetsFile.generateDocsForSSAMR()
+    tf = TweetsFile(1000, **experts_twitter_stream_settings)
+#    print tf.getStatsForSSA()
+    print tf.getStatsForSSAMR()
     
