@@ -4,6 +4,7 @@ Created on Jul 16, 2011
 @author: kykamath
 '''
 import sys
+from library.twitter import TweetFiles
 sys.path.append('../')
 from itertools import combinations
 from collections import defaultdict
@@ -56,7 +57,8 @@ class TweetsFile:
         self.rawDataFileName = clustering_quality_experts_folder+'data/%s.gz'%str(length)
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
     def getStatsForSST(self):
-        print self.rawDataFileName
+        for tweet in TweetFiles.iterateTweetsFromGzip(self.rawDataFileName):
+            print tweet['text']
     
 if __name__ == '__main__':
     TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
