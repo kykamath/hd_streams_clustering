@@ -10,9 +10,8 @@ from collections import defaultdict
 from twitter_streams_clustering import getExperts
 from settings import experts_twitter_stream_settings
 
-clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
-#clustering_quality_experts_mr_folder = clustering_quality_experts_folder+'mr_data/'
-#hdfsPath='hdfs:///user/kykamath/lsh_experts_data/ssa'
+clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
+clustering_quality_experts_sst_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
 
 class ItemsClusterer:
     def __init__(self):
@@ -50,14 +49,14 @@ class SimilarStreamAggregation:
         return vectorsWithinEpsilon
     
 class TweetsFile:
-    stats_file = clustering_quality_experts_folder+'quality_stats'
+    stats_file = clustering_quality_experts_sst_folder+'quality_stats'
     def __init__(self, length, **stream_settings):
         self.length=length
         self.stream_settings = stream_settings
-        self.fileName = clustering_quality_experts_folder+'data/'+str(length)
+        self.rawDataFileName = clustering_quality_experts_folder+'data/%s.gz'%str(length)
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
     def getStatsForSST(self):
-        print self.fileName
+        print self.rawDataFileName
     
 if __name__ == '__main__':
     TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
