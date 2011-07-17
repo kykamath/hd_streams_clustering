@@ -79,7 +79,7 @@ class SSASimilarityMRTests(unittest.TestCase):
 
 class StreamSimilarityAggregationMRTests(unittest.TestCase):
     def test_estimate(self):
-        args = '-r hadoop' if os.uname()[1]=='spock' else '-r local'
+        args = '-r hadoopsdf' if os.uname()[1]=='spock' else '-r local'
         self.assertEqual([['1', '3', '2', '4'], ['5', '7', '6']], list(StreamSimilarityAggregationMR.estimate(test_file, args.split(), jobconf={'mapred.reduce.tasks':2})))
 
 if __name__ == '__main__':
