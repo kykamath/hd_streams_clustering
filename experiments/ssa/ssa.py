@@ -56,7 +56,6 @@ class StreamSimilarityAggregationMR:
     @staticmethod
     def estimate(fileName, maxItertations=None, args='-r local'.split(), **kwargs):
         similarityJob = SSASimilarityMR(args=args)
-        print fileName; exit()
         dataFromIteration = dict(list(similarityJob.runJob(inputFileList=[fileName], **kwargs)))
         numberOfIterations = 0
         while stream_in_multiple_clusters in dataFromIteration:
