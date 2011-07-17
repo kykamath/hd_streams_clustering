@@ -67,4 +67,6 @@ class StreamSimilarityAggregationMR:
             aggrigationJob = SSAAggrigationMR(args=args)
             dataFromIteration = dict(list(aggrigationJob.runJob(inputFileList=[iteration_file], **kwargs)))
             if maxItertations!=None and numberOfIterations>=maxItertations: print 'Reached max iterations. Breaking from the loop'; break;
-        for id in dataFromIteration: yield [id]+dataFromIteration[id]['s']              
+        for id in dataFromIteration: 
+            print id, dataFromIteration[id]
+            yield [id]+dataFromIteration[id]['s']              
