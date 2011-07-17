@@ -62,7 +62,7 @@ class TweetsFile:
     @staticmethod
     def generateDocsForSSAMR():
         length=1000
-        tf = TweetsFile(2000, **experts_twitter_stream_settings)
+        tf = TweetsFile(length, **experts_twitter_stream_settings)
         iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
         print 'Writing data to ', iteration_file
         with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(tf._iterateUserDocuments(),2)]
