@@ -62,17 +62,17 @@ class TweetsFile:
         return self.getEvaluationMetrics(documentClusters, te-ts)
     @staticmethod
     def generateDocsForSSAMR():
-        length=1000
-        tf = TweetsFile(length, **experts_twitter_stream_settings)
-        iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
-        print 'Writing data to ', iteration_file
-        with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(tf._iterateUserDocuments(),2)]
-        os.system('gzip %s'%iteration_file)
-        os.system('hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath))
+        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+            tf = TweetsFile(length, **experts_twitter_stream_settings)
+            iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
+            print 'Generating data for ', iteration_file
+            with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(tf._iterateUserDocuments(),2)]
+            os.system('gzip %s'%iteration_file)
+            os.system('hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath))
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
-#    TweetsFile.generateDocsForSSAMR()
-    tf = TweetsFile(1000, **experts_twitter_stream_settings)
-    print tf.getStatsForSSA()
-    print tf.getStatsForSSAMR()
+    TweetsFile.generateDocsForSSAMR()
+#    tf = TweetsFile(1000, **experts_twitter_stream_settings)
+#    print tf.getStatsForSSA()
+#    print tf.getStatsForSSAMR()
     
