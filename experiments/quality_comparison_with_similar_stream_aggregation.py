@@ -3,6 +3,8 @@ Created on Jul 16, 2011
 
 @author: kykamath
 '''
+import sys
+sys.path.append('../')
 from itertools import combinations
 from collections import defaultdict
 from twitter_streams_clustering import getExperts
