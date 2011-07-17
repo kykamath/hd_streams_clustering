@@ -3,9 +3,9 @@ Created on Jul 17, 2011
 
 @author: kykamath
 '''
-from experiments.ssa.ssa_sim_mr import SSASimilarityMR
 from library.mrjobwrapper import CJSONProtocol
-from experiments.ssa.ssa_agg_mr import SSAAggrigationMR
+from ssa_agg_mr import SSAAggrigationMR
+from ssa_sim_mr import SSASimilarityMR
 
 stream_in_multiple_clusters = 'stream_in_multiple_clusters'
 iteration_file = '/tmp/ssa_iteration'
