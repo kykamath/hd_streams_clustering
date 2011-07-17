@@ -25,17 +25,14 @@ class SSASimilarityMR(ModifiedMRJob):
             for ssid in ssids: 
                 yield id, ssid
     def reducer(self, key, values):
-        possibleClusterIds, otherStreams = [key], []
+        otherStreams = []
         for v in values:
-#            if type(v)==type({}): possibleClusterIds.append(v['id'])
-#            else: 
             if not self.hasSeenAnOlderStream: 
                 if v in self.observedStreams: 
                     self.hasSeenAnOlderStream = True
                     yield 'stream_in_multiple_clusters', []
                 else: self.observedStreams.add(v)
             otherStreams.append(v)
-#        clusterId = min(possibleClusterIds)
         yield key, {'cid': None, 's':otherStreams}
     def steps(self): return [self.mr(mapper=self.mapper, reducer=self.reducer, mapper_final=self.mapper_final)]
 

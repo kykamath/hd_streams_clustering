@@ -20,11 +20,9 @@ class StreamSimilarityAggregationMR:
     def estimate(fileName, args='-r inline'.split(), **kwargs):
         similarityJob = SSASimilarityMR(args=args)
         dataFromIteration = dict(list(similarityJob.runJob(inputFileList=[fileName], **kwargs)))
-        if stream_in_multiple_clusters in dataFromIteration:
+        while stream_in_multiple_clusters in dataFromIteration:
             del dataFromIteration[stream_in_multiple_clusters]
             createFileForNextIteration(dataFromIteration)
             aggrigationJob = SSAAggrigationMR(args=args)
-            dataFromIteration = aggrigationJob.runJob(inputFileList=[iteration_file], **kwargs)
-            print list(dataFromIteration)                    
-
-        
+            dataFromIteration = dict(list(aggrigationJob.runJob(inputFileList=[iteration_file], **kwargs)))
+        for id in dataFromIteration: yield [id]+dataFromIteration[id]['s']              

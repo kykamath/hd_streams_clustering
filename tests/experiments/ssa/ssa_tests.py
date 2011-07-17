@@ -36,7 +36,7 @@ class SSASimilarityMRTests(unittest.TestCase):
 
 class StreamSimilarityAggregationMRTests(unittest.TestCase):
     def test_estimate(self):
-        StreamSimilarityAggregationMR.estimate(test_file)
+        self.assertEqual([[1, 2, 3, 4], [5, 6, 7]], list(StreamSimilarityAggregationMR.estimate(test_file)))
 
 if __name__ == '__main__':
     unittest.main()
