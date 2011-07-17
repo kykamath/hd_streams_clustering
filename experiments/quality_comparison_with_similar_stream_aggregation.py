@@ -64,7 +64,6 @@ class TweetsFile:
         for k, v in dataForAggregation.iteritems(): yield k, v
     def getStatsForSST(self):
         documents = list(self._iterateUserDocuments())
-        for k,v in documents.items(): print k,v
         print len(documents)
 
 if __name__ == '__main__':
