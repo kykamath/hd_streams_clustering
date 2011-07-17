@@ -3,8 +3,9 @@ Created on Jul 16, 2011
 
 @author: kykamath
 '''
-import sys
+import sys, time
 from library.classes import GeneralMethods
+from library.clustering import EvaluationMetrics
 sys.path.append('../')
 from itertools import combinations
 from collections import defaultdict
@@ -69,16 +70,23 @@ class TweetsFile:
                 textIdVector[textToIdMap[phrase]]=textVector[phrase]
             dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
         for k, v in dataForAggregation.iteritems(): yield k, v
+    def getEvaluationMetrics(self, documentClusters, timeDifference):
+        iterationData =  {'no_of_documents':self.length, 'no_of_clusters': len(documentClusters), 'iteration_time': timeDifference, 'clusters': documentClusters}
+        clustersForEvaluation = [self._getExpertClasses(cluster) for cluster in documentClusters]
+        iterationData['nmi'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.nmi)
+        iterationData['purity'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.purity)
+        iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
+        return iterationData
     def getStatsForSST(self):
+        ts = time.time()
         sstObject = SimilarStreamAggregation(dict(self._iterateUserDocuments()), self.stream_settings['sst_threshold'])
         sstObject.estimate()
-        distribution = GeneralMethods.getValueDistribution(sstObject.iterateClusters(), len)
-        for k in distribution:
-            print k, distribution[k]
-        
+        documentClusters = sstObject.iterateClusters()
+        te = time.time()
+        return self.getEvaluationMetrics(documentClusters, te-ts)
 
 if __name__ == '__main__':
     experts_twitter_stream_settings['sst_threshold']=0.75
-    TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSST()
+    print TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSST()
         
     
