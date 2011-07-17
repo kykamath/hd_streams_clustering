@@ -64,9 +64,7 @@ class TweetsFile:
         length=1000
         tf = TweetsFile(2000, **experts_twitter_stream_settings)
         iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
-#        with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write(k, v)+'\n') for k, v in data.iteritems()]
-        for doc1, doc2 in combinations(tf._iterateUserDocuments(),2):
-            print CJSONProtocol.write('x', [doc1, doc2])
+        with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(tf._iterateUserDocuments(),2)]
         print iteration_file
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
