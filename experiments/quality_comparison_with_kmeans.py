@@ -144,7 +144,7 @@ class TweetsFile:
         dataToPlot = {'k_means': {'x': [], 'y': []}, 'mr_k_means': {'x': [], 'y': []}, 'streaming_lsh': {'x': [], 'y': []}}
         for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
             for k in plotSettings: dataToPlot[k]['x'].append(data[k]['no_of_documents']); dataToPlot[k]['y'].append(data[k]['iteration_time'])
-        for k in plotSettings: plt.loglog(dataToPlot[k]['x'][:15], dataToPlot[k]['y'][:15], label=plotSettings[k]['label'], color=plotSettings[k]['color'], lw=2)
+        for k in plotSettings: plt.loglog(dataToPlot[k]['x'][:12], dataToPlot[k]['y'][:12], label=plotSettings[k]['label'], color=plotSettings[k]['color'], lw=2)
         print len(dataToPlot[k]['x']), dataToPlot[k]['x']
         plt.legend(loc=4); 
         plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString('Running time comparsion for Streaing LSH'))
