@@ -56,10 +56,14 @@ class TweetsFile:
         self.stream_settings = stream_settings
         self.rawDataFileName = clustering_quality_experts_folder+'data/%s.gz'%str(length)
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
-    def getStatsForSST(self):
+    def _iterateRawTweetsData(self):
         for tweet in TweetFiles.iterateTweetsFromGzip(self.rawDataFileName):
-            print tweet['text']
-            print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).vector
+            yield tweet['user']['screen_name'], TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).vector
+            
+    def getStatsForSST(self):
+        dataForAggregation = dict(self._iterateRawTweetsData())
+        for k, v in dataForAggregation.iteritems():
+            print k, v
     
 if __name__ == '__main__':
     TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
