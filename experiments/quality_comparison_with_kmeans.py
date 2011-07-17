@@ -148,7 +148,7 @@ class TweetsFile:
         plt.legend(loc=4); 
         plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString('Running time comparsion for Streaing LSH with k-Means'))
 #        plt.show()
-        plt.savefig('qualityComparisonSpeedKMeans.pdf')
+        plt.savefig('speedComparisonWithKMeans.pdf')
     @staticmethod
     def getClusteringQuality():
         '''
@@ -162,26 +162,30 @@ class TweetsFile:
             purity (0.96 0.00)
             nmi (0.87 0.00)
         '''
-        speedStats = {'k_means': {'f1': [], 'nmi': [], 'purity': []}, 'streaming_lsh': {'f1': [], 'nmi': [], 'purity': []} }
-        for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
+        speedStats = dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in plotSettings])
+#        TweetsFile.combined_stats_file = '/Users/kykamath/Desktop/combined_stats_file.txt'
+        for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
             for k in speedStats:
                 for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])
         # Adding this because final value of f1 is 0 instead of tuple at 300K documents.
         speedStats['k_means']['f1'][-1]=[0.,0.,0.]
-        dataForPlot = {'k_means': [], 'streaming_lsh': []}
+        dataForPlot = dict([(k, []) for k in plotSettings])
         for k, v in speedStats.iteritems(): 
             print k
             for k1,v1 in v.iteritems(): 
                 if type(v1[0])!=type([]): print k1, '(%0.2f %0.2f)'%(np.mean(v1), np.var(v1)); dataForPlot[k]+=[np.mean(v1)]
                 else: print k1, ['(%0.2f %0.2f)'%(np.mean(z),np.var(z)) for z in zip(*v1)]; dataForPlot[k]+=[np.mean(z) for z in zip(*v1)]
         ind, width = np.arange(5), 0.1
-        rects1 = plt.bar(ind, dataForPlot['k_means'], width, color=plotSettings['k_means']['color'])
-        rects2 = plt.bar(ind+width, dataForPlot['streaming_lsh'], width, color=plotSettings['streaming_lsh']['color'])
+        rects, i = [], 0
+        for k in dataForPlot: 
+            rects.append(plt.bar(ind+i*width, dataForPlot[k], width, color=plotSettings[k]['color']))
+            i+=1
         plt.ylabel(getLatexForString('Score'))
-        plt.title(getLatexForString('Clustering quality comparison for Streaming LSH'))
+        plt.title(getLatexForString('Clustering quality comparison for Streaming LSH with k-Means'))
         plt.xticks(ind+width, ('$F$', '$Precision$', '$Recall$', '$Purity$', '$NMI$') )
-        plt.legend( (rects1[0], rects2[0]), (plotSettings[plotSettings.keys()[0]]['label'], plotSettings[plotSettings.keys()[1]]['label']), loc=4 )
-        plt.show()
+        plt.legend( [r[0] for r in rects], [plotSettings[k]['label'] for k in plotSettings], loc=4 )
+#        plt.show()
+        plt.savefig('qualityComparisonWithKMeans.pdf')
     @staticmethod
     def generateCombinedStatsFile():
         for normalData, mrData in zip(FileIO.iterateJsonFromFile(TweetsFile.stats_file), FileIO.iterateJsonFromFile(TweetsFile.mr_stats_file)):
@@ -192,10 +196,9 @@ if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
 #    TweetsFile.generateStatsForMRKMeansClusteringQuality()
-#    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
     TweetsFile.plotClusteringSpeed()
-#    TweetsFile.getClusteringQuality()
+    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()
     
