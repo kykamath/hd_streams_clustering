@@ -3,6 +3,8 @@ Created on Jul 16, 2011
 
 @author: kykamath
 '''
+import sys
+sys.path.append('../../../')
 import unittest, cjson
 from library.vector import Vector
 from itertools import combinations
