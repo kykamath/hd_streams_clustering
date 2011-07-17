@@ -58,6 +58,7 @@ class StreamSimilarityAggregationMR:
         similarityJob = SSASimilarityMR(args=args)
         dataFromIteration = dict(list(similarityJob.runJob(inputFileList=[fileName], **kwargs)))
         numberOfIterations = 0
+        print 'SSAMR-args: ', fileName, args, maxItertations
         while stream_in_multiple_clusters in dataFromIteration:
             print 'SSA-MR Iteration %s'%numberOfIterations
             numberOfIterations+=1
