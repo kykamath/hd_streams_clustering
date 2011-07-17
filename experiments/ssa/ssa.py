@@ -53,17 +53,28 @@ class SimilarStreamAggregation:
         return vectorsWithinEpsilon    
 
 class StreamSimilarityAggregationMR:
+#    @staticmethod
+#    def estimate(fileName, maxItertations=None, args='-r local'.split(), **kwargs):
+#        similarityJob = SSASimilarityMR(args=args)
+#        dataFromIteration = dict(list(similarityJob.runJob(inputFileList=[fileName], **kwargs)))
+#        numberOfIterations = 0
+#        while stream_in_multiple_clusters in dataFromIteration:
+#            print 'SSA-MR Iteration %s'%numberOfIterations
+#            numberOfIterations+=1
+#            del dataFromIteration[stream_in_multiple_clusters]
+#            createFileForNextIteration(dataFromIteration)
+#            aggrigationJob = SSAAggrigationMR(args=args)
+#            dataFromIteration = dict(list(aggrigationJob.runJob(inputFileList=[iteration_file], **kwargs)))
+#            if maxItertations!=None and numberOfIterations>=maxItertations: print 'Reached max iterations. Breaking from the loop'; break;
+#        for id in dataFromIteration: yield [id]+dataFromIteration[id]['s']              
     @staticmethod
-    def estimate(fileName, maxItertations=None, args='-r local'.split(), **kwargs):
+    def estimate(fileName, args='-r local'.split(), **kwargs):
         similarityJob = SSASimilarityMR(args=args)
         dataFromIteration = dict(list(similarityJob.runJob(inputFileList=[fileName], **kwargs)))
-        numberOfIterations = 0
         while stream_in_multiple_clusters in dataFromIteration:
-            print 'SSA-MR Iteration %s'%numberOfIterations
-            numberOfIterations+=1
             del dataFromIteration[stream_in_multiple_clusters]
             createFileForNextIteration(dataFromIteration)
             aggrigationJob = SSAAggrigationMR(args=args)
             dataFromIteration = dict(list(aggrigationJob.runJob(inputFileList=[iteration_file], **kwargs)))
-            if maxItertations!=None and numberOfIterations>=maxItertations: print 'Reached max iterations. Breaking from the loop'; break;
         for id in dataFromIteration: yield [id]+dataFromIteration[id]['s']              
+
