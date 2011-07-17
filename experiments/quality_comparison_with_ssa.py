@@ -59,7 +59,7 @@ class TweetsFile:
         ts = time.time()
         documentClusters = StreamSimilarityAggregationMR.estimate(self.hdfsFile, '-r hadoop'.split(), jobconf={'mapred.reduce.tasks':10})
         te = time.time()
-        return self.getEvaluationMetrics(documentClusters, te-ts)
+        return self.getEvaluationMetrics(list(documentClusters), te-ts)
     @staticmethod
     def generateDocsForSSAMR():
         length=1000
