@@ -19,6 +19,7 @@ from library.mrjobwrapper import CJSONProtocol
 from itertools import combinations
 from streaming_lsh.classes import Document
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
+from quality_comparison_with_kmeans import TweetsFile as KMeansTweetsFile
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
 clustering_quality_experts_ssa_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
@@ -64,19 +65,19 @@ class TweetsFile:
         documentClusters = list(StreamSimilarityAggregationMR.estimate(self.hdfsFile, '-r hadoop'.split(), jobconf={'mapred.reduce.tasks':10}))
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
-    def getStatsForStreamingLSHClustering(self):
-        def _getDocumentFromTuple((user, text)):
-            vector, words = Vector(), text.split()
-            for word in words[1:]:
-                if word not in vector: vector[word]=1
-                else: vector[word]+=1
-            return Document(user, vector)
-        clustering=StreamingLSHClustering(**self.stream_settings)
-        ts = time.time()
-        for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
-        te = time.time()
-        documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
-        return self.getEvaluationMetrics(documentClusters, te-ts)
+#    def getStatsForStreamingLSHClustering(self):
+#        def _getDocumentFromTuple((user, text)):
+#            vector, words = Vector(), text.split()
+#            for word in words[1:]:
+#                if word not in vector: vector[word]=1
+#                else: vector[word]+=1
+#            return Document(user, vector)
+#        clustering=StreamingLSHClustering(**self.stream_settings)
+#        ts = time.time()
+#        for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
+#        te = time.time()
+#        documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
+#        return self.getEvaluationMetrics(documentClusters, te-ts)
     @staticmethod
     def generateDocsForSSAMR():
         for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
@@ -96,10 +97,11 @@ class QualityComparisonWithSSA:
         tf = TweetsFile(length, **experts_twitter_stream_settings)
         FileIO.writeToFileAsJson({'ssa': tf.getStatsForSSA(), 
                                   'ssa_mr': tf.getStatsForSSAMR(),
-                                  'streaming_lsh': tf.getStatsForStreamingLSHClustering(), 
+                                  'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).getStatsForStreamingLSHClustering(), 
                                   'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
                                   TweetsFile.stats_file)
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    TweetsFile.generateDocsForSSAMR()
     QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
+    
