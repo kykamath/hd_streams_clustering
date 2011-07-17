@@ -13,6 +13,7 @@ from twitter_streams_clustering import getExperts, TwitterCrowdsSpecificMethods
 from settings import experts_twitter_stream_settings
 from library.twitter import TweetFiles
 from library.vector import Vector
+from library.mrjobwrapper import CJSONProtocol
 from itertools import combinations
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
@@ -62,8 +63,11 @@ class TweetsFile:
     def generateDocsForSSAMR():
         length=1000
         tf = TweetsFile(2000, **experts_twitter_stream_settings)
+        iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
+#        with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write(k, v)+'\n') for k, v in data.iteritems()]
         for doc1, doc2 in combinations(tf._iterateUserDocuments(),2):
-            print doc1, doc2
+            print CJSONProtocol.write('x', [doc1, doc2])
+        print iteration_file
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    print TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSSA()
