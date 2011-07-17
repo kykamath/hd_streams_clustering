@@ -182,7 +182,7 @@ class TweetsFile:
         plt.legend( (rects1[0], rects2[0]), (plotSettings[plotSettings.keys()[0]]['label'], plotSettings[plotSettings.keys()[1]]['label']), loc=4 )
         plt.show()
     @staticmethod
-    def combineStatsFile():
+    def generateCombinedStatsFile():
         for normalData, mrData in zip(FileIO.iterateJsonFromFile(TweetsFile.stats_file), FileIO.iterateJsonFromFile(TweetsFile.mr_stats_file)):
             normalData['mr_k_means'] = mrData['mr_k_means']
             FileIO.writeToFileAsJson(normalData, TweetsFile.combined_stats_file)
@@ -190,22 +190,11 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
-    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+#    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-#    TweetsFile.combineStatsFile()
+    TweetsFile.generateCombinedStatsFile()
     
-#for i in range(1,10):
-#     TweetsFile(1000, **experts_twitter_stream_settings).generateStatsForKMeansClustering(svd_dimensions=250)
-
-#    from collections import defaultdict
-#    length = 100
-#    documentClusters = list(KMeans.cluster(hdfsPath+'%s'%length, extractArraysFromFile(clustering_quality_experts_mr_folder+'%s'%length, 0.2), mrArgs='-r hadoop', iterations=1, jobconf={'mapred.map.tasks':10}))
-#    clusters = [cluster for cluster in documentClusters if len(cluster)>=2]
-#    distribution = defaultdict(int)
-#    for cluster in clusters:
-#        distribution[len(cluster)]+=1
-#    for k in sorted(distribution): print k, distribution[k]
     
     
