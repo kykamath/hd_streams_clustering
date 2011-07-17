@@ -84,6 +84,7 @@ class TweetsFile:
             if len(a[1]) >= self.stream_settings['cluster_filter_threshold']: documentClusters.append(zip(*a[1])[1])
         return self.getEvaluationMetrics(documentClusters, te-ts)
     def generateStatsForStreamingLSHClustering(self):
+        print 'Streaming LSH'
         def _getDocumentFromTuple((user, text)):
             vector, words = Vector(), text.split()
             for word in words[1:]:

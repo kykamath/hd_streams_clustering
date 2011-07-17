@@ -54,6 +54,7 @@ class TweetsFile:
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
     def getStatsForSSA(self):
+        print 'SSA'
         ts = time.time()
         sstObject = SimilarStreamAggregation(dict(self._iterateUserDocuments()), self.stream_settings['ssa_threshold'])
         sstObject.estimate()
@@ -61,6 +62,7 @@ class TweetsFile:
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
     def getStatsForSSAMR(self):
+        print 'SSA-MR'
         ts = time.time()
         documentClusters = list(StreamSimilarityAggregationMR.estimate(
                                                                        self.hdfsFile, '-r hadoop'.split(), 
@@ -84,11 +86,9 @@ class QualityComparisonWithSSA:
         length = 1000
         print 'Generating stats for: ',length
         tf = TweetsFile(length, **experts_twitter_stream_settings)
-        FileIO.writeToFileAsJson({'ssa': tf.getStatsForSSA(), 
-                                  'ssa_mr': tf.getStatsForSSAMR(),
-                                  'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 
-                                  'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
-                                  TweetsFile.stats_file)
+        stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
+        print stats
+        FileIO.writeToFileAsJson(stats, TweetsFile.stats_file)
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    TweetsFile.generateDocsForSSAMR()
