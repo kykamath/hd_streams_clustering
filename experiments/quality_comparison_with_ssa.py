@@ -6,6 +6,7 @@ Created on Jul 16, 2011
 import sys, time, os
 from library.file_io import FileIO
 from library.classes import Settings
+from library.plotting import getLatexForString
 sys.path.append('../')
 from library.clustering import EvaluationMetrics
 from experiments.ssa.ssa import SimilarStreamAggregation,\
@@ -20,12 +21,19 @@ from itertools import combinations
 from streaming_lsh.classes import Document
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
 from quality_comparison_with_kmeans import TweetsFile as KMeansTweetsFile
+from matplotlib import pyplot as plt
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
 clustering_quality_experts_ssa_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
 clustering_quality_experts_ssa_mr_folder = clustering_quality_experts_ssa_folder+'mr_data/'
 hdfsPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_folder/'
 hdfsUnzippedPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_unzipped_folder/'
+
+plotSettings = {
+                 'ssa':{'label': 'SSA', 'color': '#FD0006'}, 
+                 'ssa_mr': {'label': 'SSA-MR', 'color': '#FFF400'},
+                 'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#1435AD'},
+                 }
 
 class TweetsFile:
     stats_file = clustering_quality_experts_ssa_folder+'quality_stats'
@@ -96,11 +104,20 @@ class QualityComparisonWithSSA:
             tf = TweetsFile(length, **experts_twitter_stream_settings)
             stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
             FileIO.writeToFileAsJson(stats, TweetsFile.stats_file)
+    @staticmethod
+    def plotClusteringSpeed():
+        dataToPlot = dict([(k, {'x': [], 'y': []}) for k in plotSettings])
+        for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
+            for k in plotSettings: dataToPlot[k]['x'].append(data[k]['no_of_documents']); dataToPlot[k]['y'].append(data[k]['iteration_time'])
+        for k in plotSettings: plt.loglog(dataToPlot[k]['x'], dataToPlot[k]['y'], label=plotSettings[k]['label'], color=plotSettings[k]['color'], lw=2)
+        plt.legend(loc=4); 
+        plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString('Running time comparsion for Streaing LSH with SSA'))
+#        plt.show()
+        plt.savefig('qualityComparisonSpeedSSA.pdf')
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    TweetsFile.generateDocsForSSAMR()
 #    TweetsFile.copyUnzippedSSADataToHadoop()
-    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
-#    tf = TweetsFile(5000, **experts_twitter_stream_settings)
-#    tf.getStatsForSSAMR()
-    
+
+#    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
+    QualityComparisonWithSSA.plotClusteringSpeed()
