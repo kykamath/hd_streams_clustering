@@ -69,8 +69,8 @@ class TweetsFile:
             dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
         for k, v in dataForAggregation.iteritems(): yield k, v
     def getStatsForSST(self):
-        documents = list(self._iterateUserDocuments())
-        print len(documents)
+        for k, v in self._iterateUserDocuments().items(): print k, v
+        
 
 if __name__ == '__main__':
     TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
