@@ -70,6 +70,7 @@ class TweetsFile:
                 textIdVector[textToIdMap[phrase]]=textVector[phrase]
             dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
         for k, v in dataForAggregation.iteritems(): yield k, v
+    def _getExpertClasses(self, cluster): return [self.expertsToClassMap[user.lower()] for user in cluster if user.lower() in self.expertsToClassMap]
     def getEvaluationMetrics(self, documentClusters, timeDifference):
         iterationData =  {'no_of_documents':self.length, 'no_of_clusters': len(documentClusters), 'iteration_time': timeDifference, 'clusters': documentClusters}
         clustersForEvaluation = [self._getExpertClasses(cluster) for cluster in documentClusters]
