@@ -3,9 +3,8 @@ Created on Jul 16, 2011
 
 @author: kykamath
 '''
-import sys
+import sys, os, unittest, cjson
 sys.path.append('../../../')
-import unittest, cjson
 from library.vector import Vector
 from itertools import combinations
 from library.file_io import FileIO
@@ -38,7 +37,8 @@ class SSASimilarityMRTests(unittest.TestCase):
 
 class StreamSimilarityAggregationMRTests(unittest.TestCase):
     def test_estimate(self):
-        self.assertEqual([[1, 2, 3, 4], [5, 6, 7]], list(StreamSimilarityAggregationMR.estimate(test_file)))
+        args = '-r local' if os.uname()[1]=='spock' else '-r local'
+        self.assertEqual([[1, 2, 3, 4], [5, 6, 7]], list(StreamSimilarityAggregationMR.estimate(test_file, args.split())))
 
 if __name__ == '__main__':
     unittest.main()
