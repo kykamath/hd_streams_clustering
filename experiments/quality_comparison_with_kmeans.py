@@ -147,7 +147,8 @@ class TweetsFile:
         for k in plotSettings: plt.loglog(dataToPlot[k]['x'], dataToPlot[k]['y'], label=plotSettings[k]['label'], color=plotSettings[k]['color'], lw=2)
         plt.legend(loc=4); 
         plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString('Running time comparsion for Streaing LSH'))
-        plt.show()
+#        plt.show()
+        plt.savefig('qualityComparisonSpeedKMeans.pdf')
     @staticmethod
     def getClusteringQuality():
         '''
@@ -191,10 +192,10 @@ if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
 #    TweetsFile.generateStatsForMRKMeansClusteringQuality()
-#    TweetsFile.plotClusteringSpeed()
+    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-    TweetsFile.generateCombinedStatsFile()
+#    TweetsFile.generateCombinedStatsFile()
     
     
     
