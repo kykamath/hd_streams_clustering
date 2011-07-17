@@ -59,7 +59,7 @@ class TweetsFile:
     def getStatsForSST(self):
         for tweet in TweetFiles.iterateTweetsFromGzip(self.rawDataFileName):
             print tweet['text']
-            print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).items()
+            print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).vector
     
 if __name__ == '__main__':
     TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
