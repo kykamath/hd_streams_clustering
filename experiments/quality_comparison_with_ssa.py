@@ -6,7 +6,8 @@ Created on Jul 16, 2011
 import sys, time
 sys.path.append('../')
 from library.clustering import EvaluationMetrics
-from experiments.ssa.ssa import SimilarStreamAggregation
+from experiments.ssa.ssa import SimilarStreamAggregation,\
+    StreamSimilarityAggregationMR
 from collections import defaultdict
 from twitter_streams_clustering import getExperts, TwitterCrowdsSpecificMethods
 from settings import experts_twitter_stream_settings
@@ -14,10 +15,12 @@ from library.twitter import TweetFiles
 from library.vector import Vector
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
-clustering_quality_experts_sst_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
+clustering_quality_experts_ssa_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
+clustering_quality_experts_ssa_mr_folder = clustering_quality_experts_ssa_folder+'mr_data/'
+hdfsPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_folder'
 
 class TweetsFile:
-    stats_file = clustering_quality_experts_sst_folder+'quality_stats'
+    stats_file = clustering_quality_experts_ssa_folder+'quality_stats'
     def __init__(self, length, **stream_settings):
         self.length=length
         self.stream_settings = stream_settings
@@ -49,7 +52,17 @@ class TweetsFile:
         documentClusters = list(sstObject.iterateClusters())
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
-
+#    def getStatsForSSAMR(self):
+#        ts = time.time()
+#        documentClusters = StreamSimilarityAggregationMR.estimate(test_file, '-r hadoop'.split(), jobconf={'mapred.reduce.tasks':2})
+#        te = time.time()
+#        return self.getEvaluationMetrics(documentClusters, te-ts)
+    @staticmethod
+    def generateDocsForSSAMR():
+        length=1000
+        tf = TweetsFile(2000, **experts_twitter_stream_settings)
+        for d in tf._iterateUserDocuments():
+            print d
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
     print TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSSA()
