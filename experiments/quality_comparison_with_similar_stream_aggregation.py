@@ -66,12 +66,11 @@ class TweetsFile:
             for phrase in textVector: 
                 if phrase not in textToIdMap: textToIdMap[phrase]=len(textToIdMap)
                 textIdVector[textToIdMap[phrase]]=textVector[phrase]
-            dataForAggregation[tweet['user']['screen_name']]+=textIdVector
+            dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
         for k, v in dataForAggregation.iteritems(): yield k, v
     def getStatsForSST(self):
-#        documents = list(self._iterateUserDocuments())
-#        print len(documents)
-        for k,v in self._iterateUserDocuments(): print k,v
+        documents = list(self._iterateUserDocuments())
+        print len(documents)
 
 if __name__ == '__main__':
     TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
