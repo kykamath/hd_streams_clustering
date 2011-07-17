@@ -192,17 +192,12 @@ if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
 #    TweetsFile.generateStatsForMRKMeansClusteringQuality()
-<<<<<<< HEAD:experiments/clustering_quality.py
-    TweetsFile.combineStatsFile()
-    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-=======
     TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()
->>>>>>> 1a92cf0c718cc525c2f799a4135c787bb4b5bc5a:experiments/quality_comparison_with_kmeans.py
     
     
     
