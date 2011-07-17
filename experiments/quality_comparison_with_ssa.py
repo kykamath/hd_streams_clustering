@@ -65,6 +65,7 @@ class TweetsFile:
             print d
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
-    print TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSSA()
+#    print TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSSA()
+    TweetsFile.generateDocsForSSAMR()
         
     
