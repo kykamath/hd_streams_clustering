@@ -79,6 +79,6 @@ class TweetsFile:
 
 if __name__ == '__main__':
     experts_twitter_stream_settings['sst_threshold']=0.75
-    TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
+    TweetsFile(10000, **experts_twitter_stream_settings).getStatsForSST()
         
     
