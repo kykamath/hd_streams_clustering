@@ -78,16 +78,16 @@ class TweetsFile:
         iterationData['purity'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.purity)
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
-    def getStatsForSST(self):
+    def getStatsForSSA(self):
         ts = time.time()
-        sstObject = SimilarStreamAggregation(dict(self._iterateUserDocuments()), self.stream_settings['sst_threshold'])
+        sstObject = SimilarStreamAggregation(dict(self._iterateUserDocuments()), self.stream_settings['ssa_threshold'])
         sstObject.estimate()
         documentClusters = list(sstObject.iterateClusters())
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
 
 if __name__ == '__main__':
-    experts_twitter_stream_settings['sst_threshold']=0.75
-    print TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSST()
+    experts_twitter_stream_settings['ssa_threshold']=0.75
+    print TweetsFile(2000, **experts_twitter_stream_settings).getStatsForSSA()
         
     
