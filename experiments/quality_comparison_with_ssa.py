@@ -82,7 +82,7 @@ class TweetsFile:
 class QualityComparisonWithSSA:
     @staticmethod
     def generateStatsForQualityComparisonWithSSA():
-        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+        for length in [5000, 6000, 7000, 8000, 9000]+[i*j for i in 10**4, 10**5 for j in range(1, 10)]:
             print 'Generating stats for: ',length
             tf = TweetsFile(length, **experts_twitter_stream_settings)
             stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
@@ -90,7 +90,7 @@ class QualityComparisonWithSSA:
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    TweetsFile.generateDocsForSSAMR()
-#    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
-    tf = TweetsFile(5000, **experts_twitter_stream_settings)
-    tf.getStatsForSSAMR()
+    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
+#    tf = TweetsFile(5000, **experts_twitter_stream_settings)
+#    tf.getStatsForSSAMR()
     

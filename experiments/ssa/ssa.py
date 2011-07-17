@@ -54,7 +54,7 @@ class SimilarStreamAggregation:
 
 class StreamSimilarityAggregationMR:
     @staticmethod
-    def estimate(fileName, maxItertations=2, args='-r local'.split(), **kwargs):
+    def estimate(fileName, maxItertations=5, args='-r local'.split(), **kwargs):
         similarityJob = SSASimilarityMR(args=args)
         print 'SSAMR-args: ', fileName, args, maxItertations
         dataFromIteration = dict(list(similarityJob.runJob(inputFileList=[fileName], **kwargs)))
