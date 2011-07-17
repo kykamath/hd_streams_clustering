@@ -7,9 +7,11 @@ import unittest, cjson
 from library.vector import Vector
 from itertools import combinations
 from library.file_io import FileIO
-from experiments.ssa.ssa import SimilarStreamAggregationMR
+from experiments.ssa.ssa_sim_mr import SSASimilarityMR
+from experiments.ssa.ssa import StreamSimilarityAggregationMR
 
 test_file = 'ssa_test.dat'
+test_ssa_threshold = 0.75
 
 def createTestFile():
     vectors = {
@@ -25,11 +27,16 @@ def createTestFile():
     with open(test_file, 'w') as f:
         for v1, v2 in combinations(vectors.iteritems(),2): f.write('%s\t%s\n'%(cjson.encode(['x']), cjson.encode([(v1[0], v1[1]), (v2[0], v2[1])])))
 
-class SimilarStreamAggregationMRTests(unittest.TestCase):
+class SSASimilarityMRTests(unittest.TestCase):
     def setUp(self):
-        self.job = SimilarStreamAggregationMR(args='-r inline'.split())
+        self.job = SSASimilarityMR(args='-r local'.split())
     def test_runJob(self):
-        print list(self.job.runJob(inputFileList=[test_file]))
+        testResult = {1: {'s': [2, 3, 4], 'cid': 1}, 2: {'s': [3, 4], 'cid': 2}, 3: {'s': [4], 'cid': 3}, 5: {'s': [6, 7], 'cid': 5}, 6: {'s': [7], 'cid': 6}}
+        self.assertEqual(testResult, dict(list(self.job.runJob(inputFileList=[test_file]))))
+
+#class StreamSimilarityAggregationMRTests(unittest.TestCase):
+#    def test_estimate(self):
+#        StreamSimilarityAggregationMR.estimate(test_file, ssa_threshold)
 
 if __name__ == '__main__':
     unittest.main()
