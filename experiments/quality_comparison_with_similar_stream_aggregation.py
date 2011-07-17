@@ -69,7 +69,7 @@ class TweetsFile:
             dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
         for k, v in dataForAggregation.iteritems(): yield k, v
     def getStatsForSST(self):
-        for k, v in self._iterateUserDocuments().items(): print k, v
+        for k, v in self._iterateUserDocuments(): print k, v
         
 
 if __name__ == '__main__':
