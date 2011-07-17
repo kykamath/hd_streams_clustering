@@ -8,7 +8,7 @@ from library.twitter import TweetFiles
 sys.path.append('../')
 from itertools import combinations
 from collections import defaultdict
-from twitter_streams_clustering import getExperts
+from twitter_streams_clustering import getExperts, TwitterCrowdsSpecificMethods
 from settings import experts_twitter_stream_settings
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
@@ -58,7 +58,7 @@ class TweetsFile:
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
     def getStatsForSST(self):
         for tweet in TweetFiles.iterateTweetsFromGzip(self.rawDataFileName):
-            print tweet['text']
+            print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings)
     
 if __name__ == '__main__':
     TweetsFile(1000, **experts_twitter_stream_settings).getStatsForSST()
