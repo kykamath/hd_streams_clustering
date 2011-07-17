@@ -65,7 +65,7 @@ class TweetsFile:
         print 'SSA-MR'
         ts = time.time()
         documentClusters = list(StreamSimilarityAggregationMR.estimate(
-                                                                       self.hdfsFile, '-r hadoop'.split(), 
+                                                                       self.hdfsFile, args='-r hadoop'.split(), 
                                                                        jobconf={'mapred.map.tasks':25, 'mapred.task.timeout': 7200000, 'mapred.reduce.tasks':25}))
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
