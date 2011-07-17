@@ -67,7 +67,7 @@ class TweetsFile:
         print 'Writing data to ', iteration_file
         with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(tf._iterateUserDocuments(),2)]
         os.system('gzip %s'%iteration_file)
-        os.system('hadoop fs -put %s %s'%(iteration_file, hdfsPath))
+        os.system('hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath))
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
     TweetsFile.generateDocsForSSAMR()
