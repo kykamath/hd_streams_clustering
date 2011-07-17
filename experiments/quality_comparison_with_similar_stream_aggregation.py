@@ -81,7 +81,7 @@ class TweetsFile:
         ts = time.time()
         sstObject = SimilarStreamAggregation(dict(self._iterateUserDocuments()), self.stream_settings['sst_threshold'])
         sstObject.estimate()
-        documentClusters = sstObject.iterateClusters()
+        documentClusters = list(sstObject.iterateClusters())
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
 
