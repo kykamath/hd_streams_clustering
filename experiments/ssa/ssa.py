@@ -54,7 +54,7 @@ class SimilarStreamAggregation:
 
 class StreamSimilarityAggregationMR:
     @staticmethod
-    def estimate(fileName, maxItertations=10, args='-r local'.split(), **kwargs):
+    def estimate(fileName, maxItertations=2, args='-r local'.split(), **kwargs):
         similarityJob = SSASimilarityMR(args=args)
         print 'SSAMR-args: ', fileName, args, maxItertations
         dataFromIteration = dict(list(similarityJob.runJob(inputFileList=[fileName], **kwargs)))
@@ -68,5 +68,4 @@ class StreamSimilarityAggregationMR:
             dataFromIteration = dict(list(aggrigationJob.runJob(inputFileList=[iteration_file], **kwargs)))
             if maxItertations!=None and numberOfIterations>=maxItertations: print 'Reached max iterations. Breaking from the loop'; break;
         for id in dataFromIteration: 
-            print id, dataFromIteration[id]
-            yield [id]+dataFromIteration[id]['s']              
+            if id != stream_in_multiple_clusters: yield [id]+dataFromIteration[id]['s']              
