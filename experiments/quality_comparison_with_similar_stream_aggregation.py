@@ -4,6 +4,7 @@ Created on Jul 16, 2011
 @author: kykamath
 '''
 import sys
+from library.classes import GeneralMethods
 sys.path.append('../')
 from itertools import combinations
 from collections import defaultdict
@@ -71,7 +72,9 @@ class TweetsFile:
     def getStatsForSST(self):
         sstObject = SimilarStreamAggregation(dict(self._iterateUserDocuments()), self.stream_settings['sst_threshold'])
         sstObject.estimate()
-        print list(sstObject.iterateClusters())
+        distribution = GeneralMethods.getValueDistribution(sstObject.iterateClusters(), len)
+        for k in distribution:
+            print k, distribution[k]
         
 
 if __name__ == '__main__':
