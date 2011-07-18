@@ -196,7 +196,7 @@ if __name__ == '__main__':
 #    TweetsFile.generateStatsForClusteringQuality()
 #    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-    TweetsFile.plotClusteringSpeed()
+#    TweetsFile.plotClusteringSpeed()
     TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()
