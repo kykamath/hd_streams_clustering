@@ -122,7 +122,7 @@ class QualityComparisonWithSSA:
             for k in speedStats:
                 for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])
         # Adding this because final value of f1 is 0 instead of tuple at 300K documents.
-        speedStats['k_means']['f1'][-1]=[0.,0.,0.]
+#        speedStats['k_means']['f1'][-1]=[0.,0.,0.]
         dataForPlot = dict([(k, []) for k in plotSettings])
         for k, v in speedStats.iteritems(): 
             print k
