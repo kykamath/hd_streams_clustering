@@ -163,7 +163,6 @@ class TweetsFile:
             nmi (0.87 0.00)
         '''
         speedStats = dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in plotSettings])
-#        TweetsFile.combined_stats_file = '/Users/kykamath/Desktop/combined_stats_file.txt'
         for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
             for k in speedStats:
                 for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])

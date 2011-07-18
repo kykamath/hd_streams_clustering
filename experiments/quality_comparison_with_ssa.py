@@ -22,6 +22,7 @@ from streaming_lsh.classes import Document
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
 from quality_comparison_with_kmeans import TweetsFile as KMeansTweetsFile
 from matplotlib import pyplot as plt
+import numpy as np
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
 clustering_quality_experts_ssa_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
@@ -113,7 +114,32 @@ class QualityComparisonWithSSA:
         plt.legend(loc=4); 
         plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString('Running time comparsion for Streaing LSH with SSA'))
 #        plt.show()
-        plt.savefig('qualityComparisonSpeedSSA.pdf')
+        plt.savefig('speedComparisonWithSSA.pdf')
+    @staticmethod
+    def plotClusteringQuality():
+        speedStats = dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in plotSettings])
+        for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
+            for k in speedStats:
+                for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])
+        # Adding this because final value of f1 is 0 instead of tuple at 300K documents.
+        speedStats['k_means']['f1'][-1]=[0.,0.,0.]
+        dataForPlot = dict([(k, []) for k in plotSettings])
+        for k, v in speedStats.iteritems(): 
+            print k
+            for k1,v1 in v.iteritems(): 
+                if type(v1[0])!=type([]): print k1, '(%0.2f %0.2f)'%(np.mean(v1), np.var(v1)); dataForPlot[k]+=[np.mean(v1)]
+                else: print k1, ['(%0.2f %0.2f)'%(np.mean(z),np.var(z)) for z in zip(*v1)]; dataForPlot[k]+=[np.mean(z) for z in zip(*v1)]
+        ind, width = np.arange(5), 0.1
+        rects, i = [], 0
+        for k in dataForPlot: 
+            rects.append(plt.bar(ind+i*width, dataForPlot[k], width, color=plotSettings[k]['color']))
+            i+=1
+        plt.ylabel(getLatexForString('Score'))
+        plt.title(getLatexForString('Clustering quality comparison for Streaming LSH with SSA'))
+        plt.xticks(ind+width, ('$F$', '$Precision$', '$Recall$', '$Purity$', '$NMI$') )
+        plt.legend( [r[0] for r in rects], [plotSettings[k]['label'] for k in plotSettings], loc=4 )
+#        plt.show()
+        plt.savefig('qualityComparisonWithSSA.pdf')
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    TweetsFile.generateDocsForSSAMR()
@@ -121,3 +147,4 @@ if __name__ == '__main__':
 
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
     QualityComparisonWithSSA.plotClusteringSpeed()
+    QualityComparisonWithSSA.plotClusteringQuality()
