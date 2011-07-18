@@ -117,6 +117,7 @@ class QualityComparisonWithSSA:
         plt.savefig('speedComparisonWithSSA.pdf')
     @staticmethod
     def plotClusteringQuality():
+        del plotSettings['ssa_mr']
         speedStats = dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in plotSettings])
         for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
             for k in speedStats:

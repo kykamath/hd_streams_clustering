@@ -162,6 +162,7 @@ class TweetsFile:
             purity (0.96 0.00)
             nmi (0.87 0.00)
         '''
+        del plotSettings['mr_k_means']
         speedStats = dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in plotSettings])
         for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
             for k in speedStats:
