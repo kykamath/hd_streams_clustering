@@ -118,7 +118,7 @@ class QualityComparisonWithSSA:
     @staticmethod
     def plotClusteringQuality():
         speedStats = dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in plotSettings])
-        for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
+        for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
             for k in speedStats:
                 for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])
         # Adding this because final value of f1 is 0 instead of tuple at 300K documents.
