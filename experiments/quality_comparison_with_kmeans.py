@@ -38,7 +38,7 @@ experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
 
 plotSettings = {
                  'k_means':{'label': 'k-Means', 'color': '#FD0006'}, 
-                 'mr_k_means': {'label': 'MR k-Means', 'color': '#FFF400'},
+                 'mr_k_means': {'label': 'MR k-Means', 'color': '#5AF522'},
                  'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#1435AD'},
                  }
 
@@ -197,8 +197,8 @@ if __name__ == '__main__':
 #    TweetsFile.generateStatsForClusteringQuality()
 #    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-#    TweetsFile.plotClusteringSpeed()
-    TweetsFile.getClusteringQuality()
+    TweetsFile.plotClusteringSpeed()
+#    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()
     

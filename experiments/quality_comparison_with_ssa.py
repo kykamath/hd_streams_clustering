@@ -32,12 +32,16 @@ hdfsUnzippedPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_
 
 plotSettings = {
                  'ssa':{'label': 'SSA', 'color': '#FD0006'}, 
-                 'ssa_mr': {'label': 'SSA-MR', 'color': '#FFF400'},
+                 'ssa_mr': {'label': 'SSA-MR', 'color': '#5AF522'},
                  'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#1435AD'},
+                 }
+kMeansPlotSettings = {
+                 'k_means':{'label': 'k-Means', 'color': '#5AF522'}, 
                  }
 
 class TweetsFile:
     stats_file = clustering_quality_experts_ssa_folder+'quality_stats'
+    combined_stats_file = clustering_quality_experts_folder+'combined_stats_file'
     def __init__(self, length, **stream_settings):
         self.length=length
         self.stream_settings = stream_settings
@@ -122,8 +126,6 @@ class QualityComparisonWithSSA:
         for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
             for k in speedStats:
                 for metric in speedStats['ssa']: speedStats[k][metric].append(data[k][metric])
-        # Adding this because final value of f1 is 0 instead of tuple at 300K documents.
-#        speedStats['k_means']['f1'][-1]=[0.,0.,0.]
         dataForPlot = dict([(k, []) for k in plotSettings])
         for k, v in speedStats.iteritems(): 
             print k
@@ -141,11 +143,43 @@ class QualityComparisonWithSSA:
         plt.legend( [r[0] for r in rects], [plotSettings[k]['label'] for k in plotSettings], loc=4 )
 #        plt.show()
         plt.savefig('qualityComparisonWithSSA.pdf')
+    @staticmethod
+    def plotQualityWithKMeansAndSSA():
+        del plotSettings['ssa_mr']
+        speedStats = dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in plotSettings])
+        for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
+            for k in speedStats:
+                for metric in speedStats['ssa']: speedStats[k][metric].append(data[k][metric])
+        for k in speedStats: del speedStats[k]['f1']
+        speedStats.update(dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in kMeansPlotSettings]))
+        k = 'k_means'
+        for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
+            for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])
+        for k in speedStats: 
+            if 'f1' in speedStats[k]: del speedStats[k]['f1']
+        dataForPlot = dict([(k, []) for k in speedStats])
+        for k in speedStats:
+            for k1 in speedStats[k]: dataForPlot[k]+=[np.mean(speedStats[k][k1])]
+        print dataForPlot
+        ind, width = np.arange(2), 0.1
+        rects, i = [], 1
+        plotSettings.update(kMeansPlotSettings)
+        for k in dataForPlot: 
+            rects.append(plt.bar(ind+i*width, dataForPlot[k], width, color=plotSettings[k]['color']))
+            i+=1
+        plt.ylabel(getLatexForString('Score'))
+        plt.title(getLatexForString('Clustering quality comparison for Streaming LSH with SSA'))
+        plt.xticks(ind+2*width, ('$Purity$', '$NMI$') )
+        plt.legend( [r[0] for r in rects], [plotSettings[k]['label'] for k in plotSettings], loc=4 )
+#        plt.show()
+        plt.savefig('qualityComparison.pdf')
+        
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    TweetsFile.generateDocsForSSAMR()
 #    TweetsFile.copyUnzippedSSADataToHadoop()
 
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
-#    QualityComparisonWithSSA.plotClusteringSpeed()
-    QualityComparisonWithSSA.plotClusteringQuality()
+    QualityComparisonWithSSA.plotClusteringSpeed()
+#    QualityComparisonWithSSA.plotClusteringQuality()
+#    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
