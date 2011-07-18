@@ -237,6 +237,14 @@ class CrowdTests(unittest.TestCase):
         stream2 = Stream(4, message2)
         self.cluster.addDocument(stream2)
         self.assertEqual(2, self.crowd.maxClusterSize)
+    def test_crowdSize(self):
+        self.assertEqual(1, self.crowd.crowdSize)
+        self.cluster.addDocument(Stream(2, self.m1));self.cluster.addDocument(Stream(3, self.m1))
+        self.assertEqual(3, self.crowd.crowdSize)
+        cluster = StreamCluster(Stream(3, self.m1))
+        self.crowd.append(cluster, test_time+timedelta(days=2))
+        self.assertNotEqual(4, self.crowd.crowdSize)
+        self.assertEqual(3, self.crowd.crowdSize)
         
 class VectorUpdateMethodTests(unittest.TestCase):
     def setUp(self): 

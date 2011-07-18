@@ -136,7 +136,17 @@ class Crowd:
         self.clusters = {GeneralMethods.getEpochFromDateTimeObject(clusterFormationTime): cluster}
         self.ends, self.inComingCrowds, self.outGoingCrowd = False, [], None
     @property
-    def lifespan(self): return len(self.clusters)
+    def lifespan(self): 
+        '''No. of time intervals a crowd lasts for.
+        '''
+        return len(self.clusters)
+    @property
+    def crowdSize(self):
+        ''' No. of unique users in a crowd.
+        '''
+        streamIds = set()
+        for cluster in self.clusters.values(): streamIds=streamIds.union(set(cluster.documentsInCluster))
+        return len(streamIds)
     @property
     def topDimensions(self, numberOfDimensions=10):return Vector.getMeanVector(self.clusters.itervalues()).getTopDimensions(numberOfFeatures=numberOfDimensions)
     @property

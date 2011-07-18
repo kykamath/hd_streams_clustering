@@ -60,14 +60,14 @@ class GenerateHoustonTweetsData:
 class ClusterIterators():
     ''' Iterator for clusters. '''
     @staticmethod
-    def iterateExpertClusters(startingDay=datetime(2011,3,19), endingDay=datetime(2011,3,20)):
+    def iterateExpertClusters(startingDay=datetime(2011,3,19), endingDay=datetime(2011,3, 25)):
         while startingDay<=endingDay:
             for line in FileIO.iterateJsonFromFile(experts_twitter_stream_settings.lsh_clusters_folder+FileIO.getFileByDay(startingDay)): 
                 currentTime = getDateTimeObjectFromTweetTimestamp(line['time_stamp'])
                 for clusterMap in line['clusters']: yield (currentTime, TwitterCrowdsSpecificMethods.getClusterFromMapFormat(clusterMap))
             startingDay+=timedelta(days=1)
     @staticmethod
-    def iterateHoustonClusters(startingDay=datetime(2010,11,1), endingDay=datetime(2010,11,3)):
+    def iterateHoustonClusters(startingDay=datetime(2010,11,1), endingDay=datetime(2010,11,19)):
         while startingDay<=endingDay:
             for line in FileIO.iterateJsonFromFile(houston_twitter_stream_settings.lsh_clusters_folder+FileIO.getFileByDay(startingDay)): 
                 currentTime = getDateTimeObjectFromTweetTimestamp(line['time_stamp'])
@@ -145,11 +145,6 @@ class AnalyzeData:
             if v not in AnalyzeData.crowdIdToClusterIdMap: AnalyzeData.crowdIdToClusterIdMap[v]=[]
             AnalyzeData.crowdIdToClusterIdMap[v].append(k)
     @staticmethod
-    def getCrowdsQuality(evaluationMetric):
-        if not AnalyzeData.crowdMap: AnalyzeData.constructCrowdDataStructures(ClusterIterators.iterateExpertClusters)
-        expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
-        print np.mean(map(lambda crowd: crowd.getCrowdQuality(evaluationMetric, expertsToClassMap), AnalyzeData.crowdMap.itervalues()))
-    @staticmethod
     def getCrowdHierarchy(clusterId): 
 #        AnalyzeData.constructCrowdIdToClusterIdMap()
         hierarchy, crowdIdQueue = {}, Queue()
@@ -186,15 +181,35 @@ class Plot:
         plt.title(getLatexForString('Crowd lifespan distribution'))
         plt.legend()
         if returnAxisValuesOnly: plt.show()
+    def crowdSizeDistribution(self, returnAxisValuesOnly=True):
+        AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
+        y,x= np.histogram([AnalyzeData.crowdMap[crowd].crowdSize for crowd in AnalyzeData.crowdMap], bins=15)
+        plt.semilogy(x[:-1], y, color=self.stream_settings['plot_color'], lw=2, label=self.stream_settings['plot_label'])
+        plt.xlabel(getLatexForString('Crowd Size'))
+        plt.ylabel(getLatexForString('\# of crowds'))
+        plt.title(getLatexForString('Crowd size distribution'))
+        plt.legend()
+        if returnAxisValuesOnly: plt.show()
+    def crowdSizeToLifeSpanPlot(self, returnAxisValuesOnly=True):
+        AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
+        crowdSizeX, lifeSpanY = [], []
+        for crowd in AnalyzeData.crowdMap: crowdSizeX.append(AnalyzeData.crowdMap[crowd].crowdSize), lifeSpanY.append(AnalyzeData.crowdMap[crowd].lifespan)
+        plt.loglog(crowdSizeX, lifeSpanY, 'o', color=self.stream_settings['plot_color'], label=self.stream_settings['plot_label'])
+        plt.xlabel(getLatexForString('Crowd Size'))
+        plt.ylabel(getLatexForString('Lifespan'))
+        plt.title(getLatexForString('Crowd size Vs Lifespan'))
+        plt.legend()
+        if returnAxisValuesOnly: plt.show()
     def sampleCrowds(self):
+        # Set dates for experts as startingDay=datetime(2011,3,19), endingDay=datetime(2011,3, 25)
         AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
         fig = plt.figure(); ax = fig.gca()
 #        expectedTags = set(['#redsox', '#mlb', '#sfgiants', '#49ers', '#mariners', '#twins', '#springtraining', '#mets', '#reds'])
-#        expectedTags = set(['#ctia', '#samsung', '#gingerbread', '#android', '#htc']); title = 'CTIA 2011'
+        expectedTags = set(['#ctia', '#samsung', '#gingerbread', '#android', '#htc']); title = 'CTIA 2011'
 #        expectedTags = set(['#55', '#hcr', '#hcrbday', '#oklahomas', '#aca', '#hcworks', '#npr', '#teaparty'])
 #        expectedTags = set(['#budget11', '#taxdodgers', '#budget', '#pmqs', '#budget11', '#indybudget'])
-        expectedTags = set(['#egypt2dc', '#libyan', '#yemen', '#egypt', '#syria', '#gaddaficrimes', '#damascus', '#jan25', 
-                '#daraa', '#feb17', '#gaddafi', '#libya', '#feb17', '#gadhafi', '#muslimbrotherhood', '#gaddafis']); title = 'Middle East'
+#        expectedTags = set(['#egypt2dc', '#libyan', '#yemen', '#egypt', '#syria', '#gaddaficrimes', '#damascus', '#jan25', 
+#                '#daraa', '#feb17', '#gaddafi', '#libya', '#feb17', '#gadhafi', '#muslimbrotherhood', '#gaddafis']); title = 'Middle East'
         for crowd in self._filteredCrowdIterator():
             if expectedTags.intersection(set(list(crowd.hashtagDimensions))):
                 x, y = zip(*[(datetime.fromtimestamp(clusterGenerationTime), len(crowd.clusters[clusterGenerationTime].documentsInCluster)) for clusterGenerationTime in sorted(crowd.clusters)])
@@ -242,12 +257,16 @@ class Plot:
         pos=nx.graphviz_layout(graph, prog='dot',args='')
         nx.draw(graph, pos, alpha=0.3, node_size=10, with_labels=True, labels=labels, font_size=8, arrows=True, node_color='r')
         plt.show()
-
-#def getPurityValue(evalutionMetric): AnalyzeData.getCrowdsQuality(evalutionMetric)
-
-def getLifeSpanPlot(): 
-    plotMethods([Plot(**experts_twitter_stream_settings).lifeSpanDistribution, Plot(**houston_twitter_stream_settings).lifeSpanDistribution])
-        
+    @staticmethod
+    def getLifeSpanDistributionPlot(): 
+        plotMethods([Plot(**experts_twitter_stream_settings).lifeSpanDistribution, Plot(**houston_twitter_stream_settings).lifeSpanDistribution])
+    @staticmethod
+    def getCrowdSizeDistributionPlot(): 
+        plotMethods([Plot(**experts_twitter_stream_settings).crowdSizeDistribution, Plot(**houston_twitter_stream_settings).crowdSizeDistribution])
+    @staticmethod
+    def getCrowdSizeToLifeSpanPlot(): 
+        plotMethods([Plot(**experts_twitter_stream_settings).crowdSizeToLifeSpanPlot, Plot(**houston_twitter_stream_settings).crowdSizeToLifeSpanPlot])
+    
 if __name__ == '__main__':
 #    GenerateHoustonTweetsData.generateHoustonData()
 #    generateClusters()
@@ -255,9 +274,11 @@ if __name__ == '__main__':
     experts_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateExpertClusters
     houston_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateHoustonClusters
     
-    AnalyzeData.getCrowdsQuality(EvaluationMetrics.nmi)
-#    getLifeSpanPlot()
-#    Plot(**experts_twitter_stream_settings).sampleCrowds()
+#    Plot.getLifeSpanDistributionPlot()
+#    Plot.getCrowdSizeDistributionPlot()
+#    Plot.getCrowdSizeToLifeSpanPlot()
+    Plot(**experts_twitter_stream_settings).sampleCrowds()
 #    Plot(**experts_twitter_stream_settings).crowdHierachy()
 #    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
+
     
