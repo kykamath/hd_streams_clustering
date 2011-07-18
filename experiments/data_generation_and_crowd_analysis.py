@@ -25,6 +25,7 @@ from pymongo import Connection
 import networkx as nx
 from matplotlib import pyplot as plt
 from Queue import Queue
+import matplotlib as mpl
 
 mongodb_connection = Connection('sarge', 27017)
 tweets = mongodb_connection.old_hou.Tweet
@@ -60,7 +61,8 @@ class GenerateHoustonTweetsData:
 class ClusterIterators():
     ''' Iterator for clusters. '''
     @staticmethod
-    def iterateExpertClusters(startingDay=datetime(2011,3,19), endingDay=datetime(2011,3, 25)):
+    def iterateExpertClusters(startingDay=datetime(2011,3,19), endingDay=datetime(2011,3, 30)):
+#    def iterateExpertClusters(startingDay=datetime(2011,3,19), endingDay=datetime(2011,4,7)):
         while startingDay<=endingDay:
             for line in FileIO.iterateJsonFromFile(experts_twitter_stream_settings.lsh_clusters_folder+FileIO.getFileByDay(startingDay)): 
                 currentTime = getDateTimeObjectFromTweetTimestamp(line['time_stamp'])
@@ -201,15 +203,16 @@ class Plot:
         plt.legend()
         if returnAxisValuesOnly: plt.show()
     def sampleCrowds(self):
-        # Set dates for experts as startingDay=datetime(2011,3,19), endingDay=datetime(2011,3, 25)
+        # Set dates for experts as startingDay=datetime(2011,3,19), endingDay=datetime(2011,3, 30) with a minimum of 7 users at a time.
         AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
         fig = plt.figure(); ax = fig.gca()
 #        expectedTags = set(['#redsox', '#mlb', '#sfgiants', '#49ers', '#mariners', '#twins', '#springtraining', '#mets', '#reds'])
-        expectedTags = set(['#ctia', '#samsung', '#gingerbread', '#android', '#htc']); title = 'CTIA 2011'
+#        expectedTags = set(['#ctia']); title = 'CTIA 2011'
 #        expectedTags = set(['#55', '#hcr', '#hcrbday', '#oklahomas', '#aca', '#hcworks', '#npr', '#teaparty'])
 #        expectedTags = set(['#budget11', '#taxdodgers', '#budget', '#pmqs', '#budget11', '#indybudget'])
 #        expectedTags = set(['#egypt2dc', '#libyan', '#yemen', '#egypt', '#syria', '#gaddaficrimes', '#damascus', '#jan25', 
 #                '#daraa', '#feb17', '#gaddafi', '#libya', '#feb17', '#gadhafi', '#muslimbrotherhood', '#gaddafis']); title = 'Middle East'
+        expectedTags = set(['#libya']); title = 'Libya'
         for crowd in self._filteredCrowdIterator():
             if expectedTags.intersection(set(list(crowd.hashtagDimensions))):
                 x, y = zip(*[(datetime.fromtimestamp(clusterGenerationTime), len(crowd.clusters[clusterGenerationTime].documentsInCluster)) for clusterGenerationTime in sorted(crowd.clusters)])
@@ -218,6 +221,7 @@ class Plot:
         ax.xaxis.set_major_locator(matplotlib.dates.HourLocator(interval=24))
         ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%a %d %b'))
 #        plt.legend()
+        plt.xlim((datetime(2011, 3, 19), datetime(2011, 3, 30)))
         plt.title(getLatexForString('Crowds for '+title))
         plt.ylabel(getLatexForString('Crowd size'))
         plt.show()
@@ -232,6 +236,16 @@ class Plot:
         AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
         clusterId = 'cluster_51958'
         self._plotHierarchy(AnalyzeData.getCrowdHierarchy(clusterId))
+    def sampleCrowdUsers(self):
+        AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
+        clusterId = 'cluster_51958'
+        crowd = AnalyzeData.crowdMap[AnalyzeData.clusterIdToCrowdIdMap[clusterId]]
+        j=0
+        for k, v in sorted(crowd.clusters.iteritems(), key=itemgetter(0)):
+            if j%4==0: print datetime.fromtimestamp(k).strftime('%H:%M'), ' & ' , ',\\ '.join(sorted([i.lower().replace('_', '\_') for i in v.documentsInCluster])), '\\\\'
+            j+=1
+        print datetime.fromtimestamp(k).strftime('%H:%M'), ' & ' , ',\\ '.join(sorted([i.lower().replace('_', '\_') for i in v.documentsInCluster])), '\\\\'
+        print 'A sample crowd discussing Samsung Android mobile phones during CTIA on', datetime.fromtimestamp(k).strftime('%d %B, %Y')
     def _filteredCrowdIterator(self):
         for crowd in [crowd for crowd in AnalyzeData.crowdMap.itervalues()
                                 if crowd.lifespan>10 and 
@@ -239,7 +253,7 @@ class Plot:
 #                                   crowd.startTime>datetime(2011,3,19) and 
 #                                   crowd.endTime<datetime(2011,3,23) and
                                    crowd.hashtagDimensions and 
-                                   crowd.maxClusterSize>10]: yield crowd
+                                   crowd.maxClusterSize>7]: yield crowd
     def _getCrowdsInAHierarchy(self, hierarchy): return set([AnalyzeData.clusterIdToCrowdIdMap[clusterId] for clusterId in hierarchy.keys()+hierarchy.values() if clusterId in AnalyzeData.clusterIdToCrowdIdMap])
     def _plotHierarchy(self, hierarchy):
         graph, labels = nx.DiGraph(), {}
@@ -279,6 +293,7 @@ if __name__ == '__main__':
 #    Plot.getCrowdSizeToLifeSpanPlot()
     Plot(**experts_twitter_stream_settings).sampleCrowds()
 #    Plot(**experts_twitter_stream_settings).crowdHierachy()
+#    Plot(**experts_twitter_stream_settings).sampleCrowdUsers()
 #    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
 
     

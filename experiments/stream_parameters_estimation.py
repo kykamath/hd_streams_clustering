@@ -168,7 +168,7 @@ class ParameterEstimation:
         x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution) if k>1000]
         x,y=x[:numberOfTimeUnits], y[:numberOfTimeUnits]
         exponentialCurveParams = CurveFit.getParamsAfterFittingData(x, y, CurveFit.decreasingExponentialFunction, [1.,1.])
-#        print self.stream_settings['plot_label'], exponentialCurveParams, calculateDimensionsFor(exponentialCurveParams, 0.01) 
+        print self.stream_settings['plot_label'], exponentialCurveParams, calculateDimensionsFor(exponentialCurveParams, 0.01) 
         plt.ylabel(getLatexForString('\% of new dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
         plt.semilogy(x,y,'o', color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{-%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
         plt.semilogy(x,CurveFit.getYValues(CurveFit.decreasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
