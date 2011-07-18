@@ -120,7 +120,7 @@ class QualityComparisonWithSSA:
         speedStats = dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in plotSettings])
         for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
             for k in speedStats:
-                for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])
+                for metric in speedStats['ssa']: speedStats[k][metric].append(data[k][metric])
         # Adding this because final value of f1 is 0 instead of tuple at 300K documents.
 #        speedStats['k_means']['f1'][-1]=[0.,0.,0.]
         dataForPlot = dict([(k, []) for k in plotSettings])
