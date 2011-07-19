@@ -388,7 +388,10 @@ class ClusteringParametersEstimation():
         Run this on a document set of size 100K. 
         '''
         length = 10**3
-        print KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering()
+        for t in range(1, 16): 
+            experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = t*0.05
+#            print experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster']
+            print KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering()
         
 
 '''    Experiments of Twitter streams starts here.    '''
