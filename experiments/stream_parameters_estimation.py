@@ -18,6 +18,7 @@ from hd_streams_clustering import DataStreamMethods, HDStreaminClustering
 from classes import UtilityMethods, Phrase
 from matplotlib.ticker import FuncFormatter
 from twitter_streams_clustering import TwitterIterators, TwitterCrowdsSpecificMethods
+from quality_comparison_with_kmeans import TweetsFile as KMeansTweetsFile
 from collections import defaultdict
 import matplotlib.pyplot as plt
 from datetime import timedelta
@@ -381,6 +382,14 @@ class ClusteringParametersEstimation():
         plt.ylabel(r'$\%\ of\ clusters\ with\ lag\ \leq\ TU$')
         plt.legend(loc=4)
         if returnAxisValuesOnly: plt.show()
+    @staticmethod
+    def thresholdForDocumentToBeInCluterEstimation():
+        ''' Estimate thresold for the clusters by varying the threshold_for_document_to_be_in_cluster value.
+        Run this on a document set of size 100K. 
+        '''
+        length = 10**3
+        print KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering()
+        
 
 '''    Experiments of Twitter streams starts here.    '''
 experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
@@ -420,9 +429,14 @@ def clusterDecayEstimation():
 #    ClusteringParametersEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston())
 #    ParameterEstimation.plotMethods([ClusteringParametersEstimation(**experts_twitter_stream_settings).plotCDFClustersLagDistribution, ClusteringParametersEstimation(**houston_twitter_stream_settings).plotCDFClustersLagDistribution])
     ParameterEstimation.plotMethods([ClusteringParametersEstimation(**experts_twitter_stream_settings).plotPercentageOfClustersWithinALag, ClusteringParametersEstimation(**houston_twitter_stream_settings).plotPercentageOfClustersWithinALag])
-    
+
+def thresholdForDocumentToBeInCluterEstimation():
+    ClusteringParametersEstimation.thresholdForDocumentToBeInCluterEstimation()
+
 if __name__ == '__main__':
 #    dimensionsEstimation()
 #    dimensionsUpdateFrequencyEstimation()
 #    dimensionInActivityEstimation()
-    clusterDecayEstimation()
+#    clusterDecayEstimation()
+    thresholdForDocumentToBeInCluterEstimation()
+    
