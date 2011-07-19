@@ -383,16 +383,17 @@ class ClusteringParametersEstimation():
         plt.legend(loc=4)
         if returnAxisValuesOnly: plt.show()
     @staticmethod
-    def thresholdForDocumentToBeInCluterEstimation(stream_settings):
+    def thresholdForDocumentToBeInCluterEstimation(stats_file, **stream_settings):
         ''' Estimate thresold for the clusters by varying the threshold_for_document_to_be_in_cluster value.
         Run this on a document set of size 100K. 
         '''
         length = 10**3
+        print stats_file
         for t in range(1, 16): 
             stream_settings['threshold_for_document_to_be_in_cluster'] = t*0.05
-#            print experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster']
+            print length, stream_settings['threshold_for_document_to_be_in_cluster']
             stats = {'streaming_lsh': KMeansTweetsFile(length, **stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(stream_settings)}
-            print stats
+            FileIO.writeToFileAsJson(stats, stats_file)
         
 
 '''    Experiments of Twitter streams starts here.    '''
@@ -422,7 +423,8 @@ def dimensionInActivityEstimation():
     ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotPercentageOfDimensionsWithinALag, ParameterEstimation(**houston_twitter_stream_settings).plotPercentageOfDimensionsWithinALag])
 
 def thresholdForDocumentToBeInCluterEstimation():
-    ClusteringParametersEstimation.thresholdForDocumentToBeInCluterEstimation(**experts_twitter_stream_settings)
+    threshold_for_document_to_be_in_cluster_estimation_file = experts_twitter_stream_settings['parameter_estimation_folder'] + 'threshold_for_document_to_be_in_cluster'
+    ClusteringParametersEstimation.thresholdForDocumentToBeInCluterEstimation(threshold_for_document_to_be_in_cluster_estimation_file, **experts_twitter_stream_settings)
 
 experts_twitter_stream_settings['cluster_filtering_method']=houston_twitter_stream_settings['cluster_filtering_method']=ClusteringParametersEstimation.emptyClusterFilteringMethod
 def clusterDecayEstimation():
