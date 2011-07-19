@@ -8,7 +8,7 @@ sys.path.append('../')
 import pprint
 from settings import experts_twitter_stream_settings, houston_twitter_stream_settings
 from library.file_io import FileIO
-from library.classes import GeneralMethods, FixedIntervalMethod
+from library.classes import GeneralMethods, FixedIntervalMethod, Settings
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
 from library.plotting import getLatexForString, CurveFit,\
     getCumulativeDistribution
@@ -383,15 +383,16 @@ class ClusteringParametersEstimation():
         plt.legend(loc=4)
         if returnAxisValuesOnly: plt.show()
     @staticmethod
-    def thresholdForDocumentToBeInCluterEstimation():
+    def thresholdForDocumentToBeInCluterEstimation(stream_settings):
         ''' Estimate thresold for the clusters by varying the threshold_for_document_to_be_in_cluster value.
         Run this on a document set of size 100K. 
         '''
         length = 10**3
         for t in range(1, 16): 
-            experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = t*0.05
+            stream_settings['threshold_for_document_to_be_in_cluster'] = t*0.05
 #            print experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster']
-            print KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering()
+            stats = {'streaming_lsh': KMeansTweetsFile(length, **stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(stream_settings)}
+            print stats
         
 
 '''    Experiments of Twitter streams starts here.    '''
@@ -420,6 +421,9 @@ def dimensionInActivityEstimation():
 #    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotCDFDimensionsLagDistribution, ParameterEstimation(**houston_twitter_stream_settings).plotCDFDimensionsLagDistribution])
     ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotPercentageOfDimensionsWithinALag, ParameterEstimation(**houston_twitter_stream_settings).plotPercentageOfDimensionsWithinALag])
 
+def thresholdForDocumentToBeInCluterEstimation():
+    ClusteringParametersEstimation.thresholdForDocumentToBeInCluterEstimation(**experts_twitter_stream_settings)
+
 experts_twitter_stream_settings['cluster_filtering_method']=houston_twitter_stream_settings['cluster_filtering_method']=ClusteringParametersEstimation.emptyClusterFilteringMethod
 def clusterDecayEstimation():
     def analyzeClusterLag(streamCluster, stream, **stream_settings):
@@ -432,9 +436,6 @@ def clusterDecayEstimation():
 #    ClusteringParametersEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston())
 #    ParameterEstimation.plotMethods([ClusteringParametersEstimation(**experts_twitter_stream_settings).plotCDFClustersLagDistribution, ClusteringParametersEstimation(**houston_twitter_stream_settings).plotCDFClustersLagDistribution])
     ParameterEstimation.plotMethods([ClusteringParametersEstimation(**experts_twitter_stream_settings).plotPercentageOfClustersWithinALag, ClusteringParametersEstimation(**houston_twitter_stream_settings).plotPercentageOfClustersWithinALag])
-
-def thresholdForDocumentToBeInCluterEstimation():
-    ClusteringParametersEstimation.thresholdForDocumentToBeInCluterEstimation()
 
 if __name__ == '__main__':
 #    dimensionsEstimation()
