@@ -410,7 +410,7 @@ class ClusteringParametersEstimation():
         '''
         for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
 #            for t in range(1, 16): 
-            for t in range(17,21):
+            for t in range(16,21):
                 stream_settings['threshold_for_document_to_be_in_cluster'] = t*0.05
                 print length, stream_settings['threshold_for_document_to_be_in_cluster']
                 stats = {'streaming_lsh': KMeansTweetsFile(length, **stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(stream_settings)}
