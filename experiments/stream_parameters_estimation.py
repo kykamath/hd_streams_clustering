@@ -294,6 +294,27 @@ class ParameterEstimation:
         plt.ylabel(r'$\%\ of\ phrases\ with\ lag\ \leq\ TU$')
         plt.legend(loc=4)
         if returnAxisValuesOnly: plt.show()
+    def plotThresholdForDocumentToBeInCluster(self, statsFile):
+        dataToPlot = dict(('%0.2f'%(t*0.05), {'iteration_time':[], 'purity': [], 'nmi': []}) for t in range(1, 16))
+        for data in FileIO.iterateJsonFromFile(statsFile):
+            threshold = '%0.2f'%data['settings']['threshold_for_document_to_be_in_cluster']
+            for k in dataToPlot[threshold]: dataToPlot[threshold][k]+=[data['streaming_lsh'][k]]
+        for t in dataToPlot:
+            for k in dataToPlot[t]: dataToPlot[t][k]=np.mean(dataToPlot[t][k]) 
+        print dataToPlot
+        dataX = sorted([float(i) for i in dataToPlot])
+        # Plot iteration time.
+        plt.subplot(211)
+        plt.plot(dataX, [dataToPlot['%0.2f'%x]['iteration_time'] for x in dataX], lw=2, color='k')
+        plt.ylabel(getLatexForString('Time (s)'))
+        plt.title(getLatexForString('Estimation of \epsilon for Streaming LSH'))
+        plt.subplot(212)
+        for metric, label, color in [('nmi', 'NMI', '#F60018'), ('purity', 'Purity', '#25D500')]: plt.plot(dataX,  [dataToPlot['%0.2f'%x][metric] for x in dataX], label=label, color=color, lw=2)
+        plt.ylabel(getLatexForString('Score'))
+        plt.xlabel(getLatexForString('Varying \epsilon'))
+        plt.legend(loc=4)
+        plt.show()
+        
     @staticmethod
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
     
@@ -388,7 +409,8 @@ class ClusteringParametersEstimation():
         Run this on a document set of size 100K. 
         '''
         for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
-            for t in range(1, 16): 
+#            for t in range(1, 16): 
+            for t in range(17,21):
                 stream_settings['threshold_for_document_to_be_in_cluster'] = t*0.05
                 print length, stream_settings['threshold_for_document_to_be_in_cluster']
                 stats = {'streaming_lsh': KMeansTweetsFile(length, **stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(stream_settings)}
@@ -424,6 +446,7 @@ def dimensionInActivityEstimation():
 def thresholdForDocumentToBeInCluterEstimation():
     threshold_for_document_to_be_in_cluster_estimation_file = experts_twitter_stream_settings['parameter_estimation_folder'] + 'threshold_for_document_to_be_in_cluster'
     ClusteringParametersEstimation.thresholdForDocumentToBeInCluterEstimation(threshold_for_document_to_be_in_cluster_estimation_file, **experts_twitter_stream_settings)
+#    ParameterEstimation(**experts_twitter_stream_settings).plotThresholdForDocumentToBeInCluster(threshold_for_document_to_be_in_cluster_estimation_file)
 
 experts_twitter_stream_settings['cluster_filtering_method']=houston_twitter_stream_settings['cluster_filtering_method']=ClusteringParametersEstimation.emptyClusterFilteringMethod
 def clusterDecayEstimation():
