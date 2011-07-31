@@ -33,7 +33,7 @@ hdfsUnzippedPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_
 plotSettings = {
                  'ssa':{'label': 'SSA', 'color': '#FD0006'}, 
                  'ssa_mr': {'label': 'SSA-MR', 'color': '#5AF522'},
-                 'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#1435AD'},
+                 'streaming_lsh': {'label': 'Streaming-SSA', 'color': '#1435AD'},
                  }
 kMeansPlotSettings = {
                  'k_means':{'label': 'k-Means', 'color': '#5AF522'}, 
@@ -181,6 +181,6 @@ if __name__ == '__main__':
 #    TweetsFile.copyUnzippedSSADataToHadoop()
 
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
-#    QualityComparisonWithSSA.plotClusteringSpeed()
+    QualityComparisonWithSSA.plotClusteringSpeed()
 #    QualityComparisonWithSSA.plotClusteringQuality()
     QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
