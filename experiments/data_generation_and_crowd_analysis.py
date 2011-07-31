@@ -269,7 +269,7 @@ class Plot:
             if graph.in_degree(n)==2 or graph.out_degree(n)==0: labels[n]= AnalyzeData.clusterMap[n].currentTime.strftime('%H:%M')
         F.set_size_inches( (4.86,3.0) )
         pos=nx.graphviz_layout(graph, prog='dot',args='')
-        nx.draw(graph, pos, alpha=0.3, node_size=10, with_labels=True, labels=labels, font_size=8, arrows=True, node_color='r')
+        nx.draw(graph, pos, alpha=1.0, node_size=10, with_labels=True, labels=labels, font_size=8, arrows=True, node_color='#5AF522')
         plt.show()
     @staticmethod
     def getLifeSpanDistributionPlot(): 
@@ -291,9 +291,9 @@ if __name__ == '__main__':
 #    Plot.getLifeSpanDistributionPlot()
 #    Plot.getCrowdSizeDistributionPlot()
 #    Plot.getCrowdSizeToLifeSpanPlot()
-    Plot(**experts_twitter_stream_settings).sampleCrowds()
+#    Plot(**experts_twitter_stream_settings).sampleCrowds()
 #    Plot(**experts_twitter_stream_settings).crowdHierachy()
 #    Plot(**experts_twitter_stream_settings).sampleCrowdUsers()
-#    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
+    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
 
     

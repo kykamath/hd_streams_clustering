@@ -10,9 +10,9 @@ from settings import experts_twitter_stream_settings, houston_twitter_stream_set
 from library.file_io import FileIO
 from library.classes import GeneralMethods, FixedIntervalMethod, Settings
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
-from library.plotting import getLatexForString, CurveFit,\
-    getCumulativeDistribution
-from library.math_modified import getSmallestPrimeNumberGreaterThan,\
+from library.plotting import getLatexForString, CurveFit, \
+    getCumulativeDistribution, getInverseCumulativeDistribution
+from library.math_modified import getSmallestPrimeNumberGreaterThan, \
     DateTimeAirthematic
 from hd_streams_clustering import DataStreamMethods, HDStreaminClustering
 from classes import UtilityMethods, Phrase
@@ -25,7 +25,7 @@ from datetime import timedelta
 from operator import itemgetter
 import numpy as np
 
-numberOfTimeUnits=10*24*12
+numberOfTimeUnits = 10 * 24 * 12
 xlabelTimeUnits = 'Time units'
 
 class ParameterEstimation:
@@ -35,15 +35,15 @@ class ParameterEstimation:
     def __init__(self, **stream_settings):
         self.stream_settings = stream_settings
         self.phraseTextToPhraseObjectMap = {}
-        self.convertDataToMessageMethod=stream_settings['convert_data_to_message_method']
+        self.convertDataToMessageMethod = stream_settings['convert_data_to_message_method']
         self.timeUnitInSeconds = stream_settings['time_unit_in_seconds']
         self.topDimensionsDuringPreviousIteration = None
         self.dimensionListsMap = {}
-        self.boundaries = [50, 100, 500, 1000, 5000]+[10000*i for i in range(1,21)]
-        self.dimensionUpdateTimeDeltas = [timedelta(seconds=i*10*60) for i in range(1,31)]
-        self.dimensionsEstimationFile = stream_settings['parameter_estimation_folder']+'dimensions'
-        self.dimensionsUpdateFrequencyFile = stream_settings['parameter_estimation_folder']+'dimensions_update_frequency'
-        self.dimensionInActivityTimeFile = stream_settings['parameter_estimation_folder']+'dimension_inactivity_time'
+        self.boundaries = [50, 100, 500, 1000, 5000] + [10000 * i for i in range(1, 21)]
+        self.dimensionUpdateTimeDeltas = [timedelta(seconds=i * 10 * 60) for i in range(1, 31)]
+        self.dimensionsEstimationFile = stream_settings['parameter_estimation_folder'] + 'dimensions'
+        self.dimensionsUpdateFrequencyFile = stream_settings['parameter_estimation_folder'] + 'dimensions_update_frequency'
+        self.dimensionInActivityTimeFile = stream_settings['parameter_estimation_folder'] + 'dimension_inactivity_time'
         self.lagBetweenMessagesDistribution = defaultdict(int)
         
     def run(self, dataIterator, estimationMethod, parameterSpecificDataCollectionMethod=None):
@@ -51,7 +51,7 @@ class ParameterEstimation:
         for data in dataIterator:
             message = self.convertDataToMessageMethod(data, **self.stream_settings)
             if DataStreamMethods.messageInOrder(message.timeStamp):
-                if parameterSpecificDataCollectionMethod!=None: parameterSpecificDataCollectionMethod(estimationObject=self, message=message)
+                if parameterSpecificDataCollectionMethod != None: parameterSpecificDataCollectionMethod(estimationObject=self, message=message)
                 UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
                 estimationMethod.call(message.timeStamp, estimationObject=self, currentMessageTime=message.timeStamp)
     @staticmethod
@@ -76,7 +76,7 @@ class ParameterEstimation:
         if estimationObject.topDimensionsDuringPreviousIteration:
             dimensions_estimation = {}
             for boundary in estimationObject.boundaries:
-                if boundary<len(estimationObject.phraseTextToPhraseObjectMap): dimensions_estimation[str(boundary)]=len(set(newList[:boundary]).difference(oldList[:boundary]))
+                if boundary < len(estimationObject.phraseTextToPhraseObjectMap): dimensions_estimation[str(boundary)] = len(set(newList[:boundary]).difference(oldList[:boundary]))
             print currentMessageTime, len(estimationObject.phraseTextToPhraseObjectMap)
             iterationData = {
                              'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
@@ -85,7 +85,7 @@ class ParameterEstimation:
                              ParameterEstimation.dimensionsEstimationId:dimensions_estimation
                              }
             FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionsEstimationFile)
-        estimationObject.topDimensionsDuringPreviousIteration=topDimensionsDuringCurrentIteration[:]
+        estimationObject.topDimensionsDuringPreviousIteration = topDimensionsDuringCurrentIteration[:]
     @staticmethod
     def dimensionsUpdateFrequencyEstimation(estimationObject, currentMessageTime):
         '''
@@ -100,16 +100,16 @@ class ParameterEstimation:
         def updatePhraseScore(phraseObject): 
             phraseObject.updateScore(currentMessageTime, 0, **estimationObject.stream_settings)
             return phraseObject
-        dimensions=estimationObject.stream_settings['dimensions']
+        dimensions = estimationObject.stream_settings['dimensions']
         newList = [p.text for p in Phrase.sort((updatePhraseScore(p) for p in estimationObject.phraseTextToPhraseObjectMap.itervalues()), reverse=True)][:dimensions]
         print currentMessageTime, len(newList)
-        if len(newList)>=dimensions:
-            idsOfDimensionsListToCompare = [(i, GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i)) for i in estimationObject.dimensionUpdateTimeDeltas if GeneralMethods.approximateToNearest5Minutes(currentMessageTime-i) in estimationObject.dimensionListsMap]
+        if len(newList) >= dimensions:
+            idsOfDimensionsListToCompare = [(i, GeneralMethods.approximateToNearest5Minutes(currentMessageTime - i)) for i in estimationObject.dimensionUpdateTimeDeltas if GeneralMethods.approximateToNearest5Minutes(currentMessageTime - i) in estimationObject.dimensionListsMap]
             dimensionsUpdateFrequency = {}
             for td, id in idsOfDimensionsListToCompare:
                 oldList = estimationObject.dimensionListsMap[id]
-                dimensionsUpdateFrequency[str(td.seconds)]=len(set(newList).difference(oldList))
-            print len(estimationObject.dimensionListsMap), currentMessageTime, len(newList), [(k,dimensionsUpdateFrequency[k]) for k in sorted(dimensionsUpdateFrequency)]
+                dimensionsUpdateFrequency[str(td.seconds)] = len(set(newList).difference(oldList))
+            print len(estimationObject.dimensionListsMap), currentMessageTime, len(newList), [(k, dimensionsUpdateFrequency[k]) for k in sorted(dimensionsUpdateFrequency)]
             iterationData = {
                              'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
                              'total_number_of_phrases': len(estimationObject.phraseTextToPhraseObjectMap),
@@ -119,13 +119,13 @@ class ParameterEstimation:
             FileIO.writeToFileAsJson(iterationData, estimationObject.dimensionsUpdateFrequencyFile)
             estimationObject.dimensionListsMap[GeneralMethods.approximateToNearest5Minutes(currentMessageTime)] = newList[:]
             for key in estimationObject.dimensionListsMap.keys()[:]:
-                if currentMessageTime-key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
+                if currentMessageTime - key > estimationObject.dimensionUpdateTimeDeltas[-1]: del estimationObject.dimensionListsMap[key]
     @staticmethod
     def dimensionInActivityTimeEstimation(estimationObject, currentMessageTime):
         phrasesLagDistribution = defaultdict(int)
         for phraseObject in estimationObject.phraseTextToPhraseObjectMap.itervalues():
-            lag=DateTimeAirthematic.getDifferenceInTimeUnits(currentMessageTime, phraseObject.latestOccuranceTime, estimationObject.stream_settings['time_unit_in_seconds'].seconds)
-            phrasesLagDistribution[str(lag)]+=1
+            lag = DateTimeAirthematic.getDifferenceInTimeUnits(currentMessageTime, phraseObject.latestOccuranceTime, estimationObject.stream_settings['time_unit_in_seconds'].seconds)
+            phrasesLagDistribution[str(lag)] += 1
         print currentMessageTime
         iterationData = {
                          'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
@@ -144,10 +144,10 @@ class ParameterEstimation:
         
         numberOfTimeUnits=10*24*12
         '''
-        x, y = [], []; [(x.append(getDateTimeObjectFromTweetTimestamp(line['time_stamp'])),y.append(line['total_number_of_phrases'])) for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile)]
-        x=x[:numberOfTimeUnits]; y=y[:numberOfTimeUnits]
-        plt.subplot(111).yaxis.set_major_formatter(FuncFormatter(lambda x,i: '%0.1f'%(x/10.**6)))
-        plt.text(0.0, 1.01, getLatexForString('10^6'), transform = plt.gca().transAxes)
+        x, y = [], []; [(x.append(getDateTimeObjectFromTweetTimestamp(line['time_stamp'])), y.append(line['total_number_of_phrases'])) for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile)]
+        x = x[:numberOfTimeUnits]; y = y[:numberOfTimeUnits]
+        plt.subplot(111).yaxis.set_major_formatter(FuncFormatter(lambda x, i: '%0.1f' % (x / 10. ** 6)))
+        plt.text(0.0, 1.01, getLatexForString('10^6'), transform=plt.gca().transAxes)
         plt.ylabel(getLatexForString('\# of dimensions')), plt.xlabel(getLatexForString(xlabelTimeUnits)), plt.title(getLatexForString('Growth in dimensions with increasing time.'))
         plt.plot(y, color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label']), lw=2)
         plt.legend(loc=4)
@@ -163,16 +163,16 @@ class ParameterEstimation:
         dataDistribution = defaultdict(list)
         for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile):
             for k, v in line[ParameterEstimation.dimensionsEstimationId].iteritems():
-                k=int(k)
-                if k not in dataDistribution: dataDistribution[k]=[0.,0.]
-                dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
-        x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution) if k>1000]
-        x,y=x[:numberOfTimeUnits], y[:numberOfTimeUnits]
-        exponentialCurveParams = CurveFit.getParamsAfterFittingData(x, y, CurveFit.decreasingExponentialFunction, [1.,1.])
+                k = int(k)
+                if k not in dataDistribution: dataDistribution[k] = [0., 0.]
+                dataDistribution[k][0] += v; dataDistribution[k][1] += 1
+        x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0] / dataDistribution[k][1]) / k)) for k in sorted(dataDistribution) if k > 1000]
+        x, y = x[:numberOfTimeUnits], y[:numberOfTimeUnits]
+        exponentialCurveParams = CurveFit.getParamsAfterFittingData(x, y, CurveFit.decreasingExponentialFunction, [1., 1.])
         print self.stream_settings['plot_label'], exponentialCurveParams, calculateDimensionsFor(exponentialCurveParams, 0.01) 
         plt.ylabel(getLatexForString('\% of new dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
-        plt.semilogy(x,y,'o', color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{-%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
-        plt.semilogy(x,CurveFit.getYValues(CurveFit.decreasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
+        plt.semilogy(x, y, 'o', color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label']) + getLatexForString(' (%0.2fx^{-%0.2f})') % (exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
+        plt.semilogy(x, CurveFit.getYValues(CurveFit.decreasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
         plt.legend()
         if returnAxisValuesOnly: plt.show()
     def plotDimensionsUpdateFrequencyEstimation(self, returnAxisValuesOnly=True):
@@ -184,28 +184,28 @@ class ParameterEstimation:
         dataDistribution = defaultdict(list)
         for line in FileIO.iterateJsonFromFile(self.dimensionsUpdateFrequencyFile):
             for k, v in line[ParameterEstimation.dimensionsUpdateFrequencyId].iteritems():
-                k=int(k)/self.timeUnitInSeconds.seconds
-                if k not in dataDistribution: dataDistribution[k]=[0.,0.]
-                dataDistribution[k][0]+=v; dataDistribution[k][1]+=1
-        x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0]/dataDistribution[k][1]))) for k in sorted(dataDistribution)]
-        x1, y1 = [], []; [(x1.append(k), y1.append((dataDistribution[k][0]/dataDistribution[k][1])/k)) for k in sorted(dataDistribution)]
-        x=x[:numberOfTimeUnits]; y=y[:numberOfTimeUnits]; x1=x1[:numberOfTimeUnits]; y1=y1[:numberOfTimeUnits]
+                k = int(k) / self.timeUnitInSeconds.seconds
+                if k not in dataDistribution: dataDistribution[k] = [0., 0.]
+                dataDistribution[k][0] += v; dataDistribution[k][1] += 1
+        x, y = [], []; [(x.append(k), y.append((dataDistribution[k][0] / dataDistribution[k][1]))) for k in sorted(dataDistribution)]
+        x1, y1 = [], []; [(x1.append(k), y1.append((dataDistribution[k][0] / dataDistribution[k][1]) / k)) for k in sorted(dataDistribution)]
+        x = x[:numberOfTimeUnits]; y = y[:numberOfTimeUnits]; x1 = x1[:numberOfTimeUnits]; y1 = y1[:numberOfTimeUnits]
         def subPlot(id):
             plt.subplot(id)
-            inactivityCorordinates = max(zip(x1,y1),key=itemgetter(1))
-            plt.semilogx(x1,y1,'-', color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label'] + ' (Update frequency=%d TU)'%inactivityCorordinates[0]), lw=2)
-            plt.subplot(id).yaxis.set_major_formatter(FuncFormatter(lambda x,i: '%0.1f'%(x/10.**3)))
+            inactivityCorordinates = max(zip(x1, y1), key=itemgetter(1))
+            plt.semilogx(x1, y1, '-', color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label'] + ' (Update frequency=%d TU)' % inactivityCorordinates[0]), lw=2)
+            plt.subplot(id).yaxis.set_major_formatter(FuncFormatter(lambda x, i: '%0.1f' % (x / 10. ** 3)))
             plt.semilogx([inactivityCorordinates[0]], [inactivityCorordinates[1]], 'o', alpha=0.7, color='r')
-            plt.subplot(id).yaxis.set_major_formatter(FuncFormatter(lambda x,i: '%0.1f'%(x/10.**3)))
+            plt.subplot(id).yaxis.set_major_formatter(FuncFormatter(lambda x, i: '%0.1f' % (x / 10. ** 3)))
             plt.yticks((min(y1), max(y1)))
             print self.stream_settings['plot_label'], inactivityCorordinates[0]
         plt.subplot(311)
         plt.title(getLatexForString('Dimensions update frequency estimation'))
-        plt.semilogx(x,y,'-', color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label']), lw=2)
-        plt.subplot(311).yaxis.set_major_formatter(FuncFormatter(lambda x,i: '%0.1f'%(x/10.**5)))
-        plt.text(0.0, 1.01, getLatexForString('10^5'), transform = plt.gca().transAxes)
+        plt.semilogx(x, y, '-', color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label']), lw=2)
+        plt.subplot(311).yaxis.set_major_formatter(FuncFormatter(lambda x, i: '%0.1f' % (x / 10. ** 5)))
+        plt.text(0.0, 1.01, getLatexForString('10^5'), transform=plt.gca().transAxes)
         plt.ylabel(getLatexForString('\# of decayed dimensions'))
-        if self.stream_settings['stream_id']=='experts_twitter_stream': subPlot(312)
+        if self.stream_settings['stream_id'] == 'experts_twitter_stream': subPlot(312)
         else: subPlot(313); plt.xlabel(getLatexForString(xlabelTimeUnits))
         plt.ylabel(getLatexForString('Rate of DD (10^3)'))
         plt.legend(loc=3)
@@ -237,19 +237,37 @@ class ParameterEstimation:
         other. This is expected. Irrespective of size of the streams,
         the phrases have the same lifetime and hence decay close to each other.
         '''
-        def calculateInActivityTimeFor(params, probabilityOfInactivity): return int(CurveFit.inverseOfIncreasingExponentialFunction(params, 1-probabilityOfInactivity))
+        def calculateInActivityTimeFor(params, probabilityOfInactivity): return int(CurveFit.inverseOfIncreasingExponentialFunction(params, 1 - probabilityOfInactivity))
         data = list(FileIO.iterateJsonFromFile(self.dimensionInActivityTimeFile))[numberOfTimeUnits]
         total = float(sum(data[ParameterEstimation.dimensionInActivityTimeId].values()))
         x = sorted(map(int, data[ParameterEstimation.dimensionInActivityTimeId].keys()))
-        y = getCumulativeDistribution([data[ParameterEstimation.dimensionInActivityTimeId][str(i)]/total for i in x])
+        y = getCumulativeDistribution([data[ParameterEstimation.dimensionInActivityTimeId][str(i)] / total for i in x])
         print len(x)
         exponentialCurveParams = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1., 1.])
         print self.stream_settings['plot_label'], exponentialCurveParams, calculateInActivityTimeFor(exponentialCurveParams, 0.1) 
-        plt.plot(x,y, 'o', label=getLatexForString(self.stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), color=self.stream_settings['plot_color'])
-        plt.plot(x,CurveFit.getYValues(CurveFit.increasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
+        plt.plot(x, y, 'o', label=getLatexForString(self.stream_settings['plot_label']) + getLatexForString(' (%0.2fx^{%0.2f})') % (exponentialCurveParams[0], exponentialCurveParams[1]), color=self.stream_settings['plot_color'])
+        plt.plot(x, CurveFit.getYValues(CurveFit.increasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
         plt.ylabel(r'$P\ (\ lag\ \leq\ TU\ )$'), plt.xlabel(getLatexForString(xlabelTimeUnits)), plt.title(getLatexForString('CDF for dimension lag distribution.'))
         plt.ylim((0, 1.2))
         plt.legend(loc=4)
+        if returnAxisValuesOnly: plt.show()
+    def plotICDFDimensionsInactivityThreshold(self, returnAxisValuesOnly=True):
+        ''' Plot P(in_actiivty > threshold timeunit)
+            Find time unit at which probability is low.
+            Experts stream 0.25 129
+            Houston stream 0.25 144
+        '''
+        dataX, dataY, total = set(), defaultdict(list), []
+        for line in list(FileIO.iterateJsonFromFile(self.dimensionInActivityTimeFile)):
+            data = dict((int(k), v) for k,v in line[ParameterEstimation.dimensionInActivityTimeId].iteritems())
+            total.append(sum(data.values()))
+            for i in data: dataY[i].append(data[i]); dataX.add(i)
+        totalInstancesObserved=float(sum(total))
+        x = sorted(dataX)
+        y = getInverseCumulativeDistribution([sum(dataY[k])/totalInstancesObserved for k in x])
+        plt.plot(x, y, label=getLatexForString(self.stream_settings['plot_label']), color=self.stream_settings['plot_color'], lw=2)
+        plt.ylabel(r'$P\ (\ inactivity\ duration\ \geq\ \ inactivity\ duration\ threshold )$'), plt.xlabel(getLatexForString('Inactivity duration threshold')), plt.title(getLatexForString('Inactivity analysis for dimensions.'))
+        plt.legend()
         if returnAxisValuesOnly: plt.show()
     def plotPercentageOfDimensionsWithinALag(self, returnAxisValuesOnly=True):
         '''
@@ -268,60 +286,79 @@ class ParameterEstimation:
         Experts stream [ 0.0097055   0.81888514] 223 0.187150798756
         Houston stream [ 0.00943499  0.825918  ] 228 0.164007589276
         '''
-        def calculatePercentageOfDecayedPhrasesFor(params, timeUnit): return 1- CurveFit.increasingExponentialFunction(params, timeUnit)
+        def calculatePercentageOfDecayedPhrasesFor(params, timeUnit): return 1 - CurveFit.increasingExponentialFunction(params, timeUnit)
         dataDistribution = {}
         currentTimeUnit = 0
         for data in list(FileIO.iterateJsonFromFile(self.dimensionInActivityTimeFile))[:numberOfTimeUnits]:
-            totalDimensions=float(sum(data['phrases_lag_distribution'].values()))
+            totalDimensions = float(sum(data['phrases_lag_distribution'].values()))
             tempArray = []
             for k, v in data['phrases_lag_distribution'].iteritems():
-                k=int(k)
-                if k not in dataDistribution: dataDistribution[k]=[0]*numberOfTimeUnits
-                dataDistribution[k][currentTimeUnit] = v/totalDimensions
-                tempArray.append(v/totalDimensions)
-            currentTimeUnit+=1
+                k = int(k)
+                if k not in dataDistribution: dataDistribution[k] = [0] * numberOfTimeUnits
+                dataDistribution[k][currentTimeUnit] = v / totalDimensions
+                tempArray.append(v / totalDimensions)
+            currentTimeUnit += 1
         x = sorted(dataDistribution)
         y = getCumulativeDistribution([np.mean(dataDistribution[k]) for k in x])
-        params = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1.,1.])
-        print self.stream_settings['plot_label'], params, 
+        params = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1., 1.])
+        print self.stream_settings['plot_label'], params,
         def subPlot(id, timeUnit):
             plt.subplot(id)
             print timeUnit, calculatePercentageOfDecayedPhrasesFor(params, timeUnit)
-            plt.plot(x,y, 'o', label=getLatexForString(self.stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{%0.2f})')%(params[0], params[1]), color=self.stream_settings['plot_color'])
+            plt.plot(x, y, 'o', label=getLatexForString(self.stream_settings['plot_label']) + getLatexForString(' (%0.2fx^{%0.2f})') % (params[0], params[1]), color=self.stream_settings['plot_color'])
             plt.plot(x, CurveFit.getYValues(CurveFit.increasingExponentialFunction, params, x), color=self.stream_settings['plot_color'], lw=2)
-        if self.stream_settings['stream_id']=='experts_twitter_stream': subPlot(111, 107); plt.title(getLatexForString('Percentage of phrases within a lag'))
+        if self.stream_settings['stream_id'] == 'experts_twitter_stream': subPlot(111, 107); plt.title(getLatexForString('Percentage of phrases within a lag'))
         else: subPlot(111, 126); plt.xlabel(getLatexForString(xlabelTimeUnits))
         plt.ylabel(r'$\%\ of\ phrases\ with\ lag\ \leq\ TU$')
         plt.legend(loc=4)
         if returnAxisValuesOnly: plt.show()
     def plotThresholdForDocumentToBeInCluster(self, statsFile):
-        dataToPlot = dict(('%0.2f'%(t*0.05), {'iteration_time':[], 'purity': [], 'nmi': []}) for t in range(1, 16))
+        dataToPlot = dict(('%0.2f' % (t * 0.05), {'iteration_time':[], 'purity': [], 'nmi': []}) for t in range(1, 21))
         for data in FileIO.iterateJsonFromFile(statsFile):
-            threshold = '%0.2f'%data['settings']['threshold_for_document_to_be_in_cluster']
-            for k in dataToPlot[threshold]: dataToPlot[threshold][k]+=[data['streaming_lsh'][k]]
+            threshold = '%0.2f' % data['settings']['threshold_for_document_to_be_in_cluster']
+            for k in dataToPlot[threshold]: dataToPlot[threshold][k] += [data['streaming_lsh'][k]]
         for t in dataToPlot:
-            for k in dataToPlot[t]: dataToPlot[t][k]=np.mean(dataToPlot[t][k]) 
-        print dataToPlot
-        dataX = sorted([float(i) for i in dataToPlot])
+            for k in dataToPlot[t]: dataToPlot[t][k] = np.mean(dataToPlot[t][k]) 
+        dataX = sorted([float(i) for i in dataToPlot])[:-1]
+        print dataX
         # Plot iteration time.
         plt.subplot(211)
-        plt.plot(dataX, [dataToPlot['%0.2f'%x]['iteration_time'] for x in dataX], lw=2, color='k')
+        plt.plot(dataX, [dataToPlot['%0.2f' % x]['iteration_time'] for x in dataX], lw=2, color='k')
         plt.ylabel(getLatexForString('Time (s)'))
-        plt.title(getLatexForString('Estimation of \epsilon for Streaming LSH'))
+        plt.title(getLatexForString('Estimation of \epsilon^\prime for Stream SSA'))
         plt.subplot(212)
-        for metric, label, color in [('nmi', 'NMI', '#F60018'), ('purity', 'Purity', '#25D500')]: plt.plot(dataX,  [dataToPlot['%0.2f'%x][metric] for x in dataX], label=label, color=color, lw=2)
+        for metric, label, color in [('nmi', 'NMI', '#F60018'), ('purity', 'Purity', '#25D500')]: plt.plot(dataX, [dataToPlot['%0.2f' % x][metric] for x in dataX], label=label, color=color, lw=2)
         plt.ylabel(getLatexForString('Score'))
-        plt.xlabel(getLatexForString('Varying \epsilon'))
+        plt.xlabel(getLatexForString('Similarity threshold (\epsilon^\prime)'))
         plt.legend(loc=4)
         plt.show()
-        
+    def plotICDFClustersLagDistribution(self, returnAxisValuesOnly=True):
+        '''
+        Experts stream 0.25 199
+        Houston stream 0.25 152
+        '''
+        self.stream_settings['%s_file' % ClusteringParametersEstimation.clusterLagDistributionId] = self.stream_settings['parameter_estimation_folder'] + ClusteringParametersEstimation.clusterLagDistributionId
+        dataX, dataY, total = set(), defaultdict(list), []
+        for line in list(FileIO.iterateJsonFromFile(self.stream_settings['%s_file' % ClusteringParametersEstimation.clusterLagDistributionId])):
+            print line.keys()
+            data = dict((int(k), v) for k,v in line[ClusteringParametersEstimation.clusterLagDistributionId].iteritems())
+            total.append(sum(data.values()))
+            for i in data: dataY[i].append(data[i]); dataX.add(i)
+        totalInstancesObserved=float(sum(total))
+        x = sorted(dataX)
+        y = getInverseCumulativeDistribution([sum(dataY[k])/totalInstancesObserved for k in x])
+        plt.plot(x, y, label=getLatexForString(self.stream_settings['plot_label']), color=self.stream_settings['plot_color'], lw=2)
+        if self.stream_settings['plot_label']=='Houston stream': plt.plot([0,x[-1]], [1, 0], '--', color='#5AF522', lw=2)
+        plt.ylabel(r'$P\ (\ inactivity\ duration\ \geq\ \ inactivity\ duration\ threshold )$'), plt.xlabel(getLatexForString('Inactivity duration threshold')), plt.title(getLatexForString('Inactivity analysis for crowds.'))
+        plt.legend()
+        if returnAxisValuesOnly: plt.show()
     @staticmethod
     def plotMethods(methods): map(lambda method: method(returnAxisValuesOnly=False), methods), plt.show()
     
 class ClusteringParametersEstimation():
     clusterLagDistributionId = 'cluster_lag_distribution'
     def __init__(self, **stream_settings):
-        stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId] = stream_settings['parameter_estimation_folder']+ClusteringParametersEstimation.clusterLagDistributionId
+        stream_settings['%s_file' % ClusteringParametersEstimation.clusterLagDistributionId] = stream_settings['parameter_estimation_folder'] + ClusteringParametersEstimation.clusterLagDistributionId
         self.stream_settings = stream_settings
         self.hdsClustering = HDStreaminClustering(**self.stream_settings)
     def run(self, iterator): self.hdsClustering.cluster(iterator)
@@ -331,8 +368,8 @@ class ClusteringParametersEstimation():
     def clusterLagDistributionMethod(hdStreamClusteringObject, currentMessageTime):
         lagDistribution = defaultdict(int)
         for cluster in hdStreamClusteringObject.clusters.values():
-            lag=DateTimeAirthematic.getDifferenceInTimeUnits(currentMessageTime, cluster.lastStreamAddedTime, hdStreamClusteringObject.stream_settings['time_unit_in_seconds'].seconds)
-            lagDistribution[str(lag)]+=1
+            lag = DateTimeAirthematic.getDifferenceInTimeUnits(currentMessageTime, cluster.lastStreamAddedTime, hdStreamClusteringObject.stream_settings['time_unit_in_seconds'].seconds)
+            lagDistribution[str(lag)] += 1
         print currentMessageTime, len(hdStreamClusteringObject.clusters)
         iterationData = {
                          'time_stamp': getStringRepresentationForTweetTimestamp(currentMessageTime),
@@ -341,7 +378,7 @@ class ClusteringParametersEstimation():
                          'lag_between_streams_added_to_cluster': hdStreamClusteringObject.stream_settings['lag_between_streams_added_to_cluster']
                          }
 #        print hdStreamClusteringObject.stream_settings['lag_between_streams_added_to_cluster']
-        FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId])
+        FileIO.writeToFileAsJson(iterationData, hdStreamClusteringObject.stream_settings['%s_file' % ClusteringParametersEstimation.clusterLagDistributionId])
     def plotCDFClustersLagDistribution(self, returnAxisValuesOnly=True):
         '''
         This determines the time after which a cluster can be considered 
@@ -354,15 +391,15 @@ class ClusteringParametersEstimation():
         71 (# of time units) Houston stream [ 0.73756656  0.05883258] 0.2 3
         
         '''
-        def calculateInActivityTimeFor(params, probabilityOfInactivity): return int(CurveFit.inverseOfIncreasingExponentialFunction(params, 1-probabilityOfInactivity))
-        data = list(FileIO.iterateJsonFromFile(self.hdsClustering.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId]))[-1]
+        def calculateInActivityTimeFor(params, probabilityOfInactivity): return int(CurveFit.inverseOfIncreasingExponentialFunction(params, 1 - probabilityOfInactivity))
+        data = list(FileIO.iterateJsonFromFile(self.hdsClustering.stream_settings['%s_file' % ClusteringParametersEstimation.clusterLagDistributionId]))[-1]
         total = float(sum(data['lag_between_streams_added_to_cluster'].values()))
         x = sorted(map(int, data['lag_between_streams_added_to_cluster'].keys()))
-        y = getCumulativeDistribution([data['lag_between_streams_added_to_cluster'][str(i)]/total for i in x])
+        y = getCumulativeDistribution([data['lag_between_streams_added_to_cluster'][str(i)] / total for i in x])
         exponentialCurveParams = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1., 1.])
         print self.stream_settings['plot_label'], exponentialCurveParams, calculateInActivityTimeFor(exponentialCurveParams, 0.2) 
-        plt.plot(x,y, 'o', label=getLatexForString(self.stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{%0.2f})')%(exponentialCurveParams[0], exponentialCurveParams[1]), color=self.stream_settings['plot_color'])
-        plt.plot(x,CurveFit.getYValues(CurveFit.increasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
+        plt.plot(x, y, 'o', label=getLatexForString(self.stream_settings['plot_label']) + getLatexForString(' (%0.2fx^{%0.2f})') % (exponentialCurveParams[0], exponentialCurveParams[1]), color=self.stream_settings['plot_color'])
+        plt.plot(x, CurveFit.getYValues(CurveFit.increasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
         plt.ylabel(r'$P\ (\ lag\ \leq\ TU\ )$'), plt.xlabel(getLatexForString(xlabelTimeUnits)), plt.title(getLatexForString('CDF for clusters lag distribution.'))
         plt.ylim((0, 1.2))
         plt.legend(loc=4)
@@ -372,33 +409,33 @@ class ClusteringParametersEstimation():
         458 Experts stream [ 0.01860266  0.70639136] 15 0.874004297177
         80 Houston stream [ 0.0793181   0.47644004] 3 0.866127308876
         '''
-        def calculatePercentageOfDecayedPhrasesFor(params, timeUnit): return 1- CurveFit.increasingExponentialFunction(params, timeUnit)
+        def calculatePercentageOfDecayedPhrasesFor(params, timeUnit): return 1 - CurveFit.increasingExponentialFunction(params, timeUnit)
         dataDistribution = {}
         currentTimeUnit = 0
 #        file='/mnt/chevron/kykamath/data/twitter/lsh_crowds/houston_stream/parameter_estimation/cluster_lag_distribution'
-        file = self.hdsClustering.stream_settings['%s_file'%ClusteringParametersEstimation.clusterLagDistributionId]
+        file = self.hdsClustering.stream_settings['%s_file' % ClusteringParametersEstimation.clusterLagDistributionId]
         lines = list(FileIO.iterateJsonFromFile(file))
         numberOfTimeUnits = len(lines)
         for data in lines:
-            totalClusters=float(sum(data[ClusteringParametersEstimation.clusterLagDistributionId].values()))
+            totalClusters = float(sum(data[ClusteringParametersEstimation.clusterLagDistributionId].values()))
             tempArray = []
             for k, v in data[ClusteringParametersEstimation.clusterLagDistributionId].iteritems():
-                k=int(k)
-                if k not in dataDistribution: dataDistribution[k]=[0]*numberOfTimeUnits
-                dataDistribution[k][currentTimeUnit] = v/totalClusters
-                tempArray.append(v/totalClusters)
-            currentTimeUnit+=1
+                k = int(k)
+                if k not in dataDistribution: dataDistribution[k] = [0] * numberOfTimeUnits
+                dataDistribution[k][currentTimeUnit] = v / totalClusters
+                tempArray.append(v / totalClusters)
+            currentTimeUnit += 1
         x = sorted(dataDistribution)
         print numberOfTimeUnits,
         y = getCumulativeDistribution([np.mean(dataDistribution[k]) for k in x])
-        params = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1.,1.])
-        print self.stream_settings['plot_label'], params, 
+        params = CurveFit.getParamsAfterFittingData(x, y, CurveFit.increasingExponentialFunction, [1., 1.])
+        print self.stream_settings['plot_label'], params,
         def subPlot(id, timeUnit):
             plt.subplot(id)
             print timeUnit, calculatePercentageOfDecayedPhrasesFor(params, timeUnit)
-            plt.plot(x,y, 'o', label=getLatexForString(self.stream_settings['plot_label'])+getLatexForString(' (%0.2fx^{%0.2f})')%(params[0], params[1]), color=self.stream_settings['plot_color'])
+            plt.plot(x, y, 'o', label=getLatexForString(self.stream_settings['plot_label']) + getLatexForString(' (%0.2fx^{%0.2f})') % (params[0], params[1]), color=self.stream_settings['plot_color'])
             plt.plot(x, CurveFit.getYValues(CurveFit.increasingExponentialFunction, params, x), color=self.stream_settings['plot_color'], lw=2)
-        if self.stream_settings['stream_id']=='experts_twitter_stream': subPlot(111, 15); plt.title(getLatexForString('Percentage of clusters within a lag'))
+        if self.stream_settings['stream_id'] == 'experts_twitter_stream': subPlot(111, 15); plt.title(getLatexForString('Percentage of clusters within a lag'))
         else: subPlot(111, 3); plt.xlabel(getLatexForString(xlabelTimeUnits))
         plt.ylabel(r'$\%\ of\ clusters\ with\ lag\ \leq\ TU$')
         plt.legend(loc=4)
@@ -408,17 +445,17 @@ class ClusteringParametersEstimation():
         ''' Estimate thresold for the clusters by varying the threshold_for_document_to_be_in_cluster value.
         Run this on a document set of size 100K. 
         '''
-        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+        for length in [i * j for i in 10 ** 3, 10 ** 4, 10 ** 5 for j in range(1, 10)]: 
 #            for t in range(1, 16): 
-            for t in range(16,21):
-                stream_settings['threshold_for_document_to_be_in_cluster'] = t*0.05
+            for t in range(16, 21):
+                stream_settings['threshold_for_document_to_be_in_cluster'] = t * 0.05
                 print length, stream_settings['threshold_for_document_to_be_in_cluster']
                 stats = {'streaming_lsh': KMeansTweetsFile(length, **stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(stream_settings)}
                 FileIO.writeToFileAsJson(stats, stats_file)
         
 
 '''    Experiments of Twitter streams starts here.    '''
-experts_twitter_stream_settings['convert_data_to_message_method']=houston_twitter_stream_settings['convert_data_to_message_method']=TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+experts_twitter_stream_settings['convert_data_to_message_method'] = houston_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
 
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
@@ -436,35 +473,38 @@ def dimensionInActivityEstimation():
         for phrase in message.vector:
             if phrase in estimationObject.phraseTextToPhraseObjectMap:
                 phraseObject = estimationObject.phraseTextToPhraseObjectMap[phrase]
-                lag=DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, phraseObject.latestOccuranceTime, estimationObject.twitter_stream_settings['time_unit_in_seconds'].seconds)
-                estimationObject.lagBetweenMessagesDistribution[str(lag)]+=1
+                lag = DateTimeAirthematic.getDifferenceInTimeUnits(message.timeStamp, phraseObject.latestOccuranceTime, estimationObject.twitter_stream_settings['time_unit_in_seconds'].seconds)
+                estimationObject.lagBetweenMessagesDistribution[str(lag)] += 1
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 #    ParameterEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionInActivityTimeEstimation, parameterSpecificDataCollectionMethod)
 #    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotCDFDimensionsLagDistribution, ParameterEstimation(**houston_twitter_stream_settings).plotCDFDimensionsLagDistribution])
-    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotPercentageOfDimensionsWithinALag, ParameterEstimation(**houston_twitter_stream_settings).plotPercentageOfDimensionsWithinALag])
+    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotICDFDimensionsInactivityThreshold, ParameterEstimation(**houston_twitter_stream_settings).plotICDFDimensionsInactivityThreshold])
+#    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotPercentageOfDimensionsWithinALag, ParameterEstimation(**houston_twitter_stream_settings).plotPercentageOfDimensionsWithinALag])
 
 def thresholdForDocumentToBeInCluterEstimation():
     threshold_for_document_to_be_in_cluster_estimation_file = experts_twitter_stream_settings['parameter_estimation_folder'] + 'threshold_for_document_to_be_in_cluster'
-    ClusteringParametersEstimation.thresholdForDocumentToBeInCluterEstimation(threshold_for_document_to_be_in_cluster_estimation_file, **experts_twitter_stream_settings)
-#    ParameterEstimation(**experts_twitter_stream_settings).plotThresholdForDocumentToBeInCluster(threshold_for_document_to_be_in_cluster_estimation_file)
+#    ClusteringParametersEstimation.thresholdForDocumentToBeInCluterEstimation(threshold_for_document_to_be_in_cluster_estimation_file, **experts_twitter_stream_settings)
+    ParameterEstimation(**experts_twitter_stream_settings).plotThresholdForDocumentToBeInCluster(threshold_for_document_to_be_in_cluster_estimation_file)
 
-experts_twitter_stream_settings['cluster_filtering_method']=houston_twitter_stream_settings['cluster_filtering_method']=ClusteringParametersEstimation.emptyClusterFilteringMethod
-def clusterDecayEstimation():
+experts_twitter_stream_settings['cluster_filtering_method'] = houston_twitter_stream_settings['cluster_filtering_method'] = ClusteringParametersEstimation.emptyClusterFilteringMethod
+
+def clusterInActivityEstimation():
     def analyzeClusterLag(streamCluster, stream, **stream_settings):
-        lag=DateTimeAirthematic.getDifferenceInTimeUnits(streamCluster.lastStreamAddedTime, stream.lastMessageTime, stream_settings['time_unit_in_seconds'].seconds)
-        stream_settings['lag_between_streams_added_to_cluster'][str(lag)]+=1
+        lag = DateTimeAirthematic.getDifferenceInTimeUnits(streamCluster.lastStreamAddedTime, stream.lastMessageTime, stream_settings['time_unit_in_seconds'].seconds)
+        stream_settings['lag_between_streams_added_to_cluster'][str(lag)] += 1
     experts_twitter_stream_settings['cluster_analysis_method'] = houston_twitter_stream_settings['cluster_analysis_method'] = ClusteringParametersEstimation.clusterLagDistributionMethod
     experts_twitter_stream_settings['lag_between_streams'] = houston_twitter_stream_settings['lag_between_streams'] = analyzeClusterLag
-    experts_twitter_stream_settings['lag_between_streams_added_to_cluster']=houston_twitter_stream_settings['lag_between_streams_added_to_cluster']=defaultdict(int)
+    experts_twitter_stream_settings['lag_between_streams_added_to_cluster'] = houston_twitter_stream_settings['lag_between_streams_added_to_cluster'] = defaultdict(int)
 #    ClusteringParametersEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts())
 #    ClusteringParametersEstimation(**houston_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromHouston())
 #    ParameterEstimation.plotMethods([ClusteringParametersEstimation(**experts_twitter_stream_settings).plotCDFClustersLagDistribution, ClusteringParametersEstimation(**houston_twitter_stream_settings).plotCDFClustersLagDistribution])
-    ParameterEstimation.plotMethods([ClusteringParametersEstimation(**experts_twitter_stream_settings).plotPercentageOfClustersWithinALag, ClusteringParametersEstimation(**houston_twitter_stream_settings).plotPercentageOfClustersWithinALag])
+    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotICDFClustersLagDistribution, ParameterEstimation(**houston_twitter_stream_settings).plotICDFClustersLagDistribution])
+#    ParameterEstimation.plotMethods([ClusteringParametersEstimation(**experts_twitter_stream_settings).plotPercentageOfClustersWithinALag, ClusteringParametersEstimation(**houston_twitter_stream_settings).plotPercentageOfClustersWithinALag])
 
 if __name__ == '__main__':
 #    dimensionsEstimation()
 #    dimensionsUpdateFrequencyEstimation()
 #    dimensionInActivityEstimation()
-#    clusterDecayEstimation()
+#    clusterInActivityEstimation()
     thresholdForDocumentToBeInCluterEstimation()
     
