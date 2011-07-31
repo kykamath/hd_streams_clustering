@@ -152,9 +152,9 @@ class QualityComparisonWithSSA:
                 for metric in speedStats['ssa']: speedStats[k][metric].append(data[k][metric])
         for k in speedStats: del speedStats[k]['f1']
         speedStats.update(dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in kMeansPlotSettings]))
-        k = 'k_means'
-        for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
-            for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])
+#        k = 'k_means'
+#        for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
+#            for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])
         for k in speedStats: 
             if 'f1' in speedStats[k]: del speedStats[k]['f1']
         dataForPlot = dict([(k, []) for k in speedStats])
@@ -163,7 +163,7 @@ class QualityComparisonWithSSA:
         print dataForPlot
         ind, width = np.arange(2), 0.1
         rects, i = [], 1
-        plotSettings.update(kMeansPlotSettings)
+#        plotSettings.update(kMeansPlotSettings)
         for k in dataForPlot: 
             rects.append(plt.bar(ind+i*width, dataForPlot[k], width, color=plotSettings[k]['color']))
             i+=1
