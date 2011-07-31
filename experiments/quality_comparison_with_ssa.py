@@ -160,6 +160,7 @@ class QualityComparisonWithSSA:
         dataForPlot = dict([(k, []) for k in speedStats])
         for k in speedStats:
             for k1 in speedStats[k]: dataForPlot[k]+=[np.mean(speedStats[k][k1])]
+        del dataForPlot['k_means']
         print dataForPlot
         ind, width = np.arange(2), 0.1
         rects, i = [], 1
