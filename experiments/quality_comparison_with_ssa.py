@@ -176,10 +176,10 @@ class QualityComparisonWithSSA:
         
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
-    TweetsFile.generateDocsForSSAMR()
+#    TweetsFile.generateDocsForSSAMR()
 #    TweetsFile.copyUnzippedSSADataToHadoop()
 
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
 #    QualityComparisonWithSSA.plotClusteringSpeed()
-#    QualityComparisonWithSSA.plotClusteringQuality()
+    QualityComparisonWithSSA.plotClusteringQuality()
 #    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
