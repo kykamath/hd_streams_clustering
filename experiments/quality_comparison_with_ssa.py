@@ -181,6 +181,6 @@ if __name__ == '__main__':
 #    TweetsFile.copyUnzippedSSADataToHadoop()
 
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
-    QualityComparisonWithSSA.plotClusteringSpeed()
+#    QualityComparisonWithSSA.plotClusteringSpeed()
 #    QualityComparisonWithSSA.plotClusteringQuality()
     QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
