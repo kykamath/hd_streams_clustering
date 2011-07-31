@@ -181,5 +181,5 @@ if __name__ == '__main__':
 
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
 #    QualityComparisonWithSSA.plotClusteringSpeed()
-    QualityComparisonWithSSA.plotClusteringQuality()
-#    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
+#    QualityComparisonWithSSA.plotClusteringQuality()
+    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
