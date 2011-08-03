@@ -281,12 +281,38 @@ class Plot:
     def getCrowdSizeToLifeSpanPlot(): 
         plotMethods([Plot(**experts_twitter_stream_settings).crowdSizeToLifeSpanPlot, Plot(**houston_twitter_stream_settings).crowdSizeToLifeSpanPlot])
     
+
+def generateIntroPlot():
+    graph = nx.Graph()
+    topics = {'libya': [('Oil Prices', 4), ('Gadaffi', 6)],
+             'facebook': [('IPO', 6), ('Breakup App', 3)],
+             'superbowl': [('Packers', 4), ('Steelers', 4), ('Cowboys Stadium', 3)]
+             }
+    for topic in topics:
+        for node, nodeSize in topics[topic]:
+            graph.add_edge(topic, node)
+#        print zip(*topics[topic])
+#    F=plt.gcf()
+#    for u,v in hierarchy.iteritems(): 
+#        if u in AnalyzeData.crowdMap: 
+#            labels[u]=' '.join(list(AnalyzeData.crowdMap[u].hashtagDimensions))
+#            labels[v]= AnalyzeData.clusterMap[v].currentTime.strftime('%H:%M')
+#            elif u in AnalyzeData.clusterMap: labels[u]= AnalyzeData.clusterMap[u].currentTime.strftime('%H:%M')# + ' ' + ', '.join(sorted([i.lower() for i in AnalyzeData.clusterMap[u].documentsInCluster]))
+#            if v in AnalyzeData.clusterMap: labels[v]= AnalyzeData.clusterMap[v].currentTime.strftime('%H:%M') #+' ' + ', '.join(sorted([i.lower() for i in AnalyzeData.clusterMap[v].documentsInCluster]))
+#        graph.add_edge(u, v)
+#    for n in graph.nodes_iter():
+#        if graph.in_degree(n)==2 or graph.out_degree(n)==0: labels[n]= AnalyzeData.clusterMap[n].currentTime.strftime('%H:%M')
+##    F.set_size_inches( (4.86,3.0) )
+    pos=nx.graphviz_layout(graph, prog='dot',args='')
+    nx.draw(graph, pos, alpha=1.0, node_size=500, with_labels=True, font_size=8, node_color='#5AF522')
+    plt.show()
+
 if __name__ == '__main__':
 #    GenerateHoustonTweetsData.generateHoustonData()
 #    generateClusters()
 
-    experts_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateExpertClusters
-    houston_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateHoustonClusters
+#    experts_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateExpertClusters
+#    houston_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateHoustonClusters
     
 #    Plot.getLifeSpanDistributionPlot()
 #    Plot.getCrowdSizeDistributionPlot()
@@ -294,6 +320,8 @@ if __name__ == '__main__':
 #    Plot(**experts_twitter_stream_settings).sampleCrowds()
 #    Plot(**experts_twitter_stream_settings).crowdHierachy()
 #    Plot(**experts_twitter_stream_settings).sampleCrowdUsers()
-    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
+#    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
+
+    generateIntroPlot()
 
     
