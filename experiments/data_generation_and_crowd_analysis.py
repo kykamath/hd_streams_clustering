@@ -15,7 +15,8 @@ from hd_streams_clustering import HDStreaminClustering
 from datetime import datetime, timedelta
 from library.file_io import FileIO
 from library.twitter import getStringRepresentationForTweetTimestamp, getDateTimeObjectFromTweetTimestamp
-from library.classes import GeneralMethods, Settings, timeit
+from library.classes import GeneralMethods, Settings, timeit,\
+    getEpochFromDateTimeObject
 from library.plotting import getLatexForString, plotMethods
 from library.clustering import EvaluationMetrics
 from operator import itemgetter
@@ -286,6 +287,7 @@ def getStreamStats(streamTweetsIterator):
     users = set()
     for tweet in streamTweetsIterator: 
         users.add(tweet['user']['screen_name'])
+        print getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at'])), getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at']))%300
         numberOfTweets+=1
         if numberOfTweets==100: break
     print '# of users: ', len(users)
