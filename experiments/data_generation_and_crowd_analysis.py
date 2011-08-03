@@ -286,7 +286,7 @@ def getStreamStats(streamTweetsIterator):
     users = set()
     for tweet in streamTweetsIterator: 
         users.add(tweet['user']['screen_name'])
-        print GeneralMethods.getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at'])), GeneralMethods.getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at']))%300
+        print GeneralMethods.getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at'])), GeneralMethods.getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at']))//300
         numberOfTweets+=1
         if numberOfTweets==100: break
     print '# of users: ', len(users)
