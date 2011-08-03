@@ -289,7 +289,7 @@ def getStreamStats(streamTweetsIterator):
         distributionPerTU[GeneralMethods.getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at']))//300]+=1
         numberOfTweets+=1
         if numberOfTweets==100: break
-    print distributionPerTU
+    print distributionPerTU.values()
     print '# of users: ', len(users)
     print '# of tweets: ', numberOfTweets 
 
