@@ -282,10 +282,13 @@ class Plot:
         plotMethods([Plot(**experts_twitter_stream_settings).crowdSizeToLifeSpanPlot, Plot(**houston_twitter_stream_settings).crowdSizeToLifeSpanPlot])
 
 def getStreamStats(streamTweetsIterator):
-    numberOfTweets, numberOfUsers = 0, 0
+    numberOfTweets = 0
     users = set()
-    for tweet in streamTweetsIterator:
-        print tweet['user']['screen_name']
+    for tweet in streamTweetsIterator: 
+        users.add(tweet['user']['screen_name'])
+        numberOfTweets+=1
+    print '# of users: ', len(users)
+    print '# of tweets: ', numberOfTweets 
 
 if __name__ == '__main__':
 #    GenerateHoustonTweetsData.generateHoustonData()
