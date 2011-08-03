@@ -291,7 +291,7 @@ def getStreamStats(streamTweetsIterator):
         if numberOfTweets==100: break
     print '# of users: ', len(users)
     print '# of tweets: ', numberOfTweets 
-    print '# of tweets per tu: ', np.mean(distributionPerTU.values())
+    print '# of tweets per tu (mean, var): ', np.mean(distributionPerTU.values()), np.var(distributionPerTU.values())
 
 if __name__ == '__main__':
 #    GenerateHoustonTweetsData.generateHoustonData()
