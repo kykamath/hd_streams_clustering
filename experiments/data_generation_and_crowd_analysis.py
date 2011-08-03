@@ -287,6 +287,7 @@ def getStreamStats(streamTweetsIterator):
     for tweet in streamTweetsIterator: 
         users.add(tweet['user']['screen_name'])
         numberOfTweets+=1
+        if numberOfTweets==100: break
     print '# of users: ', len(users)
     print '# of tweets: ', numberOfTweets 
 
@@ -304,5 +305,8 @@ if __name__ == '__main__':
 #    Plot(**experts_twitter_stream_settings).crowdHierachy()
 #    Plot(**experts_twitter_stream_settings).sampleCrowdUsers()
 #    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
-
+    
+    print 'Experts stats'
     getStreamStats(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,20)))
+#    print 'Houston stats'
+#    getStreamStats(TwitterIterators.iterateTweetsFromHouston(houstonDataStartTime=datetime(2010,11,1), houstonDataEndTime=datetime(2011,12,1)))
