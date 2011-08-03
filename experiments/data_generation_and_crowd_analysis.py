@@ -26,6 +26,7 @@ import networkx as nx
 from matplotlib import pyplot as plt
 from Queue import Queue
 import matplotlib as mpl
+from collections import defaultdict
 
 mongodb_connection = Connection('sarge', 27017)
 tweets = mongodb_connection.old_hou.Tweet
@@ -282,13 +283,13 @@ class Plot:
         plotMethods([Plot(**experts_twitter_stream_settings).crowdSizeToLifeSpanPlot, Plot(**houston_twitter_stream_settings).crowdSizeToLifeSpanPlot])
 
 def getStreamStats(streamTweetsIterator):
-    numberOfTweets = 0
-    users = set()
+    numberOfTweets, users, distributionPerTU = 0, set(), defaultdict(int)
     for tweet in streamTweetsIterator: 
         users.add(tweet['user']['screen_name'])
-        print GeneralMethods.getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at'])), GeneralMethods.getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at']))//300
+        distributionPerTU[GeneralMethods.getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at']))//300]+=1
         numberOfTweets+=1
         if numberOfTweets==100: break
+    print distributionPerTU
     print '# of users: ', len(users)
     print '# of tweets: ', numberOfTweets 
 
