@@ -289,9 +289,9 @@ def getStreamStats(streamTweetsIterator):
         distributionPerTU[GeneralMethods.getEpochFromDateTimeObject(getDateTimeObjectFromTweetTimestamp(tweet['created_at']))//300]+=1
         numberOfTweets+=1
         if numberOfTweets==100: break
-    print distributionPerTU.values()
     print '# of users: ', len(users)
     print '# of tweets: ', numberOfTweets 
+    print '# of tweets per tu: ', np.mean(distributionPerTU.itervalues())
 
 if __name__ == '__main__':
 #    GenerateHoustonTweetsData.generateHoustonData()
