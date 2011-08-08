@@ -170,7 +170,7 @@ class ParameterEstimation:
         x, y = x[:numberOfTimeUnits], y[:numberOfTimeUnits]
         exponentialCurveParams = CurveFit.getParamsAfterFittingData(x, y, CurveFit.decreasingExponentialFunction, [1., 1.])
         print self.stream_settings['plot_label'], exponentialCurveParams, calculateDimensionsFor(exponentialCurveParams, 0.01) 
-        plt.ylabel(getLatexForString('\% of new dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
+        plt.ylabel(getLatexForString('\% of decaying dimensions')), plt.xlabel(getLatexForString('\# of dimensions')), plt.title(getLatexForString('Dimension stability with increasing number of dimensions.'))
         plt.semilogy(x, y, 'o', color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label']) + getLatexForString(' (%0.2fx^{-%0.2f})') % (exponentialCurveParams[0], exponentialCurveParams[1]), lw=2)
         plt.semilogy(x, CurveFit.getYValues(CurveFit.decreasingExponentialFunction, exponentialCurveParams, x), color=self.stream_settings['plot_color'], lw=2)
         plt.legend()
@@ -502,9 +502,9 @@ def clusterInActivityEstimation():
 #    ParameterEstimation.plotMethods([ClusteringParametersEstimation(**experts_twitter_stream_settings).plotPercentageOfClustersWithinALag, ClusteringParametersEstimation(**houston_twitter_stream_settings).plotPercentageOfClustersWithinALag])
 
 if __name__ == '__main__':
-#    dimensionsEstimation()
+    dimensionsEstimation()
 #    dimensionsUpdateFrequencyEstimation()
 #    dimensionInActivityEstimation()
 #    clusterInActivityEstimation()
-    thresholdForDocumentToBeInCluterEstimation()
+#    thresholdForDocumentToBeInCluterEstimation()
     

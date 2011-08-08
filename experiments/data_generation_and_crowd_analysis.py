@@ -283,7 +283,7 @@ class Plot:
         plotMethods([Plot(**experts_twitter_stream_settings).crowdSizeToLifeSpanPlot, Plot(**houston_twitter_stream_settings).crowdSizeToLifeSpanPlot])
 
 def getStreamStats(streamTweetsIterator):
-    ''' 30-Day
+    ''' 30-day
         Experts stats:
         # of users:  4804
         # of tweets:  1614510
@@ -293,6 +293,17 @@ def getStreamStats(streamTweetsIterator):
         # of users:  107494
         # of tweets:  15946768
         # of tweets per tu (mean, var):  1730.33506944 4834419.37341
+        
+        10-day
+        Experts stats
+        # of users:  4674
+        # of tweets:  608798
+        # of tweets per tu (mean, var):  190.726190476 8132.75460228
+        Houston stats
+        # of users:  39618
+        # of tweets:  2139829
+        # of tweets per tu (mean, var):  619.163483796 94450.7334004
+
     '''
     numberOfTweets, users, distributionPerTU = 0, set(), defaultdict(int)
     for tweet in streamTweetsIterator: 
