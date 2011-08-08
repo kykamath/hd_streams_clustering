@@ -31,9 +31,9 @@ hdfsPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_folder/'
 hdfsUnzippedPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_unzipped_folder/'
 
 plotSettings = {
-                 'ssa':{'label': 'SSA', 'color': '#FD0006'}, 
-                 'ssa_mr': {'label': 'MR-SSA', 'color': '#5AF522'},
-                 'streaming_lsh': {'label': 'Stream-SSA', 'color': '#1435AD'},
+                 'ssa':{'label': 'Iterative-CDA', 'color': '#FD0006'}, 
+                 'ssa_mr': {'label': 'MR-CDA', 'color': '#5AF522'},
+                 'streaming_lsh': {'label': 'Stream-CDA', 'color': '#1435AD'},
                  }
 kMeansPlotSettings = {
                  'k_means':{'label': 'k-Means', 'color': '#5AF522'}, 
