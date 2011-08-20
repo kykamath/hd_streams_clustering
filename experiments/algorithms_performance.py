@@ -52,6 +52,7 @@ class DimensionsPerformance():
     @staticmethod
     def modifiedClusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
         global evaluation, previousTime
+        print 'comes here'
         currentTime = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
         iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'dimensions': experts_twitter_stream_settings['dimensions']})
@@ -68,6 +69,7 @@ class DimensionsPerformance():
             print dimensions
             experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(dimensions)
             previousTime = time.time()
+            print experts_twitter_stream_settings['dimensions']
             HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,19,7)))
         
 if __name__ == '__main__':
