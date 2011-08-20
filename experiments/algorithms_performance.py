@@ -53,12 +53,12 @@ class DimensionsPerformance():
         currentTime = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
         iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'type': experts_twitter_stream_settings['dimensions_performance_type'], 'dimensions': experts_twitter_stream_settings['dimensions']})
-        iteration_data['no_of_observed_dimensions'] = len(hdStreamClusteringObject.phraseTextAndDimensionMap)
+        iteration_data['no_of_observed_dimensions'] = len(hdStreamClusteringObject.phraseTextToPhraseObjectMap)
         previousTime = time.time()
         FileIO.writeToFileAsJson(iteration_data, DimensionsPerformance.stats_file)
         del iteration_data['clusters']
         print currentMessageTime, iteration_data
-        if experts_twitter_stream_settings['dimensions']!=76819 and 2*experts_twitter_stream_settings['dimensions']<=len(hdStreamClusteringObject.phraseTextAndDimensionMap): raise Exception
+        if experts_twitter_stream_settings['dimensions']!=76819 and 2*experts_twitter_stream_settings['dimensions']<=len(hdStreamClusteringObject.phraseTextToPhraseObjectMap): raise Exception
     def firstNDimensions(self):
         global previousTime
         experts_twitter_stream_settings['dimensions_performance_type'] = DimensionsPerformance.first_n_dimension
