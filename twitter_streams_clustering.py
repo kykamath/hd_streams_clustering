@@ -41,6 +41,7 @@ class TwitterIterators:
         while currentTime <= expertsDataEndTime:
             for tweet in TwitterIterators.iterateFromFile(experts_twitter_stream_settings.twitter_users_tweets_folder+'%s.gz'%FileIO.getFileByDay(currentTime)):
                 print getDateTimeObjectFromTweetTimestamp(tweet['created_at']), expertsDataEndTime
+                exit()
                 if tweet['user']['id_str'] in experts and getDateTimeObjectFromTweetTimestamp(tweet['created_at']) <= expertsDataEndTime : 
                     print tweet['created_at']
             exit()
