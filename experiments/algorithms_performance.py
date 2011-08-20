@@ -55,10 +55,10 @@ class DimensionsPerformance():
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
         iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'dimensions': experts_twitter_stream_settings['dimensions']})
         previousTime = time.time()
-        print iteration_data
         FileIO.writeToFileAsJson(iteration_data, 
                                   DimensionsPerformance.stats_file)
-        
+        del iteration_data['clusters']
+        print iteration_data
     
     def runExperiment(self):
         global previousTime
