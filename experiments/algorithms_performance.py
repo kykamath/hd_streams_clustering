@@ -1,0 +1,65 @@
+'''
+Created on Aug 19, 2011
+
+@author: kykamath
+'''
+import time
+from settings import experts_twitter_stream_settings
+from hd_streams_clustering import HDStreaminClustering
+from twitter_streams_clustering import TwitterIterators,\
+    TwitterCrowdsSpecificMethods, getExperts
+from library.math_modified import getLargestPrimeLesserThan
+from library.clustering import EvaluationMetrics
+
+def emptyUpdateDimensionsMethod(hdStreamClusteringObject, currentMessageTime): pass # print 'Comes to empty update dimensions'
+def emptyClusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): pass # print 'Comes to empty analysis'
+def emptyClusterFilteringMethod(hdStreamClusteringObject, currentMessageTime): pass # print 'Comes to empty filtering'
+
+#previousSet = set()
+#def modifiedUpdateDimensionsMethod(hdStreamClusteringObject, currentMessageTime): 
+#    global previousSet
+#    print len(hdStreamClusteringObject.phraseTextAndDimensionMap)
+#    print 'Intersection', len(previousSet.intersection(set([l for l in hdStreamClusteringObject.phraseTextAndDimensionMap.data[1]])))
+#    previousSet = set([l for l in hdStreamClusteringObject.phraseTextAndDimensionMap.data[1]])
+
+experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+
+class Evaluation():
+    def __init__(self): self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
+    def _getExpertClasses(self, cluster): return [self.expertsToClassMap[user.lower()] for user in cluster if user.lower() in self.expertsToClassMap]
+    def getEvaluationMetrics(self, documentClusters, timeDifference, iteration_parameters):
+#        iterationData =  {'iteration_parameters': iteration_parameters, 'no_of_clusters': len(documentClusters), 'iteration_time': timeDifference, 'clusters': documentClusters}
+        iterationData =  {'iteration_parameters': iteration_parameters, 'no_of_clusters': len(documentClusters), 'iteration_time': timeDifference}
+        clustersForEvaluation = [self._getExpertClasses(cluster) for cluster in documentClusters]
+        iterationData['nmi'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.nmi)
+        iterationData['purity'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.purity)
+        iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
+        return iterationData
+
+evaluation = Evaluation()
+previousTime = None
+
+class DimensionsPerformance():
+    def __init__(self):
+        experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
+        experts_twitter_stream_settings['cluster_analysis_method'] = DimensionsPerformance.modifiedClusterAnalysisMethod
+        experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
+        
+    @staticmethod
+    def modifiedClusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
+        global evaluation, previousTime
+        currentTime = time.time()
+        documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
+        print evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'dimensions': experts_twitter_stream_settings['dimensions']})
+        previousTime = time.time()
+    
+    def runExperiment(self):
+        global previousTime
+        experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(100000)
+        print experts_twitter_stream_settings['dimensions']
+        previousTime = time.time()
+        HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts())
+        
+if __name__ == '__main__':
+#    DimensionsPerformance().runExperiment()
+    for i in range(10**4,201*10**4,10**4): print i

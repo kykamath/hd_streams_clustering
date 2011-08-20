@@ -7,6 +7,8 @@ from classes import UtilityMethods, Stream, VectorUpdateMethods, StreamCluster
 from library.classes import GeneralMethods, FixedIntervalMethod, timeit
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
 
+#previousSet = set()
+
 class DataStreamMethods:
     messageInOrderVariable = None
     @staticmethod
@@ -26,9 +28,16 @@ class DataStreamMethods:
     @timeit
     def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
         # Update dimensions.
+        
+#        global previousSet
+#        print len(hdStreamClusteringObject.phraseTextAndDimensionMap)
+#        print 'Intersection', len(previousSet.intersection(set([l for l in hdStreamClusteringObject.phraseTextAndDimensionMap.data[1]])))
+        
         UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
         DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
 #        if hdStreamClusteringObject.analyzeIterationDataMethod!=None: hdStreamClusteringObject.analyzeIterationDataMethod(hdStreamClusteringObject, currentMessageTime)
+#        previousSet = set([l for l in hdStreamClusteringObject.phraseTextAndDimensionMap.data[1]])
+        
     @staticmethod
     @timeit
     def clusterFilteringMethod(hdStreamClusteringObject, currentMessageTime):
@@ -51,7 +60,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         self.clustersAnalysisFrequency = stream_settings['cluster_analysis_frequency_in_seconds']
         self.clustersFilteringFrequency = stream_settings['cluster_filtering_frequency_in_seconds']
 
-        self.updateDimensionsMethod = FixedIntervalMethod(DataStreamMethods.updateDimensions, self.dimensionsUpdatingFrequency)
+        self.updateDimensionsMethod = FixedIntervalMethod(stream_settings.get('update_dimensions_method', DataStreamMethods.updateDimensions), self.dimensionsUpdatingFrequency)
         self.clusterAnalysisMethod = FixedIntervalMethod(stream_settings.get('cluster_analysis_method', DataStreamMethods.clusterAnalysisMethod), self.clustersAnalysisFrequency)
         self.clusterFilteringMethod = FixedIntervalMethod(stream_settings.get('cluster_filtering_method', DataStreamMethods.clusterFilteringMethod), self.clustersFilteringFrequency)
         
