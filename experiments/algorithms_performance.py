@@ -111,15 +111,15 @@ class JustifyDimensionsEstimation():
 class JustifyMemoryPruning:
     with_memory_pruning = 'with_memory_pruning'
     without_memory_pruning = 'without_memory_pruning'
-    
+    stats_file = clustering_quality_experts_folder+'memory_pruning_need_analysis'
     @staticmethod
     def modifiedClusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
         global evaluation, previousTime
         currentTime = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
-        iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'type': experts_twitter_stream_settings['pruing_type'], 'number_of_clusters': len(hdStreamClusteringObject.clusters)})
+        iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'type': experts_twitter_stream_settings['pruing_type'], 'total_clusters': len(hdStreamClusteringObject.clusters), 'current_time': getStringRepresentationForTweetTimestamp(currentMessageTime)})
         previousTime = time.time()
-#        FileIO.writeToFileAsJson(iteration_data, JustifyDimensionsEstimation.stats_file)
+        FileIO.writeToFileAsJson(iteration_data, JustifyMemoryPruning.stats_file)
         del iteration_data['clusters']
         print getStringRepresentationForTweetTimestamp(currentMessageTime), iteration_data
     
@@ -134,7 +134,7 @@ class JustifyMemoryPruning:
         except Exception as e: pass
     @staticmethod
     def runExperiment():
-        JustifyMemoryPruning().generateExperimentData(withOutPruning=False)
+        JustifyMemoryPruning().generateExperimentData(withOutPruning=True)
     
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
