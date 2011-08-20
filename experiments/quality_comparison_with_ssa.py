@@ -115,10 +115,12 @@ class QualityComparisonWithSSA:
         for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
             for k in plotSettings: dataToPlot[k]['x'].append(data[k]['no_of_documents']); dataToPlot[k]['y'].append(data[k]['iteration_time'])
         for k in plotSettings: plt.loglog(dataToPlot[k]['x'], dataToPlot[k]['y'], label=plotSettings[k]['label'], color=plotSettings[k]['color'], lw=2)
+        print dataToPlot['streaming_lsh']['x'][10]
+        print dataToPlot['streaming_lsh']['y'][10]
         plt.legend(loc=4); 
         plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString('Running time comparsion for Streaing LSH with SSA'))
-#        plt.show()
-        plt.savefig('speedComparisonWithSSA.pdf')
+        plt.show()
+#        plt.savefig('speedComparisonWithSSA.pdf')
     @staticmethod
     def plotClusteringQuality():
         del plotSettings['ssa_mr']
@@ -172,8 +174,8 @@ class QualityComparisonWithSSA:
         plt.title(getLatexForString('Clustering quality comparison for Streaming LSH with SSA'))
         plt.xticks(ind+2*width, ('$Purity$', '$NMI$') )
         plt.legend( [r[0] for r in rects], [plotSettings[k]['label'] for k in plotSettings], loc=4 )
-#        plt.show()
-        plt.savefig('qualityComparison.pdf')
+        plt.show()
+#        plt.savefig('qualityComparison.pdf')
         
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
@@ -181,6 +183,6 @@ if __name__ == '__main__':
 #    TweetsFile.copyUnzippedSSADataToHadoop()
 
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
-#    QualityComparisonWithSSA.plotClusteringSpeed()
+    QualityComparisonWithSSA.plotClusteringSpeed()
 #    QualityComparisonWithSSA.plotClusteringQuality()
-    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
+#    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()

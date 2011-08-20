@@ -28,15 +28,8 @@ class DataStreamMethods:
     @timeit
     def updateDimensions(hdStreamClusteringObject, currentMessageTime): 
         # Update dimensions.
-        
-#        global previousSet
-#        print len(hdStreamClusteringObject.phraseTextAndDimensionMap)
-#        print 'Intersection', len(previousSet.intersection(set([l for l in hdStreamClusteringObject.phraseTextAndDimensionMap.data[1]])))
-        
         UtilityMethods.updateDimensions(hdStreamClusteringObject.phraseTextAndDimensionMap, hdStreamClusteringObject.phraseTextToPhraseObjectMap, currentMessageTime, **hdStreamClusteringObject.stream_settings)
         DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
-#        if hdStreamClusteringObject.analyzeIterationDataMethod!=None: hdStreamClusteringObject.analyzeIterationDataMethod(hdStreamClusteringObject, currentMessageTime)
-#        previousSet = set([l for l in hdStreamClusteringObject.phraseTextAndDimensionMap.data[1]])
         
     @staticmethod
     @timeit
