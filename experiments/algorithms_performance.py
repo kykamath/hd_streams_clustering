@@ -55,6 +55,7 @@ class DimensionsPerformance():
         currentTime = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
         iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'dimensions': experts_twitter_stream_settings['dimensions']})
+        iteration_data['no_of_observed_dimensions'] = len(hdStreamClusteringObject.phraseTextAndDimensionMap)
         previousTime = time.time()
         FileIO.writeToFileAsJson(iteration_data, 
                                   DimensionsPerformance.stats_file)
@@ -66,7 +67,7 @@ class DimensionsPerformance():
         for dimensions in range(10**4,201*10**4,10**4):
             experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(dimensions)
             previousTime = time.time()
-            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,19, 5)))
+            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,19, 11)))
         
 if __name__ == '__main__':
     DimensionsPerformance().runExperiment()

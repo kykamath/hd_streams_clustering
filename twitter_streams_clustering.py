@@ -35,16 +35,11 @@ class TwitterIterators:
         for tweet in TweetFiles.iterateTweetsFromGzip(file): yield tweet
     @staticmethod
     def iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,4,12)):
-        print expertsDataStartTime, expertsDataEndTime
         experts = getExperts()
         currentTime = expertsDataStartTime
         while currentTime <= expertsDataEndTime:
             for tweet in TwitterIterators.iterateFromFile(experts_twitter_stream_settings.twitter_users_tweets_folder+'%s.gz'%FileIO.getFileByDay(currentTime)):
-                print getDateTimeObjectFromTweetTimestamp(tweet['created_at']), expertsDataEndTime
-                exit()
-                if tweet['user']['id_str'] in experts and getDateTimeObjectFromTweetTimestamp(tweet['created_at']) <= expertsDataEndTime : 
-                    print tweet['created_at']
-            exit()
+                if tweet['user']['id_str'] in experts and getDateTimeObjectFromTweetTimestamp(tweet['created_at']) <= expertsDataEndTime : yield tweet
             currentTime+=timedelta(days=1)
     @staticmethod
     def iterateTweetsFromHouston(houstonDataStartTime=datetime(2010,11,1), houstonDataEndTime=datetime(2011,5,30)):
