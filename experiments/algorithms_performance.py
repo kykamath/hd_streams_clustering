@@ -60,7 +60,7 @@ class DimensionsPerformance():
         FileIO.writeToFileAsJson(iteration_data, 
                                   DimensionsPerformance.stats_file)
         del iteration_data['clusters']
-        print iteration_data
+        print currentMessageTime, iteration_data
     
     def runExperiment(self):
         global previousTime
