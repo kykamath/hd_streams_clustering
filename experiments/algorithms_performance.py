@@ -58,7 +58,7 @@ class DimensionsPerformance():
         FileIO.writeToFileAsJson(iteration_data, DimensionsPerformance.stats_file)
         del iteration_data['clusters']
         print currentMessageTime, iteration_data
-        if experts_twitter_stream_settings['dimensions']!=76819 and experts_twitter_stream_settings['dimensions']<=2*len(hdStreamClusteringObject.phraseTextAndDimensionMap): raise Exception
+        if experts_twitter_stream_settings['dimensions']!=76819 and 2*experts_twitter_stream_settings['dimensions']<=len(hdStreamClusteringObject.phraseTextAndDimensionMap): raise Exception
     def firstNDimensions(self):
         global previousTime
         experts_twitter_stream_settings['dimensions_performance_type'] = DimensionsPerformance.first_n_dimension
