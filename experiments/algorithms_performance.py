@@ -12,6 +12,7 @@ from twitter_streams_clustering import TwitterIterators,\
 from library.math_modified import getLargestPrimeLesserThan
 from library.clustering import EvaluationMetrics
 from library.file_io import FileIO
+from datetime import datetime
 
 def emptyUpdateDimensionsMethod(hdStreamClusteringObject, currentMessageTime): pass # print 'Comes to empty update dimensions'
 def emptyClusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): pass # print 'Comes to empty analysis'
@@ -65,7 +66,7 @@ class DimensionsPerformance():
         for dimensions in range(10**4,201*10**4,10**4):
             experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(dimensions)
             previousTime = time.time()
-            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts())
+            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,25)))
         
 if __name__ == '__main__':
     DimensionsPerformance().runExperiment()
