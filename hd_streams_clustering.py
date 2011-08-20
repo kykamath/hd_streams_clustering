@@ -60,14 +60,14 @@ class HDStreaminClustering(StreamingLSHClustering):
         self.clustersAnalysisFrequency = stream_settings['cluster_analysis_frequency_in_seconds']
         self.clustersFilteringFrequency = stream_settings['cluster_filtering_frequency_in_seconds']
 
-        print stream_settings.get('cluster_analysis_method', DataStreamMethods.clusterAnalysisMethod)
-        print self.clustersAnalysisFrequency
         self.updateDimensionsMethod = FixedIntervalMethod(stream_settings.get('update_dimensions_method', DataStreamMethods.updateDimensions), self.dimensionsUpdatingFrequency)
         self.clusterAnalysisMethod = FixedIntervalMethod(stream_settings.get('cluster_analysis_method', DataStreamMethods.clusterAnalysisMethod), self.clustersAnalysisFrequency)
         self.clusterFilteringMethod = FixedIntervalMethod(stream_settings.get('cluster_filtering_method', DataStreamMethods.clusterFilteringMethod), self.clustersFilteringFrequency)
         
         self.combineClustersMethod=stream_settings.get('combine_clusters_method',None)
         self.convertDataToMessageMethod=stream_settings['convert_data_to_message_method']
+        
+        DataStreamMethods.messageInOrderVariable = None
     
     def cluster(self, dataIterator):
         i=0
