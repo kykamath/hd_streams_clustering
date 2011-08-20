@@ -69,3 +69,6 @@
 #        pool.map(innerMeth, xrange(10))
 #
 #C.meth()
+from library.math_modified import getLargestPrimeLesserThan
+
+for dimensions in range(10**4,21*10**4,10**4): print dimensions, getLargestPrimeLesserThan(dimensions)

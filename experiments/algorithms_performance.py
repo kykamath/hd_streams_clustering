@@ -65,7 +65,7 @@ class DimensionsPerformance():
     
     def runExperiment(self):
         global previousTime
-        for dimensions in range(10**4,201*10**4,10**4):
+        for dimensions in range(10**4,21*10**4,10**4):
             experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(dimensions)
             previousTime = time.time()
             try:
