@@ -66,7 +66,7 @@ class DimensionsPerformance():
         for dimensions in range(10**4,201*10**4,10**4):
             experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(dimensions)
             previousTime = time.time()
-            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,20)))
+            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,19,15)))
         
 if __name__ == '__main__':
     DimensionsPerformance().runExperiment()
