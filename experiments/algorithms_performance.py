@@ -121,7 +121,7 @@ class JustifyMemoryPruning:
         previousTime = time.time()
 #        FileIO.writeToFileAsJson(iteration_data, JustifyDimensionsEstimation.stats_file)
         del iteration_data['clusters']
-        print getStringRepresentationForTweetTimestamp(cluster.lastStreamAddedTime), iteration_data
+        print getStringRepresentationForTweetTimestamp(currentMessageTime), iteration_data
     
     def generateExperimentData(self, withOutPruning):
         global previousTime
@@ -134,7 +134,7 @@ class JustifyMemoryPruning:
         except Exception as e: pass
     @staticmethod
     def runExperiment():
-        JustifyMemoryPruning().generateExperimentData(withOutPruning=True)
+        JustifyMemoryPruning().generateExperimentData(withOutPruning=False)
     
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
