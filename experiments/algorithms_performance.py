@@ -3,7 +3,8 @@ Created on Aug 19, 2011
 
 @author: kykamath
 '''
-import time
+import sys, time
+sys.path.append('../')
 from settings import experts_twitter_stream_settings
 from hd_streams_clustering import HDStreaminClustering
 from twitter_streams_clustering import TwitterIterators,\
