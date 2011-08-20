@@ -43,6 +43,7 @@ evaluation = Evaluation()
 previousTime = None
 
 class DimensionsPerformance():
+    
     stats_file = clustering_quality_experts_folder+'dimensions_need_analysis'
     def __init__(self):
         experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
@@ -60,13 +61,16 @@ class DimensionsPerformance():
         FileIO.writeToFileAsJson(iteration_data, DimensionsPerformance.stats_file)
         del iteration_data['clusters']
         print currentMessageTime, iteration_data
+        if len(hdStreamClusteringObject.phraseTextAndDimensionMap) == experts_twitter_stream_settings['dimensions']: raise Exception
     
     def runExperiment(self):
         global previousTime
         for dimensions in range(10**4,201*10**4,10**4):
             experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(dimensions)
             previousTime = time.time()
-            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,19,15)))
-        
+            try:
+#                HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,19,15)))
+                HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts())
+            except Exception as e: pass 
 if __name__ == '__main__':
     DimensionsPerformance().runExperiment()
