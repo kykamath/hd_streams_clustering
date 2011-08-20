@@ -129,9 +129,7 @@ class JustifyMemoryPruning:
         else: experts_twitter_stream_settings['pruing_type'] = JustifyMemoryPruning.with_memory_pruning
         experts_twitter_stream_settings['cluster_analysis_method'] = JustifyMemoryPruning.modifiedClusterAnalysisMethod
         previousTime = time.time()
-        try:
-            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts())
-        except Exception as e: pass
+        HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27)))
     @staticmethod
     def runExperiment():
         JustifyMemoryPruning().generateExperimentData(withOutPruning=True)
