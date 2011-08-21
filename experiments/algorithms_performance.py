@@ -191,10 +191,11 @@ class JustifyExponentialDecay:
     
     @staticmethod
     def runExperiment():
-        JustifyExponentialDecay().generateExperimentData(withOutDecay=False)
+        JustifyExponentialDecay().generateExperimentData(withOutDecay=True)
 #        JustifyExponentialDecay().plotJustifyMemoryPruning()
     
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
-    JustifyMemoryPruning.runExperiment()
+#    JustifyMemoryPruning.runExperiment()
+    JustifyExponentialDecay.runExperiment()
 
