@@ -149,17 +149,14 @@ class JustifyMemoryPruning:
         plt.legend(loc=2)
         plt.title(getLatexForString('Need for memory pruning'))
         plt.ylabel(getLatexForString('Running time (s)'))
-        
         plt.subplot(312)
         for k in experimentsData: plt.plot(range(len(experimentsData[k]['quality'])), experimentsData[k]['quality'], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
         plt.ylabel(getLatexForString('Purity'))
-
         plt.subplot(313)
         for k in experimentsData: plt.semilogy(range(len(experimentsData[k]['total_clusters'])), experimentsData[k]['total_clusters'], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
         plt.ylabel(getLatexForString('\# of clusters'))
         plt.xlabel(getLatexForString('Time'))
         plt.show()
-        
     @staticmethod
     def runExperiment():
 #        JustifyMemoryPruning().generateExperimentData(withOutPruning=False)
