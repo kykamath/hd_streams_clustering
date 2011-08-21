@@ -122,7 +122,6 @@ class JustifyMemoryPruning:
         FileIO.writeToFileAsJson(iteration_data, JustifyMemoryPruning.stats_file)
         del iteration_data['clusters']
         print getStringRepresentationForTweetTimestamp(currentMessageTime), iteration_data
-    
     def generateExperimentData(self, withOutPruning):
         global previousTime
         if withOutPruning: experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod; experts_twitter_stream_settings['pruing_type'] = JustifyMemoryPruning.without_memory_pruning
@@ -130,10 +129,72 @@ class JustifyMemoryPruning:
         experts_twitter_stream_settings['cluster_analysis_method'] = JustifyMemoryPruning.modifiedClusterAnalysisMethod
         previousTime = time.time()
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27)))
+    def plotJustifyMemoryPruning(self):
+        pltInfo =  {JustifyMemoryPruning.with_memory_pruning: {'label': getLatexForString('With pruning'), 'color': 'b', 'type': '-'}, 
+                    JustifyMemoryPruning.without_memory_pruning: {'label': getLatexForString('With out pruning'), 'color': 'k', 'type': '-x'}}
+        experimentsData = {JustifyMemoryPruning.with_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyMemoryPruning.without_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
+        for data in FileIO.iterateJsonFromFile(JustifyMemoryPruning.stats_file):
+            if data['purity']>0 and data['purity']<1:
+                experimentsData[data['iteration_parameters']['type']]['iteration_time'].append(data['iteration_time'])
+                experimentsData[data['iteration_parameters']['type']]['quality'].append(data['purity'])
+                experimentsData[data['iteration_parameters']['type']]['total_clusters'].append(data['iteration_parameters']['total_clusters'])
+        plt.subplot(311)
+#        for k in experimentsData: 
+#            dataX, dataY = [],[]
+#            for x,y in zip(range(len(experimentsData[k]['iteration_time'])), experimentsData[k]['iteration_time']): 
+#                if x%4!=0: dataX.append(x), dataY.append(y)
+#            plt.plot(range(len(experimentsData[k]['iteration_time'])), experimentsData[k]['iteration_time'], 'o', label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+#            plt.plot(dataX, dataY, pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+        for k in experimentsData: plt.plot(range(len(experimentsData[k]['iteration_time']))[:-1], map(lambda i: np.mean(experimentsData[k]['iteration_time'][i:i+1]), range(len(experimentsData[k]['iteration_time'])))[:-1], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+        plt.legend(loc=2)
+        plt.title(getLatexForString('Need for memory pruning'))
+        plt.ylabel(getLatexForString('Running time (s)'))
+        
+        plt.subplot(312)
+        for k in experimentsData: plt.plot(range(len(experimentsData[k]['quality'])), experimentsData[k]['quality'], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+        plt.ylabel(getLatexForString('Purity'))
+
+        plt.subplot(313)
+        for k in experimentsData: plt.semilogy(range(len(experimentsData[k]['total_clusters'])), experimentsData[k]['total_clusters'], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+        plt.ylabel(getLatexForString('\# of clusters'))
+        plt.xlabel(getLatexForString('Time'))
+        plt.show()
+        
     @staticmethod
     def runExperiment():
-        JustifyMemoryPruning().generateExperimentData(withOutPruning=False)
+#        JustifyMemoryPruning().generateExperimentData(withOutPruning=False)
+        JustifyMemoryPruning().plotJustifyMemoryPruning()
+        
+class JustifyExponentialDecay:
+    with_decay = 'with_decay'
+    without_decay = 'without_decay'
+    stats_file = clustering_quality_experts_folder+'exponential_decay_need_analysis'
+    @staticmethod
+    def modifiedClusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
+        global evaluation, previousTime
+        currentTime = time.time()
+        documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
+        iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'type': experts_twitter_stream_settings['decay_type'], 'total_clusters': len(hdStreamClusteringObject.clusters), 'current_time': getStringRepresentationForTweetTimestamp(currentMessageTime)})
+        previousTime = time.time()
+        FileIO.writeToFileAsJson(iteration_data, JustifyExponentialDecay.stats_file)
+        del iteration_data['clusters']
+        print getStringRepresentationForTweetTimestamp(currentMessageTime), iteration_data
+    def generateExperimentData(self, withOutDecay):
+        global previousTime
+        if withOutDecay: 
+            experts_twitter_stream_settings['decay_type'] = JustifyExponentialDecay.without_decay
+            experts_twitter_stream_settings['phrase_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_cluster_decay_coefficient']=1.0;
+        else: experts_twitter_stream_settings['decay_type'] = JustifyExponentialDecay.with_decay
+        experts_twitter_stream_settings['cluster_analysis_method'] = JustifyExponentialDecay.modifiedClusterAnalysisMethod
+        previousTime = time.time()
+        HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
+    
+    @staticmethod
+    def runExperiment():
+        JustifyExponentialDecay().generateExperimentData(withOutDecay=False)
+#        JustifyExponentialDecay().plotJustifyMemoryPruning()
     
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
     JustifyMemoryPruning.runExperiment()
+
