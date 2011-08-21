@@ -215,7 +215,7 @@ class JustifyTrie:
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
     @staticmethod
     def runExperiment():
-        JustifyTrie().generateExperimentData(withoutTrie=True)
+        JustifyTrie().generateExperimentData(withoutTrie=False)
 #        JustifyTrie().plotJustifyMemoryPruning()
     
 if __name__ == '__main__':
