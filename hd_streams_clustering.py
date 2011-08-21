@@ -19,7 +19,7 @@ class DataStreamMethods:
     def _resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime):
         '''    This method clears the tries and puts current clusters into it. Do this everytime clusters or the dimensions change.    '''
         # Reset signature tries.
-        for permutation in hdStreamClusteringObject.signaturePermutations: permutation.resetSignatureTrie()
+        for permutation in hdStreamClusteringObject.signaturePermutations: permutation.resetSignatureDataStructure()
         # Put current clusters into tries.
         for cluster in hdStreamClusteringObject.clusters.itervalues(): 
             cluster.setSignatureUsingVectorPermutations(hdStreamClusteringObject.unitVector, hdStreamClusteringObject.vectorPermutations, hdStreamClusteringObject.phraseTextAndDimensionMap)
@@ -96,7 +96,7 @@ class HDStreaminClustering(StreamingLSHClustering):
 #        3. Remove old clusters below a threshold.
 #        4. Add every cluster to all the newly set signature permutation tries. 
 #        '''
-#        for permutation in self.signaturePermutations: permutation.resetSignatureTrie()
+#        for permutation in self.signaturePermutations: permutation.resetSignatureDataStructure()
 #        '''
 #        Do not remove this comment. Might need this if StreamCluster is used again in future.
 #        for cluster in self.clusters.itervalues(): cluster.updateScore(occuranceTime, 0, **self.stream_settings)

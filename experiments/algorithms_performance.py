@@ -188,11 +188,38 @@ class JustifyExponentialDecay:
         experts_twitter_stream_settings['cluster_analysis_method'] = JustifyExponentialDecay.modifiedClusterAnalysisMethod
         previousTime = time.time()
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
-    
     @staticmethod
     def runExperiment():
         JustifyExponentialDecay().generateExperimentData(withOutDecay=False)
 #        JustifyExponentialDecay().plotJustifyMemoryPruning()
+
+class JustifyTrie:
+    with_trie = 'with_trie'
+    with_sorted_list = 'with_sorted_list'
+    stats_file = clustering_quality_experts_folder+'trie_need_analysis'
+    @staticmethod
+    def modifiedClusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
+        global evaluation, previousTime
+        currentTime = time.time()
+        documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
+        iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'type': experts_twitter_stream_settings['trie_type'], 'total_clusters': len(hdStreamClusteringObject.clusters), 'current_time': getStringRepresentationForTweetTimestamp(currentMessageTime)})
+        previousTime = time.time()
+        FileIO.writeToFileAsJson(iteration_data, JustifyTrie.stats_file)
+        del iteration_data['clusters']
+        print getStringRepresentationForTweetTimestamp(currentMessageTime), iteration_data
+    def generateExperimentData(self, withoutTrie):
+        global previousTime
+        if withoutTrie: 
+            experts_twitter_stream_settings['trie_type'] = JustifyTrie.with_sorted_list
+            experts_twitter_stream_settings['signature_type']='signature_type_list'
+        else: experts_twitter_stream_settings['trie_type'] = JustifyTrie.with_trie
+        experts_twitter_stream_settings['cluster_analysis_method'] = JustifyTrie.modifiedClusterAnalysisMethod
+        previousTime = time.time()
+        HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
+    @staticmethod
+    def runExperiment():
+        JustifyTrie().generateExperimentData(withOutDecay=False)
+#        JustifyTrie().plotJustifyMemoryPruning()
     
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
