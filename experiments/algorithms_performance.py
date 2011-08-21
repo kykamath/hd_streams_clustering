@@ -191,7 +191,7 @@ class JustifyExponentialDecay:
     
     @staticmethod
     def runExperiment():
-        JustifyExponentialDecay().generateExperimentData(withOutDecay=True)
+        JustifyExponentialDecay().generateExperimentData(withOutDecay=False)
 #        JustifyExponentialDecay().plotJustifyMemoryPruning()
     
 if __name__ == '__main__':
