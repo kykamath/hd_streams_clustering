@@ -44,7 +44,7 @@ class Evaluation():
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
 
-#evaluation = Evaluation()
+evaluation = Evaluation()
 previousTime = None
 
 class JustifyDimensionsEstimation():
@@ -291,7 +291,7 @@ class JustifyTrie:
             plt.savefig('justifyTrie.pdf')
     @staticmethod
     def runExperiment():
-        JustifyTrie().generateExperimentData(withoutTrie=False)
+        JustifyTrie().generateExperimentData(withoutTrie=True)
 #        JustifyTrie().plotJustifyTrie()
     
 if __name__ == '__main__':
