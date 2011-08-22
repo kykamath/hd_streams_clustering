@@ -291,7 +291,7 @@ class JustifyTrie:
             plt.savefig('justifyTrie.pdf')
     @staticmethod
     def runExperiment():
-        JustifyTrie().generateExperimentData(withoutTrie=True)
+        JustifyTrie().generateExperimentData(withoutTrie=False)
 #        JustifyTrie().plotJustifyTrie()
     
 if __name__ == '__main__':
