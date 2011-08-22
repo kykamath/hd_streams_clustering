@@ -216,7 +216,10 @@ class JustifyExponentialDecay:
         plt.title(getLatexForString('Need for exponential decay'))
         plt.ylabel(getLatexForString('Running time (s)'))
         plt.subplot(212)
-        for k in experimentsData: plt.plot(range(numberOfPoints), experimentsData[k]['quality'][:numberOfPoints], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+        for k in experimentsData: 
+            qualityMean = np.mean(experimentsData[k]['quality'][:numberOfPoints])
+            plt.plot(range(numberOfPoints), [qualityMean]*numberOfPoints,'--', label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+            plt.plot(range(numberOfPoints), experimentsData[k]['quality'][:numberOfPoints], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
         plt.ylabel(getLatexForString('Purity'))
 #        plt.subplot(313)
 #        for k in experimentsData: plt.semilogy(range(numberOfPoints), experimentsData[k]['total_clusters'][:numberOfPoints], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
@@ -249,16 +252,51 @@ class JustifyTrie:
             experts_twitter_stream_settings['signature_type']='signature_type_list'
         else: experts_twitter_stream_settings['trie_type'] = JustifyTrie.with_trie
         experts_twitter_stream_settings['cluster_analysis_method'] = JustifyTrie.modifiedClusterAnalysisMethod
+        experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
         previousTime = time.time()
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
+    def plotJustifyTrie(self):
+            pltInfo =  {JustifyTrie.with_trie: {'label': getLatexForString('With trie'), 'color': 'b', 'type': '-'}, 
+                JustifyTrie.with_sorted_list: {'label': getLatexForString('With sorted list'), 'color': 'k', 'type': '-x'}}
+            experimentsData = {JustifyTrie.with_trie: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyTrie.with_sorted_list: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
+#            for data in FileIO.iterateJsonFromFile(JustifyExponentialDecay.stats_file):
+            for data in FileIO.iterateJsonFromFile('temp/trie_need_analysis'):
+                if data['purity']>0 and data['purity']<1:
+                    experimentsData[data['iteration_parameters']['type']]['iteration_time'].append(data['iteration_time'])
+                    experimentsData[data['iteration_parameters']['type']]['quality'].append(data['purity'])
+                    experimentsData[data['iteration_parameters']['type']]['total_clusters'].append(data['iteration_parameters']['total_clusters'])
+            plt.subplot(111)
+#            for k in experimentsData: plt.plot(range(len(experimentsData[k]['iteration_time']))[:-1], map(lambda i: np.mean(experimentsData[k]['iteration_time'][i:i+1]), range(len(experimentsData[k]['iteration_time'])))[:-1], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+            dataY1, dataY2 = [], []
+            for y1, y2 in zip(experimentsData[JustifyTrie.with_trie]['iteration_time'], experimentsData[JustifyTrie.with_sorted_list]['iteration_time']):
+                if y1<=y2: 
+                    dataY1.append(y1), dataY2.append(y2)
+            numberOfPoints = len(dataY1)
+            for k, dataY in zip(experimentsData, [dataY1, dataY2]): 
+                plt.plot(range(numberOfPoints)[:-10], map(lambda i: np.mean(dataY[:numberOfPoints][i:i+10]), range(numberOfPoints))[:-10], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+#                plt.plot(range(numberOfPoints), dataY[:numberOfPoints], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+            plt.legend(loc=2)
+            plt.title(getLatexForString('Need for trie'))
+            plt.ylabel(getLatexForString('Running time (s)'))
+#            plt.subplot(312)
+#            for k in experimentsData: 
+#                qualityMean = np.mean(experimentsData[k]['quality'][:numberOfPoints])
+#                plt.plot(range(numberOfPoints), [qualityMean]*numberOfPoints,'--', label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+#                plt.plot(range(numberOfPoints), experimentsData[k]['quality'][:numberOfPoints], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+#            plt.ylabel(getLatexForString('Purity'))
+#            plt.subplot(313)
+#            for k in experimentsData: plt.semilogy(range(numberOfPoints), experimentsData[k]['total_clusters'][:numberOfPoints], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+#            plt.ylabel(getLatexForString('\# of clusters'))
+            plt.xlabel(getLatexForString('Time'))
+            plt.savefig('justifyTrie.pdf')
     @staticmethod
     def runExperiment():
-        JustifyTrie().generateExperimentData(withoutTrie=False)
-#        JustifyTrie().plotJustifyMemoryPruning()
+        JustifyTrie().generateExperimentData(withoutTrie=True)
+#        JustifyTrie().plotJustifyTrie()
     
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
-    JustifyMemoryPruning.runExperiment()
+#    JustifyMemoryPruning.runExperiment()
 #    JustifyExponentialDecay.runExperiment()
-#    JustifyTrie.runExperiment()
+    JustifyTrie.runExperiment()
 
