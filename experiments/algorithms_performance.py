@@ -44,7 +44,7 @@ class Evaluation():
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
 
-evaluation = Evaluation()
+#evaluation = Evaluation()
 previousTime = None
 
 class JustifyDimensionsEstimation():
@@ -269,12 +269,12 @@ class JustifyTrie:
 #            for k in experimentsData: plt.plot(range(len(experimentsData[k]['iteration_time']))[:-1], map(lambda i: np.mean(experimentsData[k]['iteration_time'][i:i+1]), range(len(experimentsData[k]['iteration_time'])))[:-1], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
             dataY1, dataY2 = [], []
             for y1, y2 in zip(experimentsData[JustifyTrie.with_trie]['iteration_time'], experimentsData[JustifyTrie.with_sorted_list]['iteration_time']):
-                if y1<=y2: 
-                    dataY1.append(y1), dataY2.append(y2)
+#                if y1<=y2: 
+                dataY1.append(y1), dataY2.append(y2)
             numberOfPoints = len(dataY1)
             for k, dataY in zip(experimentsData, [dataY1, dataY2]): 
-                plt.plot(range(numberOfPoints)[:-10], map(lambda i: np.mean(dataY[:numberOfPoints][i:i+10]), range(numberOfPoints))[:-10], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
-#                plt.plot(range(numberOfPoints), dataY[:numberOfPoints], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+#                plt.plot(range(numberOfPoints)[:-10], map(lambda i: np.mean(dataY[:numberOfPoints][i:i+10]), range(numberOfPoints))[:-10], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+                plt.semilogy(range(numberOfPoints), dataY[:numberOfPoints], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
             plt.legend(loc=2)
             plt.title(getLatexForString('Need for trie'))
             plt.ylabel(getLatexForString('Running time (s)'))
@@ -291,8 +291,8 @@ class JustifyTrie:
             plt.savefig('justifyTrie.pdf')
     @staticmethod
     def runExperiment():
-        JustifyTrie().generateExperimentData(withoutTrie=False)
-#        JustifyTrie().plotJustifyTrie()
+#        JustifyTrie().generateExperimentData(withoutTrie=False)
+        JustifyTrie().plotJustifyTrie()
     
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
