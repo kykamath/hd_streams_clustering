@@ -312,7 +312,7 @@ class JustifyNotUsingVanillaLSH:
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
     @staticmethod
     def runExperiment():
-        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=True)
+        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
 #        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
