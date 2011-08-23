@@ -289,6 +289,7 @@ class JustifyTrie:
 class JustifyNotUsingVanillaLSH:
     with_vanilla_lsh = 'with_vanilla_lsh'
     with_modified_lsh = 'with_modified_lsh'
+    stats_file = clustering_quality_experts_folder+'modified_lsh_need_analysis'
     @staticmethod
     def modifiedClusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
         global evaluation, previousTime
@@ -296,7 +297,7 @@ class JustifyNotUsingVanillaLSH:
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
         iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'type': experts_twitter_stream_settings['lsh_type'], 'total_clusters': len(hdStreamClusteringObject.clusters), 'current_time': getStringRepresentationForTweetTimestamp(currentMessageTime)})
         previousTime = time.time()
-        FileIO.writeToFileAsJson(iteration_data, JustifyTrie.stats_file)
+        FileIO.writeToFileAsJson(iteration_data, JustifyNotUsingVanillaLSH.stats_file)
         del iteration_data['clusters']
         print getStringRepresentationForTweetTimestamp(currentMessageTime), iteration_data
     def generateExperimentData(self, with_vanilla_lsh):
@@ -312,7 +313,7 @@ class JustifyNotUsingVanillaLSH:
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
     @staticmethod
     def runExperiment():
-        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
+        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=True)
 #        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
