@@ -164,9 +164,9 @@ class JustifyMemoryPruning:
         experimentsData = {JustifyMemoryPruning.with_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyMemoryPruning.without_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
         loadExperimentsData(experimentsData, JustifyMemoryPruning.stats_file)
         numberOfPoints = 275
-        plt.subplot(312); plotRunningTime(experimentsData, pltInfo, JustifyMemoryPruning.with_memory_pruning, JustifyMemoryPruning.without_memory_pruning); plt.legend(loc=2, ncol=2)
-        plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlabel(getLatexForString('Time'))
-        plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Need for memory pruning'))
+        plt.subplot(312); plotRunningTime(experimentsData, pltInfo, JustifyMemoryPruning.with_memory_pruning, JustifyMemoryPruning.without_memory_pruning); plt.legend(loc=2, ncol=2); plt.xticks([], tick1On=False), plt.xlim(xmax=270)
+        plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlabel(getLatexForString('Time')), plt.xlim(xmax=270)
+        plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Need for memory pruning')); plt.xticks([], tick1On=False), plt.xlim(xmax=270)
         plt.savefig('justifyMemoryPruning.pdf')
     @staticmethod
     def runExperiment():
@@ -202,7 +202,7 @@ class JustifyExponentialDecay:
         loadExperimentsData(experimentsData, JustifyExponentialDecay.stats_file)
         plt.subplot(211)
         numberOfPoints = 350
-        plotRunningTime(experimentsData, pltInfo, JustifyExponentialDecay.with_decay, JustifyExponentialDecay.without_decay)
+        plotRunningTime(experimentsData, pltInfo, JustifyExponentialDecay.with_decay, JustifyExponentialDecay.without_decay); plt.xticks([], tick1On=False), plt.xlim(xmax=350)
         plt.legend(loc=2)
         plt.title(getLatexForString('Need for exponential decay'))
         plt.ylabel(getLatexForString('Running time (s)'))
@@ -277,9 +277,9 @@ class JustifyTrie:
             pltInfo = {JustifyTrie.with_trie: {'label': getLatexForString('With trie'), 'color': '#7109AA', 'type': '-'}, JustifyTrie.with_sorted_list: {'label': getLatexForString('With sorted list'), 'color': '#5AF522', 'type': '-'}}
             experimentsData = {JustifyTrie.with_trie: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyTrie.with_sorted_list: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
             loadExperimentsData(experimentsData, JustifyTrie.stats_file)
-            plt.subplot(212); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyTrie.with_trie, JustifyTrie.with_sorted_list)
+            plt.subplot(212); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyTrie.with_trie, JustifyTrie.with_sorted_list); plt.xlim(xmax=200)
             plt.xlabel(getLatexForString('Time'))
-            plt.subplot(211); plotClusters(experimentsData, numberOfPoints, pltInfo)
+            plt.subplot(211); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.xticks([], tick1On=False); plt.xlim(xmax=200)
             plt.title(getLatexForString('Need for trie'))
             plt.legend(loc=4)
             plt.savefig('justifyTrie.pdf')
@@ -319,15 +319,15 @@ class JustifyNotUsingVanillaLSH:
             pltInfo = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'label': getLatexForString('Modified LSH'), 'color': '#7109AA', 'type': '-'}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'label': getLatexForString('Plain LSH'), 'color': '#5AF522', 'type': '-'}}
             experimentsData = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
             loadExperimentsData(experimentsData, JustifyNotUsingVanillaLSH.stats_file)
-            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyNotUsingVanillaLSH.with_modified_lsh, JustifyNotUsingVanillaLSH.with_vanilla_lsh, semilog=False)
+            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyNotUsingVanillaLSH.with_modified_lsh, JustifyNotUsingVanillaLSH.with_vanilla_lsh, semilog=False); plt.xticks([], tick1On=False)
             plt.legend(loc=2)
             plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlabel(getLatexForString('Time'))
-            plt.subplot(311);plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Need for modified lsh'))
+            plt.subplot(311);plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Need for modified lsh')); plt.xticks([], tick1On=False)
             plt.savefig('justifyNotUsingVanillaLSH.pdf')
     @staticmethod
     def runExperiment():
-        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
-#        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
+#        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
+        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
