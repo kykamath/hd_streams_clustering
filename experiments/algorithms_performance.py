@@ -46,11 +46,14 @@ def loadExperimentsData(experimentsData, file):
 def plotClusters(experimentsData, numberOfPoints, pltInfo):
     for k in experimentsData: window = 4; plt.semilogy(range(numberOfPoints)[:-window], movingAverage(experimentsData[k]['total_clusters'][:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
     plt.ylabel(getLatexForString('Clusters in memory'))
-def plotRunningTime(experimentsData, pltInfo, key1, key2):
+def plotRunningTime(experimentsData, pltInfo, key1, key2, semilog=True):
     dataY1, dataY2 = [], []
     for y1, y2 in zip(experimentsData[key1]['iteration_time'], experimentsData[key2]['iteration_time']): dataY1.append(y1), dataY2.append(y2)
     numberOfPoints = len(dataY1)
-    for k, dataY in zip(experimentsData, [dataY1, dataY2]): window = 20; plt.semilogy(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+    for k, dataY in zip(experimentsData, [dataY1, dataY2]): 
+        window = 20; 
+        if semilog: plt.semilogy(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
+        else: plt.plot(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
     plt.ylabel(getLatexForString('Running time (s)'))
     return numberOfPoints
 def plotQuality(experimentsData, numberOfPoints, pltInfo):
@@ -307,13 +310,26 @@ class JustifyNotUsingVanillaLSH:
             experts_twitter_stream_settings['phrase_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_cluster_decay_coefficient']=1.0;
             experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod;
             experts_twitter_stream_settings['trie_type'] = JustifyTrie.with_sorted_list
+            experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(100000)
+            experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
         else: experts_twitter_stream_settings['lsh_type'] = JustifyNotUsingVanillaLSH.with_modified_lsh
         experts_twitter_stream_settings['cluster_analysis_method'] = JustifyNotUsingVanillaLSH.modifiedClusterAnalysisMethod
         previousTime = time.time()
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
+    def plotJustifyNotUsingVanillaLSH(self):
+            pltInfo = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'label': getLatexForString('Modified LSH'), 'color': 'b', 'type': '-'}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'label': getLatexForString('Plain LSH'), 'color': 'k', 'type': '-x'}}
+            experimentsData = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
+            loadExperimentsData(experimentsData, JustifyNotUsingVanillaLSH.stats_file)
+            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyNotUsingVanillaLSH.with_modified_lsh, JustifyNotUsingVanillaLSH.with_vanilla_lsh, semilog=False)
+            plt.legend(loc=2)
+            plt.subplot(311); plotQuality(experimentsData, numberOfPoints, pltInfo)
+            plt.title(getLatexForString('Need for modified lsh'))
+            plt.subplot(313);plotClusters(experimentsData, numberOfPoints, pltInfo)
+            plt.xlabel(getLatexForString('Time'))
+            plt.savefig('justifyNotUsingVanillaLSH.pdf')
     @staticmethod
     def runExperiment():
-        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
+        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=True)
 #        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
