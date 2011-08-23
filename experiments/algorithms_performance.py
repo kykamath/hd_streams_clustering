@@ -285,10 +285,39 @@ class JustifyTrie:
     def runExperiment():
 #        JustifyTrie().generateExperimentData(withoutTrie=False)
         JustifyTrie().plotJustifyTrie()
+        
+class JustifyNotUsingVanillaLSH:
+    with_vanilla_lsh = 'with_vanilla_lsh'
+    with_modified_lsh = 'with_modified_lsh'
+    @staticmethod
+    def modifiedClusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
+        global evaluation, previousTime
+        currentTime = time.time()
+        documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
+        iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'type': experts_twitter_stream_settings['lsh_type'], 'total_clusters': len(hdStreamClusteringObject.clusters), 'current_time': getStringRepresentationForTweetTimestamp(currentMessageTime)})
+        previousTime = time.time()
+        FileIO.writeToFileAsJson(iteration_data, JustifyTrie.stats_file)
+        del iteration_data['clusters']
+        print getStringRepresentationForTweetTimestamp(currentMessageTime), iteration_data
+    def generateExperimentData(self, with_vanilla_lsh):
+        global previousTime
+        if with_vanilla_lsh: 
+            experts_twitter_stream_settings['lsh_type'] = JustifyNotUsingVanillaLSH.with_vanilla_lsh
+            experts_twitter_stream_settings['phrase_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_cluster_decay_coefficient']=1.0;
+            experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod;
+            experts_twitter_stream_settings['trie_type'] = JustifyTrie.with_sorted_list
+        else: experts_twitter_stream_settings['lsh_type'] = JustifyNotUsingVanillaLSH.with_modified_lsh
+        experts_twitter_stream_settings['cluster_analysis_method'] = JustifyNotUsingVanillaLSH.modifiedClusterAnalysisMethod
+        previousTime = time.time()
+        HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
+    @staticmethod
+    def runExperiment():
+        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=True)
+#        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
 #    JustifyMemoryPruning.runExperiment()
-    JustifyExponentialDecay.runExperiment()
+#    JustifyExponentialDecay.runExperiment()
 #    JustifyTrie.runExperiment()
-
+    JustifyNotUsingVanillaLSH.runExperiment()
