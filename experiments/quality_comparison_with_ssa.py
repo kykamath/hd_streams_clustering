@@ -31,13 +31,15 @@ hdfsPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_folder/'
 hdfsUnzippedPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_unzipped_folder/'
 
 plotSettings = {
-                 'ssa':{'label': 'Iterative-CDA', 'color': '#FD0006'}, 
-                 'ssa_mr': {'label': 'MR-CDA', 'color': '#5AF522'},
-                 'streaming_lsh': {'label': 'Stream-CDA', 'color': '#1435AD'},
+                 'ssa':{'label': 'Iterative CDA', 'color': '#FD0006'}, 
+                 'ssa_mr': {'label': 'MR CDA', 'color': '#5AF522'},
+                 'streaming_lsh': {'label': 'Stream CDA', 'color': '#1435AD'},
                  }
 kMeansPlotSettings = {
-                 'k_means':{'label': 'k-Means', 'color': '#5AF522'}, 
+                 'k_means':{'label': 'Iterative k-means', 'color': '#5AF522'}, 
                  }
+
+def movingAverage(list, window): return map(lambda i: np.mean(list[i:i+window]), range(len(list)))
 
 class TweetsFile:
     stats_file = clustering_quality_experts_ssa_folder+'quality_stats'
@@ -110,17 +112,18 @@ class QualityComparisonWithSSA:
             stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
             FileIO.writeToFileAsJson(stats, TweetsFile.stats_file)
     @staticmethod
-    def plotClusteringSpeed():
+    def plotClusteringSpeed(saveFig=True):
         dataToPlot = dict([(k, {'x': [], 'y': []}) for k in plotSettings])
         for data in FileIO.iterateJsonFromFile(TweetsFile.stats_file):
             for k in plotSettings: dataToPlot[k]['x'].append(data[k]['no_of_documents']); dataToPlot[k]['y'].append(data[k]['iteration_time'])
-        for k in plotSettings: plt.loglog(dataToPlot[k]['x'], dataToPlot[k]['y'], label=plotSettings[k]['label'], color=plotSettings[k]['color'], lw=2)
+        for k in plotSettings: plt.loglog(dataToPlot[k]['x'], movingAverage(dataToPlot[k]['y'], 1), label=plotSettings[k]['label'], color=plotSettings[k]['color'], lw=2)
         print dataToPlot['streaming_lsh']['x'][10]
         print dataToPlot['streaming_lsh']['y'][10]
         plt.legend(loc=4); 
-        plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString('Running time comparsion for Streaing LSH with SSA'))
-        plt.show()
-#        plt.savefig('speedComparisonWithSSA.pdf')
+        if saveFig: plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString('Running time comparsion for Streaing LSH with SSA'))
+        plt.xlim(xmin=500, xmax=600000)
+#        plt.show()
+        if saveFig: plt.savefig('speedComparisonWithSSA.pdf')
     @staticmethod
     def plotClusteringQuality():
         del plotSettings['ssa_mr']
@@ -154,19 +157,19 @@ class QualityComparisonWithSSA:
                 for metric in speedStats['ssa']: speedStats[k][metric].append(data[k][metric])
         for k in speedStats: del speedStats[k]['f1']
         speedStats.update(dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in kMeansPlotSettings]))
-#        k = 'k_means'
-#        for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
-#            for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])
+        k = 'k_means'
+        for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
+            for metric in speedStats['k_means']: speedStats[k][metric].append(data[k][metric])
         for k in speedStats: 
             if 'f1' in speedStats[k]: del speedStats[k]['f1']
         dataForPlot = dict([(k, []) for k in speedStats])
         for k in speedStats:
             for k1 in speedStats[k]: dataForPlot[k]+=[np.mean(speedStats[k][k1])]
-        del dataForPlot['k_means']
+#        del dataForPlot['k_means']
         print dataForPlot
         ind, width = np.arange(2), 0.1
         rects, i = [], 1
-#        plotSettings.update(kMeansPlotSettings)
+        plotSettings.update(kMeansPlotSettings)
         for k in dataForPlot: 
             rects.append(plt.bar(ind+i*width, dataForPlot[k], width, color=plotSettings[k]['color']))
             i+=1
@@ -174,8 +177,37 @@ class QualityComparisonWithSSA:
         plt.title(getLatexForString('Clustering quality comparison for Streaming LSH with SSA'))
         plt.xticks(ind+2*width, ('$Purity$', '$NMI$') )
         plt.legend( [r[0] for r in rects], [plotSettings[k]['label'] for k in plotSettings], loc=4 )
-        plt.show()
-#        plt.savefig('qualityComparison.pdf')
+#        plt.show()
+        plt.savefig('qualityComparisonAll.pdf')
+    @staticmethod
+    def plotSpeedWithKMeansAndSSA():
+        plt.subplot(211); QualityComparisonWithKMeans.plotClusteringSpeed(saveFig=False)
+        plt.title(getLatexForString('Running time comparisons for CDA Algorithm'))
+        plt.ylabel(getLatexForString('Running time (s)'))
+        plt.subplot(212); QualityComparisonWithSSA.plotClusteringSpeed(saveFig=False)
+        plt.xlabel(getLatexForString('\# of documents.'))
+        plt.ylabel(getLatexForString('Running time (s)'))
+        plt.savefig('runningTimeComparisonAll.pdf')
+
+
+class QualityComparisonWithKMeans():
+    @staticmethod
+    def plotClusteringSpeed(saveFig=True):
+        plotSettings = {
+                 'k_means':{'label': 'Iterative k-means', 'color': '#FD0006'}, 
+                 'mr_k_means': {'label': 'MR k-means', 'color': '#5AF522'},
+                 'streaming_lsh': {'label': 'Stream CDA', 'color': '#1435AD'},
+                 }
+        dataToPlot = {'k_means': {'x': [], 'y': []}, 'mr_k_means': {'x': [], 'y': []}, 'streaming_lsh': {'x': [], 'y': []}}
+        for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
+            for k in plotSettings: dataToPlot[k]['x'].append(data[k]['no_of_documents']); dataToPlot[k]['y'].append(data[k]['iteration_time'])
+        for k in plotSettings: plt.loglog(dataToPlot[k]['x'], dataToPlot[k]['y'], label=plotSettings[k]['label'], color=plotSettings[k]['color'], lw=2)
+        plt.legend(loc=4); 
+        if saveFig: plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString('Running time comparsion for Streaing LSH with k-Means'))
+        plt.xlim(xmin=800, xmax=100000)
+        plt.xticks([])
+#        plt.show()
+        if saveFig: plt.savefig('speedComparisonWithKMeans.pdf')
         
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
@@ -183,6 +215,7 @@ if __name__ == '__main__':
 #    TweetsFile.copyUnzippedSSADataToHadoop()
 
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
-    QualityComparisonWithSSA.plotClusteringSpeed()
+#    QualityComparisonWithSSA.plotClusteringSpeed()
 #    QualityComparisonWithSSA.plotClusteringQuality()
-#    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
+    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
+#    QualityComparisonWithSSA.plotSpeedWithKMeansAndSSA()

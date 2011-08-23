@@ -220,26 +220,27 @@ class JustifyExponentialDecay:
         clusterWithOutDecay = [i for i in experimentsData[JustifyExponentialDecay.without_decay][keyTime] if len(i)>=3]
 #        for c in clusterWithDecay:
 #            print c, [evaluation.expertsToClassMap[i.lower()] for i in c]
-#        for c in clusterWithOutDecay:
-#            print c, [evaluation.expertsToClassMap[i.lower()] for i in c]
 
         interestedCluster = set(['Zap2it', 'ESPNAndyKatz', 'comingsoonnet', '950KJR', 'ginasmith888', 'UKCoachCalipari', 'SportsFanz', 'David_Henrie'])
+        for c in clusterWithOutDecay:
+            if len(set(c).intersection(interestedCluster))>0: 
+#                print c, [evaluation.expertsToClassMap[i.lower()] for i in c]
+                setString = ', '.join(['%s (%s)'%(i, evaluation.expertsToClassMap[i.lower()]) for i in sorted(c)]).replace(' ', '\\ ').replace('_', '\\_')
+                print keyTime, '&', setString, '\\\\'
+            
+        clustersDiscoveredEarlierByDecay = {}
         for kt in sorted(experimentsData[JustifyExponentialDecay.with_decay]):
             for c in experimentsData[JustifyExponentialDecay.with_decay][kt]:
                 c=sorted(c)
                 if len(set(c).intersection(interestedCluster))>0: 
                     classes = [evaluation.expertsToClassMap[i.lower()] for i in c if i.lower() in evaluation.expertsToClassMap]
                     if sorted([(k, len(list(g))/float(len(classes))) for k,g in groupby(sorted(classes))], key=itemgetter(1))[-1][1]>0.7:
-                        print kt, set(c).intersection(interestedCluster), c, classes
-        print '************', keyTime
-        for kt in sorted(experimentsData[JustifyExponentialDecay.without_decay]):
-            for c in experimentsData[JustifyExponentialDecay.without_decay][kt]:
-                c=sorted(c)
-                if len(set(c).intersection(interestedCluster))>1:
-                    print kt, c, [evaluation.expertsToClassMap[i.lower()] for i in c if i.lower() in evaluation.expertsToClassMap]
-#                    print k, len(set(c).intersection(interestedCluster)), c, classes
-        print keyTime
-#        expertsToClassMap[user.lower()]
+                        if kt>datetime(2011,3,19) and kt<=keyTime: clustersDiscoveredEarlierByDecay[kt]=c
+        observedStrings = set()
+        for k in sorted(clustersDiscoveredEarlierByDecay): 
+            setString = ', '.join(['%s (%s)'%(i, evaluation.expertsToClassMap[i.lower()]) for i in sorted(clustersDiscoveredEarlierByDecay[k])]).replace(' ', '\\ ').replace('_', '\\_')
+            if setString not in observedStrings: print k, '&', setString, '\\\\'; observedStrings.add(setString)
+        
     @staticmethod
     def runExperiment():
 #        JustifyExponentialDecay().generateExperimentData(withOutDecay=False)

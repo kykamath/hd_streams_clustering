@@ -140,7 +140,7 @@ class TweetsFile:
                                       'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
                                       TweetsFile.mr_stats_file)
     @staticmethod
-    def plotClusteringSpeed():
+    def plotClusteringSpeed(saveFig=True):
         dataToPlot = {'k_means': {'x': [], 'y': []}, 'mr_k_means': {'x': [], 'y': []}, 'streaming_lsh': {'x': [], 'y': []}}
         for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
             for k in plotSettings: dataToPlot[k]['x'].append(data[k]['no_of_documents']); dataToPlot[k]['y'].append(data[k]['iteration_time'])
@@ -148,8 +148,8 @@ class TweetsFile:
         plt.legend(loc=4); 
         plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString('Running time comparsion for Streaing LSH with k-Means'))
         plt.xlim(xmax=500000)
-        plt.show()
-#        plt.savefig('speedComparisonWithKMeans.pdf')
+#        plt.show()
+        if saveFig: plt.savefig('speedComparisonWithKMeans.pdf')
     @staticmethod
     def getClusteringQuality():
         '''
@@ -196,9 +196,9 @@ class TweetsFile:
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
 #    TweetsFile.generateStatsForClusteringQuality()
-    TweetsFile.generateStatsForMRKMeansClusteringQuality()
+#    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-#    TweetsFile.plotClusteringSpeed()
+    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()

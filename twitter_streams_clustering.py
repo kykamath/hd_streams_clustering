@@ -17,10 +17,7 @@ from library.file_io import FileIO
 
 def getExperts(byScreenName=False):
     usersList, usersData = {}, defaultdict(list)
-    for l in open(experts_twitter_stream_settings.users_to_crawl_file): 
-        print l
-        data = l.strip().split(); usersData[data[0]].append(data[1:])
-    exit()
+    for l in open(experts_twitter_stream_settings.users_to_crawl_file): data = l.strip().split(); usersData[data[0]].append(data[1:])
     for k, v in usersData.iteritems(): 
         for user in v: 
             if byScreenName: usersList[user[0]] = {'id': user[1], 'class':k}
