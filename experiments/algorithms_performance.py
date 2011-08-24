@@ -327,7 +327,7 @@ class JustifyNotUsingVanillaLSH:
             plt.savefig('justifyNotUsingVanillaLSH.pdf')
     @staticmethod
     def runExperiment():
-        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=True)
+        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
 #        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
