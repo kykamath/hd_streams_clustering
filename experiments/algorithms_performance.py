@@ -74,7 +74,7 @@ class Evaluation():
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
 
-evaluation = Evaluation()
+#evaluation = Evaluation()
 previousTime = None
 
 class JustifyDimensionsEstimation():
@@ -307,7 +307,7 @@ class JustifyNotUsingVanillaLSH:
         if with_vanilla_lsh: 
             experts_twitter_stream_settings['lsh_type'] = JustifyNotUsingVanillaLSH.with_vanilla_lsh
             experts_twitter_stream_settings['phrase_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_cluster_decay_coefficient']=1.0;
-            experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod;
+#            experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod;
             experts_twitter_stream_settings['signature_type']='signature_type_list'
 #            experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(100000)
 #            experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
@@ -318,15 +318,16 @@ class JustifyNotUsingVanillaLSH:
     def plotJustifyNotUsingVanillaLSH(self):
             pltInfo = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'label': getLatexForString('Modified LSH'), 'color': '#7109AA', 'type': '-'}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'label': getLatexForString('Plain LSH'), 'color': '#5AF522', 'type': '-'}}
             experimentsData = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
-            loadExperimentsData(experimentsData, JustifyNotUsingVanillaLSH.stats_file)
-            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyNotUsingVanillaLSH.with_modified_lsh, JustifyNotUsingVanillaLSH.with_vanilla_lsh, semilog=False); plt.xticks([], tick1On=False)
+#            loadExperimentsData(experimentsData, JustifyNotUsingVanillaLSH.stats_file)
+            loadExperimentsData(experimentsData, 'temp/modified_lsh_need_analysis')
+            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyNotUsingVanillaLSH.with_modified_lsh, JustifyNotUsingVanillaLSH.with_vanilla_lsh, semilog=True); plt.xticks([], tick1On=False)
             plt.legend(loc=2)
             plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlabel(getLatexForString('Time'))
             plt.subplot(311);plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Need for modified lsh')); plt.xticks([], tick1On=False)
             plt.savefig('justifyNotUsingVanillaLSH.pdf')
     @staticmethod
     def runExperiment():
-        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
+        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=True)
 #        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
