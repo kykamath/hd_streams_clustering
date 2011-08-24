@@ -111,7 +111,7 @@ class JustifyDimensionsEstimation():
         global evaluation, previousTime
         currentTime = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
-        iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'type': experts_twitter_stream_settings['dimensions_performance_type'], 'total_clusters': len(hdStreamClusteringObject.clusters), 'current_time': getStringRepresentationForTweetTimestamp(currentMessageTime)})
+        iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'type': experts_twitter_stream_settings['dimensions_performance_type'], 'total_clusters': len(hdStreamClusteringObject.clusters), 'current_time': getStringRepresentationForTweetTimestamp(currentMessageTime), 'dimensions': experts_twitter_stream_settings['dimensions']})
         previousTime = time.time()
         FileIO.writeToFileAsJson(iteration_data, JustifyDimensionsEstimation.stats_file_2)
         del iteration_data['clusters']
