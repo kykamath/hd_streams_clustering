@@ -116,12 +116,27 @@ class JustifyDimensionsEstimation():
         FileIO.writeToFileAsJson(iteration_data, JustifyDimensionsEstimation.stats_file_2)
         del iteration_data['clusters']
         print getStringRepresentationForTweetTimestamp(currentMessageTime), iteration_data
+#    def generateExperimentData2(self, fixedType):
+#        global previousTime
+#        experts_twitter_stream_settings['cluster_analysis_method'] = JustifyDimensionsEstimation.modifiedClusterAnalysisMethod2
+#        if fixedType:
+#            experts_twitter_stream_settings['dimensions_performance_type'] = JustifyDimensionsEstimation.first_n_dimension
+#            experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
+#            for dimensions in range(10**4,21*10**4,10**4):
+#                experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(dimensions)
+#                previousTime = time.time()
+#                HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,20,5)))
+#        else:
+#            experts_twitter_stream_settings['dimensions_performance_type'] = JustifyDimensionsEstimation.top_n_dimension
+#            previousTime = time.time()
+#            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,20,5)))
     def generateExperimentData2(self, fixedType):
         global previousTime
         experts_twitter_stream_settings['cluster_analysis_method'] = JustifyDimensionsEstimation.modifiedClusterAnalysisMethod2
         if fixedType:
             experts_twitter_stream_settings['dimensions_performance_type'] = JustifyDimensionsEstimation.first_n_dimension
-            experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
+#            experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
+            experts_twitter_stream_settings['phrase_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_cluster_decay_coefficient']=1.0;
             for dimensions in range(10**4,21*10**4,10**4):
                 experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(dimensions)
                 previousTime = time.time()
@@ -130,7 +145,6 @@ class JustifyDimensionsEstimation():
             experts_twitter_stream_settings['dimensions_performance_type'] = JustifyDimensionsEstimation.top_n_dimension
             previousTime = time.time()
             HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,20,5)))
-            
     def plotJustifyDimensionsEstimation(self):
         runningTimeData, purityData = defaultdict(list), defaultdict(list)
         for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file):
@@ -152,12 +166,34 @@ class JustifyDimensionsEstimation():
         plt.legend(loc=3)
         plt.savefig('justifyDimensionsEstimation.pdf')
         
+    def plotJustifyDimensionsEstimation2(self):
+        pltInfo =  {JustifyDimensionsEstimation.top_n_dimension: {'label': getLatexForString('With pruning'), 'color': '#7109AA', 'type': '-'}, JustifyDimensionsEstimation.first_n_dimension: {'label': getLatexForString('With out pruning'), 'color': '#5AF522', 'type': '-'}}
+#        experimentsData = {JustifyMemoryPruning.with_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyMemoryPruning.without_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
+        experimentsData = defaultdict(dict)
+        for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file_2):
+            if 'dimensions' in data['iteration_parameters']: 
+                dimension = data['iteration_parameters']['dimensions']
+                if dimension not in experimentsData: experimentsData[dimension] = {'iteration_time': [], 'quality': [], 'total_clusters': []}
+                experimentsData[dimension]['iteration_time'].append(data['iteration_time']), experimentsData[dimension]['quality'].append(data['purity']), experimentsData[dimension]['total_clusters'].append(data['iteration_parameters']['total_clusters'])
+        lshData = dict([(k, np.mean(experimentsData[dimension][k])) for k in experimentsData[76819]])
+        del experimentsData[76819]
+        plotData = defaultdict(list)
+        for dimension in sorted(experimentsData): plotData['dataX'].append(dimension); [plotData[k].append(np.mean(experimentsData[dimension][k])) for k in experimentsData[dimension]]
+#        for k, v in plotData.iteritems(): print k, v
+#        print lshData
+#        for k, v in plotData.iteritems(): print k, len(v)
+#        plt.subplot(311); plt.plot(plotData['dataX'], plotData['total_clusters']); plt.xlabel('total_clusters'); plt.plot(plotData['dataX'], [lshData['total_clusters']]*len(plotData['dataX']), '--');
+        plt.subplot(211); plt.semilogy(plotData['dataX'], plotData['iteration_time']); plt.ylabel('iteration_time'); plt.plot(plotData['dataX'], [lshData['iteration_time']]*len(plotData['dataX']), '--');
+        plt.subplot(212); plt.plot(plotData['dataX'], movingAverage(plotData['quality'], 4)); plt.ylabel('quality'); plt.plot(plotData['dataX'], [lshData['quality']]*len(plotData['dataX']), '--');
+        plt.savefig('justifyDimensionsEstimation2.pdf')
+        
     @staticmethod
     def runExperiment():
 #        JustifyDimensionsEstimation().generateExperimentData()
-        JustifyDimensionsEstimation().generateExperimentData2(fixedType=False)
+#        JustifyDimensionsEstimation().generateExperimentData2(fixedType=False)
         JustifyDimensionsEstimation().generateExperimentData2(fixedType=True)
 #        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation()
+#        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation2()
 
 class JustifyMemoryPruning:
     with_memory_pruning = 'with_memory_pruning'
@@ -221,14 +257,12 @@ class JustifyExponentialDecay:
         pltInfo =  {JustifyExponentialDecay.with_decay: {'label': getLatexForString('With decay'), 'color': '#7109AA', 'type': '-'}, JustifyExponentialDecay.without_decay: {'label': getLatexForString('With out decay'), 'color': '#5AF522', 'type': '-'}}
         experimentsData = {JustifyExponentialDecay.with_decay: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyExponentialDecay.without_decay: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
         loadExperimentsData(experimentsData, JustifyExponentialDecay.stats_file)
-        plt.subplot(211)
         numberOfPoints = 350
-        plotRunningTime(experimentsData, pltInfo, JustifyExponentialDecay.with_decay, JustifyExponentialDecay.without_decay); plt.xticks([], tick1On=False), plt.xlim(xmax=350)
-        plt.legend(loc=2)
-        plt.title(getLatexForString('Need for exponential decay'))
+        plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Need for exponential decay'))
+        plt.subplot(312); plotRunningTime(experimentsData, pltInfo, JustifyExponentialDecay.with_decay, JustifyExponentialDecay.without_decay); plt.xticks([], tick1On=False), plt.xlim(xmax=350)
+        plt.legend(loc=2, ncol=2)
         plt.ylabel(getLatexForString('Running time (s)'))
-        plt.subplot(212)
-        plotQuality(experimentsData, numberOfPoints, pltInfo)
+        plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo)
         plt.xlabel(getLatexForString('Time'))
         plt.savefig('justifyExponentialDecay.pdf')
     def analyzeJustifyExponentialDecay(self):
