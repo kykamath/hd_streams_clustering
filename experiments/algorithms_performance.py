@@ -51,7 +51,7 @@ def plotRunningTime(experimentsData, pltInfo, key1, key2, semilog=True):
     for y1, y2 in zip(experimentsData[key1]['iteration_time'], experimentsData[key2]['iteration_time']): dataY1.append(y1), dataY2.append(y2)
     numberOfPoints = len(dataY1)
     for k, dataY in zip(experimentsData, [dataY1, dataY2]): 
-        window = 20; 
+        window = 1; 
         if semilog: plt.semilogy(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
         else: plt.plot(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
     plt.ylabel(getLatexForString('Running time (s)'))
@@ -307,10 +307,10 @@ class JustifyNotUsingVanillaLSH:
         if with_vanilla_lsh: 
             experts_twitter_stream_settings['lsh_type'] = JustifyNotUsingVanillaLSH.with_vanilla_lsh
             experts_twitter_stream_settings['phrase_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_cluster_decay_coefficient']=1.0;
-#            experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod;
+            experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod;
             experts_twitter_stream_settings['signature_type']='signature_type_list'
-#            experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(100000)
-#            experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
+            experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(10000)
+            experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
         else: experts_twitter_stream_settings['lsh_type'] = JustifyNotUsingVanillaLSH.with_modified_lsh
         experts_twitter_stream_settings['cluster_analysis_method'] = JustifyNotUsingVanillaLSH.modifiedClusterAnalysisMethod
         previousTime = time.time()
@@ -327,7 +327,7 @@ class JustifyNotUsingVanillaLSH:
             plt.savefig('justifyNotUsingVanillaLSH.pdf')
     @staticmethod
     def runExperiment():
-        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
+        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=True)
 #        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
