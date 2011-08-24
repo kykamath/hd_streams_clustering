@@ -80,4 +80,4 @@ houston_twitter_stream_settings.lsh_clusters_folder='%slsh_crowds/houston_stream
 houston_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/houston_stream/parameter_estimation/'%twitterDataFolder
 
 if __name__ == '__main__':
-    print getLargestPrimeLesserThan(23)
+    print getLargestPrimeLesserThan(80000)

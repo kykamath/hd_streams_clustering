@@ -50,8 +50,8 @@ def plotRunningTime(experimentsData, pltInfo, key1, key2, semilog=True):
     dataY1, dataY2 = [], []
     for y1, y2 in zip(experimentsData[key1]['iteration_time'], experimentsData[key2]['iteration_time']): dataY1.append(y1), dataY2.append(y2)
     numberOfPoints = len(dataY1)
-    for k, dataY in zip(experimentsData, [dataY1, dataY2]): 
-        window = 1; 
+    for k, dataY in zip([key1, key2], [dataY1, dataY2]): 
+        window = 20; 
         if semilog: plt.semilogy(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
         else: plt.plot(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
     plt.ylabel(getLatexForString('Running time (s)'))
@@ -81,6 +81,7 @@ class JustifyDimensionsEstimation():
     first_n_dimension = 'first_n_dimension'
     top_n_dimension = 'top_n_dimension'
     stats_file = clustering_quality_experts_folder+'dimensions_need_analysis'
+    stats_file_2 = clustering_quality_experts_folder+'dimensions_need_analysis_2'
     def __init__(self): experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
     @staticmethod
     def modifiedClusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime):
@@ -105,19 +106,37 @@ class JustifyDimensionsEstimation():
             try:
                 HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts())
             except Exception as e: pass
+    @staticmethod
+    def modifiedClusterAnalysisMethod2(hdStreamClusteringObject, currentMessageTime):
+        global evaluation, previousTime
+        currentTime = time.time()
+        documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
+        iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime, {'type': experts_twitter_stream_settings['dimensions_performance_type'], 'total_clusters': len(hdStreamClusteringObject.clusters), 'current_time': getStringRepresentationForTweetTimestamp(currentMessageTime)})
+        previousTime = time.time()
+        FileIO.writeToFileAsJson(iteration_data, JustifyDimensionsEstimation.stats_file_2)
+        del iteration_data['clusters']
+        print getStringRepresentationForTweetTimestamp(currentMessageTime), iteration_data
+    def generateExperimentData2(self, fixedType):
+        global previousTime
+        experts_twitter_stream_settings['cluster_analysis_method'] = JustifyDimensionsEstimation.modifiedClusterAnalysisMethod2
+        if fixedType:
+            experts_twitter_stream_settings['dimensions_performance_type'] = JustifyDimensionsEstimation.first_n_dimension
+            experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
+            for dimensions in range(10**4,21*10**4,10**4):
+                experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(dimensions)
+                previousTime = time.time()
+                HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,20,5)))
+        else:
+            experts_twitter_stream_settings['dimensions_performance_type'] = JustifyDimensionsEstimation.top_n_dimension
+            previousTime = time.time()
+            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,20,5)))
+            
     def plotJustifyDimensionsEstimation(self):
         runningTimeData, purityData = defaultdict(list), defaultdict(list)
         for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file):
             if data['iteration_parameters']['dimensions']<data['no_of_observed_dimensions']:
                 no_of_dimensions = data['iteration_parameters']['dimensions']
                 runningTimeData[no_of_dimensions].append(data['iteration_time']), purityData[no_of_dimensions].append(data['purity'])
-#        plt.subplot(211)
-#        dataX, dataY = [], []
-#        for k in sorted(runningTimeData): dataX.append(k), dataY.append(np.mean(runningTimeData[k])) 
-#        plt.semilogx(dataX, dataY, '-x', label=getLatexForString('Fixed dimensions'), color='k', lw=2)
-#        plt.ylabel(getLatexForString('Running time (s)'))
-#        plt.xlim(7000, 203000)
-        
         plt.subplot(111)
         dataX, dataY = [], []
         del purityData[169991]; del purityData[39989]
@@ -136,7 +155,9 @@ class JustifyDimensionsEstimation():
     @staticmethod
     def runExperiment():
 #        JustifyDimensionsEstimation().generateExperimentData()
-        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation()
+        JustifyDimensionsEstimation().generateExperimentData2(fixedType=False)
+        JustifyDimensionsEstimation().generateExperimentData2(fixedType=True)
+#        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation()
 
 class JustifyMemoryPruning:
     with_memory_pruning = 'with_memory_pruning'
@@ -277,11 +298,12 @@ class JustifyTrie:
             pltInfo = {JustifyTrie.with_trie: {'label': getLatexForString('With trie'), 'color': '#7109AA', 'type': '-'}, JustifyTrie.with_sorted_list: {'label': getLatexForString('With sorted list'), 'color': '#5AF522', 'type': '-'}}
             experimentsData = {JustifyTrie.with_trie: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyTrie.with_sorted_list: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
             loadExperimentsData(experimentsData, JustifyTrie.stats_file)
-            plt.subplot(212); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyTrie.with_trie, JustifyTrie.with_sorted_list); plt.xlim(xmax=200)
+            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyTrie.with_trie, JustifyTrie.with_sorted_list); plt.xlim(xmax=200); plt.xticks([], tick1On=False);
             plt.xlabel(getLatexForString('Time'))
-            plt.subplot(211); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.xticks([], tick1On=False); plt.xlim(xmax=200)
+            plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.xticks([], tick1On=False); plt.xlim(xmax=200)
             plt.title(getLatexForString('Need for trie'))
-            plt.legend(loc=4)
+            plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlim(xmax=200)
+            plt.legend(loc=1)
             plt.savefig('justifyTrie.pdf')
     @staticmethod
     def runExperiment():
@@ -318,21 +340,21 @@ class JustifyNotUsingVanillaLSH:
     def plotJustifyNotUsingVanillaLSH(self):
             pltInfo = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'label': getLatexForString('Modified LSH'), 'color': '#7109AA', 'type': '-'}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'label': getLatexForString('Plain LSH'), 'color': '#5AF522', 'type': '-'}}
             experimentsData = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
-#            loadExperimentsData(experimentsData, JustifyNotUsingVanillaLSH.stats_file)
-            loadExperimentsData(experimentsData, 'temp/modified_lsh_need_analysis')
-            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyNotUsingVanillaLSH.with_modified_lsh, JustifyNotUsingVanillaLSH.with_vanilla_lsh, semilog=False); plt.xticks([], tick1On=False)
-            plt.legend(loc=2)
+            loadExperimentsData(experimentsData, JustifyNotUsingVanillaLSH.stats_file)
+#            loadExperimentsData(experimentsData, 'temp/modified_lsh_need_analysis')
+            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyNotUsingVanillaLSH.with_modified_lsh, JustifyNotUsingVanillaLSH.with_vanilla_lsh, semilog=True); plt.xticks([], tick1On=False)
+            plt.legend(loc=4, ncol=2)
             plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlabel(getLatexForString('Time'))
             plt.subplot(311);plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Need for modified lsh')); plt.xticks([], tick1On=False)
             plt.savefig('justifyNotUsingVanillaLSH.pdf')
     @staticmethod
     def runExperiment():
-        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
-#        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
+#        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
+        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
-#    JustifyDimensionsEstimation.runExperiment()
+    JustifyDimensionsEstimation.runExperiment()
 #    JustifyMemoryPruning.runExperiment()
 #    JustifyExponentialDecay.runExperiment()
 #    JustifyTrie.runExperiment()
-    JustifyNotUsingVanillaLSH.runExperiment()
+#    JustifyNotUsingVanillaLSH.runExperiment()
