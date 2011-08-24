@@ -308,7 +308,7 @@ class JustifyNotUsingVanillaLSH:
             experts_twitter_stream_settings['lsh_type'] = JustifyNotUsingVanillaLSH.with_vanilla_lsh
             experts_twitter_stream_settings['phrase_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_cluster_decay_coefficient']=1.0;
 #            experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod;
-            experts_twitter_stream_settings['signature_type']='signature_type_list'
+#            experts_twitter_stream_settings['signature_type']='signature_type_list'
 #            experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(100000)
 #            experts_twitter_stream_settings['update_dimensions_method'] = emptyUpdateDimensionsMethod
         else: experts_twitter_stream_settings['lsh_type'] = JustifyNotUsingVanillaLSH.with_modified_lsh
@@ -327,7 +327,7 @@ class JustifyNotUsingVanillaLSH:
             plt.savefig('justifyNotUsingVanillaLSH.pdf')
     @staticmethod
     def runExperiment():
-        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=False)
+        JustifyNotUsingVanillaLSH().generateExperimentData(with_vanilla_lsh=True)
 #        JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
