@@ -74,7 +74,7 @@ class Evaluation():
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
 
-evaluation = Evaluation()
+#evaluation = Evaluation()
 previousTime = None
 
 class JustifyDimensionsEstimation():
@@ -167,21 +167,21 @@ class JustifyDimensionsEstimation():
         plt.savefig('justifyDimensionsEstimation.pdf')
         
     def plotJustifyDimensionsEstimation2(self):
-        pltInfo =  {JustifyDimensionsEstimation.top_n_dimension: {'label': getLatexForString('With pruning'), 'color': '#7109AA', 'type': '-'}, JustifyDimensionsEstimation.first_n_dimension: {'label': getLatexForString('With out pruning'), 'color': '#5AF522', 'type': '-'}}
+        pltInfo =  {JustifyDimensionsEstimation.top_n_dimension: {'label': getLatexForString('Ranked dimensions'), 'color': '#7109AA', 'type': '-'}, JustifyDimensionsEstimation.first_n_dimension: {'label': getLatexForString('Fixed top dimensions'), 'color': '#5AF522', 'type': '-'}}
 #        experimentsData = {JustifyMemoryPruning.with_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyMemoryPruning.without_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
         experimentsData = defaultdict(dict)
 #        for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file_2):
-        for data in FileIO.iterateJsonFromFile('temp/dimensions_need_analysis_2_bak'):
+        for data in FileIO.iterateJsonFromFile('temp/dimensions_need_analysis_2'):
             if 'dimensions' in data['iteration_parameters']: 
                 dimension = data['iteration_parameters']['dimensions']
                 if dimension not in experimentsData: experimentsData[dimension] = {'iteration_time': [], 'quality': [], 'total_clusters': []}
                 experimentsData[dimension]['iteration_time'].append(data['iteration_time']), experimentsData[dimension]['quality'].append(data['purity']), experimentsData[dimension]['total_clusters'].append(data['iteration_parameters']['total_clusters'])
-        print len(experimentsData[76819]['iteration_time'])
-        print sum(experimentsData[76819]['iteration_time'])
-        print sum(experimentsData[76819]['iteration_time'])/len(experimentsData[76819]['iteration_time'])
+#        print len(experimentsData[76819]['iteration_time'])
+#        print sum(experimentsData[76819]['iteration_time'])
+#        print sum(experimentsData[76819]['iteration_time'])/len(experimentsData[76819]['iteration_time'])
         lshData = dict([(k, np.mean(experimentsData[76819][k])) for k in experimentsData[76819]])
-        print lshData
-        exit()
+#        print lshData
+#        exit()
         del experimentsData[76819]
         plotData = defaultdict(list)
 #        lshData = {'total_clusters': 4596.2280701754389, 'quality': 0.92960892728101752, 'iteration_time': 6.7044307934628078}
@@ -189,17 +189,23 @@ class JustifyDimensionsEstimation():
 #        for k, v in plotData.iteritems(): print k, v
 #        for k, v in plotData.iteritems(): print k, len(v)
 #        plt.subplot(311); plt.plot(plotData['dataX'], plotData['total_clusters']); plt.xlabel('total_clusters'); plt.plot(plotData['dataX'], [lshData['total_clusters']]*len(plotData['dataX']), '--');
-        plt.subplot(211); plt.plot(plotData['dataX'], plotData['iteration_time']); plt.ylabel('iteration_time'); plt.plot(plotData['dataX'], [lshData['iteration_time']]*len(plotData['dataX']), '--');
-        plt.subplot(212); plt.plot(plotData['dataX'], movingAverage(plotData['quality'], 4)); plt.ylabel('quality'); plt.plot(plotData['dataX'], [lshData['quality']]*len(plotData['dataX']), '--');
+#        plt.subplot(211); plt.plot(plotData['dataX'], plotData['iteration_time']); plt.ylabel('iteration_time'); plt.plot(plotData['dataX'], [lshData['iteration_time']]*len(plotData['dataX']), '--');
+        plt.subplot(111); plt.plot([x/10**3 for x in plotData['dataX']], movingAverage(plotData['quality'], 4), color=pltInfo[JustifyDimensionsEstimation.first_n_dimension]['color'], label=pltInfo[JustifyDimensionsEstimation.first_n_dimension]['label'], lw=2);
+        plt.ylabel('$Purity$'); 
+        plt.title(getLatexForString('Impact of dimension ranking'))
+        plt.xlabel('$\#\ number\ of\ dimensions\ (10^3)$')
+        plt.plot([x/10**3 for x in plotData['dataX']], [lshData['quality']]*len(plotData['dataX']), '--', color=pltInfo[JustifyDimensionsEstimation.top_n_dimension]['color'], label=pltInfo[JustifyDimensionsEstimation.top_n_dimension]['label'], lw=2);
+        plt.ylim(ymin=0.70,ymax=1.0)
+        plt.legend(loc=3)
         plt.savefig('justifyDimensionsEstimation2.pdf')
         
     @staticmethod
     def runExperiment():
 #        JustifyDimensionsEstimation().generateExperimentData()
-        JustifyDimensionsEstimation().generateExperimentData2(fixedType=False)
+#        JustifyDimensionsEstimation().generateExperimentData2(fixedType=False)
 #        JustifyDimensionsEstimation().generateExperimentData2(fixedType=True)
 #        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation()
-#        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation2()
+        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation2()
 
 class JustifyMemoryPruning:
     with_memory_pruning = 'with_memory_pruning'
