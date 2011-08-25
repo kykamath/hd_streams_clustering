@@ -74,7 +74,7 @@ class Evaluation():
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
 
-#evaluation = Evaluation()
+evaluation = Evaluation()
 previousTime = None
 
 class JustifyDimensionsEstimation():
