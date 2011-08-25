@@ -74,7 +74,7 @@ class Evaluation():
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
 
-#evaluation = Evaluation()
+evaluation = Evaluation()
 previousTime = None
 
 class JustifyDimensionsEstimation():
@@ -145,6 +145,18 @@ class JustifyDimensionsEstimation():
             experts_twitter_stream_settings['dimensions_performance_type'] = JustifyDimensionsEstimation.top_n_dimension
             previousTime = time.time()
             HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,20,5)))
+    def generateExperimentData3(self, fixedType):
+        global previousTime
+        experts_twitter_stream_settings['cluster_analysis_method'] = JustifyDimensionsEstimation.modifiedClusterAnalysisMethod2
+        if fixedType:
+            experts_twitter_stream_settings['dimensions_performance_type'] = JustifyDimensionsEstimation.first_n_dimension
+            experts_twitter_stream_settings['phrase_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_decay_coefficient']=1.0; experts_twitter_stream_settings['stream_cluster_decay_coefficient']=1.0;
+        else: experts_twitter_stream_settings['dimensions_performance_type'] = JustifyDimensionsEstimation.top_n_dimension
+        for dimensions in range(10**4,21*10**4,10**4):
+            experts_twitter_stream_settings['dimensions'] = getLargestPrimeLesserThan(dimensions)
+            previousTime = time.time()
+            HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,20,5)))
+        
     def plotJustifyDimensionsEstimation(self):
         runningTimeData, purityData = defaultdict(list), defaultdict(list)
         for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file):
@@ -202,10 +214,10 @@ class JustifyDimensionsEstimation():
     @staticmethod
     def runExperiment():
 #        JustifyDimensionsEstimation().generateExperimentData()
-#        JustifyDimensionsEstimation().generateExperimentData2(fixedType=False)
+        JustifyDimensionsEstimation().generateExperimentData3(fixedType=False)
 #        JustifyDimensionsEstimation().generateExperimentData2(fixedType=True)
 #        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation()
-        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation2()
+#        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation2()
 
 class JustifyMemoryPruning:
     with_memory_pruning = 'with_memory_pruning'
