@@ -171,27 +171,32 @@ class JustifyDimensionsEstimation():
 #        experimentsData = {JustifyMemoryPruning.with_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyMemoryPruning.without_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
         experimentsData = defaultdict(dict)
 #        for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file_2):
-        for data in FileIO.iterateJsonFromFile('temp/dimensions_need_analysis_2'):
+        for data in FileIO.iterateJsonFromFile('temp/dimensions_need_analysis_2_bak'):
             if 'dimensions' in data['iteration_parameters']: 
                 dimension = data['iteration_parameters']['dimensions']
                 if dimension not in experimentsData: experimentsData[dimension] = {'iteration_time': [], 'quality': [], 'total_clusters': []}
                 experimentsData[dimension]['iteration_time'].append(data['iteration_time']), experimentsData[dimension]['quality'].append(data['purity']), experimentsData[dimension]['total_clusters'].append(data['iteration_parameters']['total_clusters'])
-        lshData = dict([(k, np.mean(experimentsData[dimension][k])) for k in experimentsData[76819]])
+        print len(experimentsData[76819]['iteration_time'])
+        print sum(experimentsData[76819]['iteration_time'])
+        print sum(experimentsData[76819]['iteration_time'])/len(experimentsData[76819]['iteration_time'])
+        lshData = dict([(k, np.mean(experimentsData[76819][k])) for k in experimentsData[76819]])
+        print lshData
+        exit()
         del experimentsData[76819]
         plotData = defaultdict(list)
+#        lshData = {'total_clusters': 4596.2280701754389, 'quality': 0.92960892728101752, 'iteration_time': 6.7044307934628078}
         for dimension in sorted(experimentsData): plotData['dataX'].append(dimension); [plotData[k].append(np.mean(experimentsData[dimension][k])) for k in experimentsData[dimension]]
 #        for k, v in plotData.iteritems(): print k, v
-#        print lshData
 #        for k, v in plotData.iteritems(): print k, len(v)
 #        plt.subplot(311); plt.plot(plotData['dataX'], plotData['total_clusters']); plt.xlabel('total_clusters'); plt.plot(plotData['dataX'], [lshData['total_clusters']]*len(plotData['dataX']), '--');
-        plt.subplot(211); plt.semilogy(plotData['dataX'], plotData['iteration_time']); plt.ylabel('iteration_time');# plt.plot(plotData['dataX'], [lshData['iteration_time']]*len(plotData['dataX']), '--');
-        plt.subplot(212); plt.plot(plotData['dataX'], movingAverage(plotData['quality'], 4)); plt.ylabel('quality');# plt.plot(plotData['dataX'], [lshData['quality']]*len(plotData['dataX']), '--');
+        plt.subplot(211); plt.plot(plotData['dataX'], plotData['iteration_time']); plt.ylabel('iteration_time'); plt.plot(plotData['dataX'], [lshData['iteration_time']]*len(plotData['dataX']), '--');
+        plt.subplot(212); plt.plot(plotData['dataX'], movingAverage(plotData['quality'], 4)); plt.ylabel('quality'); plt.plot(plotData['dataX'], [lshData['quality']]*len(plotData['dataX']), '--');
         plt.savefig('justifyDimensionsEstimation2.pdf')
         
     @staticmethod
     def runExperiment():
-        JustifyDimensionsEstimation().generateExperimentData()
-#        JustifyDimensionsEstimation().generateExperimentData2(fixedType=False)
+#        JustifyDimensionsEstimation().generateExperimentData()
+        JustifyDimensionsEstimation().generateExperimentData2(fixedType=False)
 #        JustifyDimensionsEstimation().generateExperimentData2(fixedType=True)
 #        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation()
 #        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation2()
@@ -375,8 +380,8 @@ class JustifyNotUsingVanillaLSH:
     def plotJustifyNotUsingVanillaLSH(self):
             pltInfo = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'label': getLatexForString('Modified LSH'), 'color': '#7109AA', 'type': '-'}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'label': getLatexForString('Plain LSH'), 'color': '#5AF522', 'type': '-'}}
             experimentsData = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
-            loadExperimentsData(experimentsData, JustifyNotUsingVanillaLSH.stats_file)
-#            loadExperimentsData(experimentsData, 'temp/modified_lsh_need_analysis')
+#            loadExperimentsData(experimentsData, JustifyNotUsingVanillaLSH.stats_file)
+            loadExperimentsData(experimentsData, 'temp/modified_lsh_need_analysis')
             plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyNotUsingVanillaLSH.with_modified_lsh, JustifyNotUsingVanillaLSH.with_vanilla_lsh, semilog=True); plt.xticks([], tick1On=False)
             plt.legend(loc=4, ncol=2)
             plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlabel(getLatexForString('Time'))
@@ -393,3 +398,10 @@ if __name__ == '__main__':
 #    JustifyExponentialDecay.runExperiment()
 #    JustifyTrie.runExperiment()
 #    JustifyNotUsingVanillaLSH.runExperiment()
+
+#    for data in FileIO.iterateJsonFromFile('temp/dimensions_need_analysis_2'):
+#            if 'dimensions' in data['iteration_parameters']: 
+#                dimension = data['iteration_parameters']['dimensions']
+#                if dimension==76819:
+#                    print dimension
+##                    FileIO.writeToFileAsJson(data,'temp_data')
