@@ -74,7 +74,7 @@ class Evaluation():
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
 
-evaluation = Evaluation()
+#evaluation = Evaluation()
 previousTime = None
 
 class JustifyDimensionsEstimation():
@@ -170,7 +170,8 @@ class JustifyDimensionsEstimation():
         pltInfo =  {JustifyDimensionsEstimation.top_n_dimension: {'label': getLatexForString('With pruning'), 'color': '#7109AA', 'type': '-'}, JustifyDimensionsEstimation.first_n_dimension: {'label': getLatexForString('With out pruning'), 'color': '#5AF522', 'type': '-'}}
 #        experimentsData = {JustifyMemoryPruning.with_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyMemoryPruning.without_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
         experimentsData = defaultdict(dict)
-        for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file_2):
+#        for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file_2):
+        for data in FileIO.iterateJsonFromFile('temp/dimensions_need_analysis_2'):
             if 'dimensions' in data['iteration_parameters']: 
                 dimension = data['iteration_parameters']['dimensions']
                 if dimension not in experimentsData: experimentsData[dimension] = {'iteration_time': [], 'quality': [], 'total_clusters': []}
@@ -183,15 +184,15 @@ class JustifyDimensionsEstimation():
 #        print lshData
 #        for k, v in plotData.iteritems(): print k, len(v)
 #        plt.subplot(311); plt.plot(plotData['dataX'], plotData['total_clusters']); plt.xlabel('total_clusters'); plt.plot(plotData['dataX'], [lshData['total_clusters']]*len(plotData['dataX']), '--');
-        plt.subplot(211); plt.semilogy(plotData['dataX'], plotData['iteration_time']); plt.ylabel('iteration_time'); plt.plot(plotData['dataX'], [lshData['iteration_time']]*len(plotData['dataX']), '--');
-        plt.subplot(212); plt.plot(plotData['dataX'], movingAverage(plotData['quality'], 4)); plt.ylabel('quality'); plt.plot(plotData['dataX'], [lshData['quality']]*len(plotData['dataX']), '--');
+        plt.subplot(211); plt.semilogy(plotData['dataX'], plotData['iteration_time']); plt.ylabel('iteration_time');# plt.plot(plotData['dataX'], [lshData['iteration_time']]*len(plotData['dataX']), '--');
+        plt.subplot(212); plt.plot(plotData['dataX'], movingAverage(plotData['quality'], 4)); plt.ylabel('quality');# plt.plot(plotData['dataX'], [lshData['quality']]*len(plotData['dataX']), '--');
         plt.savefig('justifyDimensionsEstimation2.pdf')
         
     @staticmethod
     def runExperiment():
-#        JustifyDimensionsEstimation().generateExperimentData()
+        JustifyDimensionsEstimation().generateExperimentData()
 #        JustifyDimensionsEstimation().generateExperimentData2(fixedType=False)
-        JustifyDimensionsEstimation().generateExperimentData2(fixedType=True)
+#        JustifyDimensionsEstimation().generateExperimentData2(fixedType=True)
 #        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation()
 #        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation2()
 
