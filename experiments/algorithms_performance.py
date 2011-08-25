@@ -191,7 +191,7 @@ class JustifyDimensionsEstimation():
 #        plt.subplot(311); plt.plot(plotData['dataX'], plotData['total_clusters']); plt.xlabel('total_clusters'); plt.plot(plotData['dataX'], [lshData['total_clusters']]*len(plotData['dataX']), '--');
 #        plt.subplot(211); plt.plot(plotData['dataX'], plotData['iteration_time']); plt.ylabel('iteration_time'); plt.plot(plotData['dataX'], [lshData['iteration_time']]*len(plotData['dataX']), '--');
         plt.subplot(111); plt.plot([x/10**3 for x in plotData['dataX']], movingAverage(plotData['quality'], 4), color=pltInfo[JustifyDimensionsEstimation.first_n_dimension]['color'], label=pltInfo[JustifyDimensionsEstimation.first_n_dimension]['label'], lw=2);
-        plt.ylabel('$Purity$'); 
+        plt.ylabel('$Mean\ purity\ per\ iteration$'); 
         plt.title(getLatexForString('Impact of dimension ranking'))
         plt.xlabel('$\#\ number\ of\ dimensions\ (10^3)$')
         plt.plot([x/10**3 for x in plotData['dataX']], [lshData['quality']]*len(plotData['dataX']), '--', color=pltInfo[JustifyDimensionsEstimation.top_n_dimension]['color'], label=pltInfo[JustifyDimensionsEstimation.top_n_dimension]['label'], lw=2);
