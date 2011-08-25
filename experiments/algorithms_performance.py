@@ -167,7 +167,7 @@ class JustifyDimensionsEstimation():
         plt.savefig('justifyDimensionsEstimation.pdf')
         
     def plotJustifyDimensionsEstimation2(self):
-        pltInfo =  {JustifyDimensionsEstimation.top_n_dimension: {'label': getLatexForString('Ranked dimensions'), 'color': '#7109AA', 'type': '-'}, JustifyDimensionsEstimation.first_n_dimension: {'label': getLatexForString('Fixed top dimensions'), 'color': '#5AF522', 'type': '-'}}
+        pltInfo =  {JustifyDimensionsEstimation.top_n_dimension: {'label': getLatexForString('Temporally significant dimensions'), 'color': '#7109AA', 'type': '-'}, JustifyDimensionsEstimation.first_n_dimension: {'label': getLatexForString('Top dimensions by occurrence'), 'color': '#5AF522', 'type': '-'}}
 #        experimentsData = {JustifyMemoryPruning.with_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyMemoryPruning.without_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
         experimentsData = defaultdict(dict)
 #        for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file_2):
