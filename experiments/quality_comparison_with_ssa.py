@@ -33,7 +33,7 @@ hdfsUnzippedPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_
 plotSettings = {
                  'ssa':{'label': 'Iterative CDA', 'color': '#FD0006'}, 
                  'ssa_mr': {'label': 'MR CDA', 'color': '#5AF522'},
-                 'streaming_lsh': {'label': 'Stream CDA', 'color': '#1435AD'},
+                 'streaming_lsh': {'label': 'Stream CDA', 'color': '#7109AA'},
                  }
 kMeansPlotSettings = {
                  'k_means':{'label': 'Iterative k-means', 'color': '#5AF522'}, 
@@ -196,7 +196,7 @@ class QualityComparisonWithKMeans():
         plotSettings = {
                  'k_means':{'label': 'Iterative k-means', 'color': '#FD0006'}, 
                  'mr_k_means': {'label': 'MR k-means', 'color': '#5AF522'},
-                 'streaming_lsh': {'label': 'Stream CDA', 'color': '#1435AD'},
+                 'streaming_lsh': {'label': 'Stream CDA', 'color': '#7109AA'},
                  }
         dataToPlot = {'k_means': {'x': [], 'y': []}, 'mr_k_means': {'x': [], 'y': []}, 'streaming_lsh': {'x': [], 'y': []}}
         for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
@@ -217,5 +217,5 @@ if __name__ == '__main__':
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
 #    QualityComparisonWithSSA.plotClusteringSpeed()
 #    QualityComparisonWithSSA.plotClusteringQuality()
-    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
-#    QualityComparisonWithSSA.plotSpeedWithKMeansAndSSA()
+#    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
+    QualityComparisonWithSSA.plotSpeedWithKMeansAndSSA()

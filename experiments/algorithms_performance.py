@@ -166,7 +166,7 @@ class JustifyDimensionsEstimation():
         plt.subplot(111)
         dataX, dataY = [], []
         del purityData[169991]; del purityData[39989]
-        plt.title(getLatexForString('Need for dimension estimation'))
+        plt.title(getLatexForString('Impact of dimension estimation'))
         for k in sorted(purityData): dataX.append(k), dataY.append(np.mean(purityData[k])) 
         plt.semilogx(dataX, [0.96]*len(dataX), '--', label=getLatexForString('Top n dimensions'), color='#7109AA', lw=2)
         plt.semilogx(dataX, [np.mean(dataY)]*len(dataX), '--', color='#5AF522', lw=2)
@@ -181,42 +181,43 @@ class JustifyDimensionsEstimation():
     def plotJustifyDimensionsEstimation2(self):
         pltInfo =  {JustifyDimensionsEstimation.top_n_dimension: {'label': getLatexForString('Temporally significant dimensions'), 'color': '#7109AA', 'type': '-'}, JustifyDimensionsEstimation.first_n_dimension: {'label': getLatexForString('Top dimensions by occurrence'), 'color': '#5AF522', 'type': '-'}}
 #        experimentsData = {JustifyMemoryPruning.with_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyMemoryPruning.without_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
-        experimentsData = defaultdict(dict)
-#        for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file_2):
-        for data in FileIO.iterateJsonFromFile('temp/dimensions_need_analysis_2'):
-            if 'dimensions' in data['iteration_parameters']: 
-                dimension = data['iteration_parameters']['dimensions']
-                if dimension not in experimentsData: experimentsData[dimension] = {'iteration_time': [], 'quality': [], 'total_clusters': []}
-                experimentsData[dimension]['iteration_time'].append(data['iteration_time']), experimentsData[dimension]['quality'].append(data['purity']), experimentsData[dimension]['total_clusters'].append(data['iteration_parameters']['total_clusters'])
-#        print len(experimentsData[76819]['iteration_time'])
-#        print sum(experimentsData[76819]['iteration_time'])
-#        print sum(experimentsData[76819]['iteration_time'])/len(experimentsData[76819]['iteration_time'])
-        lshData = dict([(k, np.mean(experimentsData[76819][k])) for k in experimentsData[76819]])
-#        print lshData
-#        exit()
-        del experimentsData[76819]
-        plotData = defaultdict(list)
-#        lshData = {'total_clusters': 4596.2280701754389, 'quality': 0.92960892728101752, 'iteration_time': 6.7044307934628078}
-        for dimension in sorted(experimentsData): plotData['dataX'].append(dimension); [plotData[k].append(np.mean(experimentsData[dimension][k])) for k in experimentsData[dimension]]
-#        for k, v in plotData.iteritems(): print k, v
-#        for k, v in plotData.iteritems(): print k, len(v)
-#        plt.subplot(311); plt.plot(plotData['dataX'], plotData['total_clusters']); plt.xlabel('total_clusters'); plt.plot(plotData['dataX'], [lshData['total_clusters']]*len(plotData['dataX']), '--');
-#        plt.subplot(211); plt.plot(plotData['dataX'], plotData['iteration_time']); plt.ylabel('iteration_time'); plt.plot(plotData['dataX'], [lshData['iteration_time']]*len(plotData['dataX']), '--');
-        plt.subplot(111); plt.plot([x/10**3 for x in plotData['dataX']], movingAverage(plotData['quality'], 4), color=pltInfo[JustifyDimensionsEstimation.first_n_dimension]['color'], label=pltInfo[JustifyDimensionsEstimation.first_n_dimension]['label'], lw=2);
+        experimentsData = {JustifyDimensionsEstimation.top_n_dimension: defaultdict(dict), JustifyDimensionsEstimation.first_n_dimension: defaultdict(dict)}
+        for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file_2):
+#        for data in FileIO.iterateJsonFromFile('temp/dimensions_need_analysis_2'):
+#            if 'dimensions' in data['iteration_parameters']: 
+            dimension = data['iteration_parameters']['dimensions']
+            type = data['iteration_parameters']['type']
+            if dimension not in experimentsData[type]: experimentsData[type][dimension] = {'iteration_time': [], 'quality': [], 'total_clusters': []}
+            experimentsData[type][dimension]['iteration_time'].append(data['iteration_time']), experimentsData[type][dimension]['quality'].append(data['purity']), experimentsData[type][dimension]['total_clusters'].append(data['iteration_parameters']['total_clusters'])
+        lshData = dict([(k, np.mean(experimentsData[JustifyDimensionsEstimation.top_n_dimension][76819][k])) for k in experimentsData[JustifyDimensionsEstimation.top_n_dimension][76819]])
+        del experimentsData[JustifyDimensionsEstimation.top_n_dimension][76819]
+        print lshData
+        plotData = {JustifyDimensionsEstimation.top_n_dimension: defaultdict(list), JustifyDimensionsEstimation.first_n_dimension: defaultdict(list)}
+        for type in experimentsData:
+            for dimension in sorted(experimentsData[type]): plotData[type]['dataX'].append(dimension); [plotData[type][k].append(np.mean(experimentsData[type][dimension][k])) for k in experimentsData[type][dimension]]
+#        plt.subplot(211); 
+#        for type in experimentsData:
+#            plt.plot([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['iteration_time'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2);
+#        plt.plot([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['iteration_time']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819 dimensions'), lw=2);
+#        
+#        plt.subplot(212); 
+        for type in experimentsData:
+            plt.plot([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['quality'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2);
         plt.ylabel('$Mean\ purity\ per\ iteration$'); 
         plt.title(getLatexForString('Impact of dimension ranking'))
         plt.xlabel('$\#\ number\ of\ dimensions\ (10^3)$')
-        plt.plot([x/10**3 for x in plotData['dataX']], [lshData['quality']]*len(plotData['dataX']), '--', color=pltInfo[JustifyDimensionsEstimation.top_n_dimension]['color'], label=pltInfo[JustifyDimensionsEstimation.top_n_dimension]['label'], lw=2);
-        plt.ylim(ymin=0.70,ymax=1.0)
+        plt.plot([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['quality']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819 dimensions'), lw=2);
+        plt.ylim(ymin=0.80,ymax=1.0)
         plt.legend(loc=3)
         plt.savefig('justifyDimensionsEstimation2.pdf')
         
     @staticmethod
     def runExperiment():
 #        JustifyDimensionsEstimation().generateExperimentData()
-        JustifyDimensionsEstimation().generateExperimentData3(fixedType=False)
+#        JustifyDimensionsEstimation().generateExperimentData3(fixedType=False)
 #        JustifyDimensionsEstimation().generateExperimentData2(fixedType=True)
 #        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation()
+        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation2()
 #        JustifyDimensionsEstimation().plotJustifyDimensionsEstimation2()
 
 class JustifyMemoryPruning:
@@ -247,7 +248,7 @@ class JustifyMemoryPruning:
         numberOfPoints = 275
         plt.subplot(312); plotRunningTime(experimentsData, pltInfo, JustifyMemoryPruning.with_memory_pruning, JustifyMemoryPruning.without_memory_pruning); plt.legend(loc=2, ncol=2); plt.xticks([], tick1On=False), plt.xlim(xmax=270)
         plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlabel(getLatexForString('Time')), plt.xlim(xmax=270)
-        plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Need for memory pruning')); plt.xticks([], tick1On=False), plt.xlim(xmax=270)
+        plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Impact of memory pruning')); plt.xticks([], tick1On=False), plt.xlim(xmax=270)
         plt.savefig('justifyMemoryPruning.pdf')
     @staticmethod
     def runExperiment():
@@ -281,12 +282,12 @@ class JustifyExponentialDecay:
         pltInfo =  {JustifyExponentialDecay.with_decay: {'label': getLatexForString('With decay'), 'color': '#7109AA', 'type': '-'}, JustifyExponentialDecay.without_decay: {'label': getLatexForString('With out decay'), 'color': '#5AF522', 'type': '-'}}
         experimentsData = {JustifyExponentialDecay.with_decay: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyExponentialDecay.without_decay: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
         loadExperimentsData(experimentsData, JustifyExponentialDecay.stats_file)
-        numberOfPoints = 350
-        plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Need for exponential decay'))
-        plt.subplot(312); plotRunningTime(experimentsData, pltInfo, JustifyExponentialDecay.with_decay, JustifyExponentialDecay.without_decay); plt.xticks([], tick1On=False), plt.xlim(xmax=350)
+        numberOfPoints = 275
+        plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Impact of exponential decay')), plt.xlim(xmax=275)
+        plt.subplot(312); plotRunningTime(experimentsData, pltInfo, JustifyExponentialDecay.with_decay, JustifyExponentialDecay.without_decay); plt.xticks([], tick1On=False), plt.xlim(xmax=275)
         plt.legend(loc=2, ncol=2)
         plt.ylabel(getLatexForString('Running time (s)'))
-        plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo)
+        plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo), plt.xlim(xmax=275)
         plt.xlabel(getLatexForString('Time'))
         plt.savefig('justifyExponentialDecay.pdf')
     def analyzeJustifyExponentialDecay(self):
@@ -353,15 +354,15 @@ class JustifyTrie:
         previousTime = time.time()
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
     def plotJustifyTrie(self):
-            pltInfo = {JustifyTrie.with_trie: {'label': getLatexForString('With trie'), 'color': '#7109AA', 'type': '-'}, JustifyTrie.with_sorted_list: {'label': getLatexForString('With sorted list'), 'color': '#5AF522', 'type': '-'}}
+            pltInfo = {JustifyTrie.with_trie: {'label': getLatexForString('With prefix tree'), 'color': '#7109AA', 'type': '-'}, JustifyTrie.with_sorted_list: {'label': getLatexForString('With sorted list'), 'color': '#5AF522', 'type': '-'}}
             experimentsData = {JustifyTrie.with_trie: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyTrie.with_sorted_list: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
             loadExperimentsData(experimentsData, JustifyTrie.stats_file)
-            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyTrie.with_trie, JustifyTrie.with_sorted_list); plt.xlim(xmax=200); plt.xticks([], tick1On=False);
+            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyTrie.with_trie, JustifyTrie.with_sorted_list); plt.xlim(xmax=200); plt.xticks([], tick1On=False); plt.ylim(ymin=1, ymax=35000);
+            plt.legend(loc=2, ncol=2)
             plt.xlabel(getLatexForString('Time'))
             plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.xticks([], tick1On=False); plt.xlim(xmax=200)
-            plt.title(getLatexForString('Need for trie'))
+            plt.title(getLatexForString('Impact of using prefix tree'))
             plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlim(xmax=200)
-            plt.legend(loc=1)
             plt.savefig('justifyTrie.pdf')
     @staticmethod
     def runExperiment():
@@ -398,12 +399,14 @@ class JustifyNotUsingVanillaLSH:
     def plotJustifyNotUsingVanillaLSH(self):
             pltInfo = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'label': getLatexForString('Modified LSH'), 'color': '#7109AA', 'type': '-'}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'label': getLatexForString('Plain LSH'), 'color': '#5AF522', 'type': '-'}}
             experimentsData = {JustifyNotUsingVanillaLSH.with_modified_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyNotUsingVanillaLSH.with_vanilla_lsh: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
-#            loadExperimentsData(experimentsData, JustifyNotUsingVanillaLSH.stats_file)
-            loadExperimentsData(experimentsData, 'temp/modified_lsh_need_analysis')
-            plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyNotUsingVanillaLSH.with_modified_lsh, JustifyNotUsingVanillaLSH.with_vanilla_lsh, semilog=True); plt.xticks([], tick1On=False)
-            plt.legend(loc=4, ncol=2)
-            plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlabel(getLatexForString('Time'))
-            plt.subplot(311);plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Need for modified lsh')); plt.xticks([], tick1On=False)
+            loadExperimentsData(experimentsData, JustifyNotUsingVanillaLSH.stats_file)
+#            loadExperimentsData(experimentsData, 'temp/modified_lsh_need_analysis')
+            numberOfPoints = 275
+            plt.subplot(312); plotRunningTime(experimentsData, pltInfo, JustifyNotUsingVanillaLSH.with_modified_lsh, JustifyNotUsingVanillaLSH.with_vanilla_lsh, semilog=True); plt.xlim(xmax=270); plt.xticks([], tick1On=False); plt.ylim(ymin=1, ymax=5000);
+            plt.legend(loc=2, ncol=2)
+#            plt.xlabel(getLatexForString('Time'))
+            plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo); plt.xlabel(getLatexForString('Time')); plt.ylim(ymin=0.72); plt.xlim(xmax=270) 
+            plt.subplot(311);plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Impact of modified lsh')); plt.xticks([], tick1On=False); plt.xlim(xmax=270)
             plt.savefig('justifyNotUsingVanillaLSH.pdf')
     @staticmethod
     def runExperiment():
@@ -411,11 +414,11 @@ class JustifyNotUsingVanillaLSH:
         JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
-    JustifyDimensionsEstimation.runExperiment()
+#    JustifyDimensionsEstimation.runExperiment()
 #    JustifyMemoryPruning.runExperiment()
 #    JustifyExponentialDecay.runExperiment()
 #    JustifyTrie.runExperiment()
-#    JustifyNotUsingVanillaLSH.runExperiment()
+    JustifyNotUsingVanillaLSH.runExperiment()
 
 #    for data in FileIO.iterateJsonFromFile('temp/dimensions_need_analysis_2'):
 #            if 'dimensions' in data['iteration_parameters']: 
