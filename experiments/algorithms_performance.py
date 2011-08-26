@@ -325,7 +325,7 @@ class JustifyExponentialDecay:
         
     @staticmethod
     def runExperiment():
-        JustifyExponentialDecay().generateExperimentData(withOutDecay=True)
+        JustifyExponentialDecay().generateExperimentData(withOutDecay=False)
 #        JustifyExponentialDecay().plotJustifyExponentialDecay()
 #        JustifyExponentialDecay().analyzeJustifyExponentialDecay()
 
