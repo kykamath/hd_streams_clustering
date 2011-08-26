@@ -277,7 +277,7 @@ class JustifyExponentialDecay:
         else: experts_twitter_stream_settings['decay_type'] = JustifyExponentialDecay.with_decay
         experts_twitter_stream_settings['cluster_analysis_method'] = JustifyExponentialDecay.modifiedClusterAnalysisMethod
         previousTime = time.time()
-        HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
+        HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,4,1), expertsDataEndTime=datetime(2011,4,8))) 
     def plotJustifyExponentialDecay(self):
         pltInfo =  {JustifyExponentialDecay.with_decay: {'label': getLatexForString('With decay'), 'color': '#7109AA', 'type': '-'}, JustifyExponentialDecay.without_decay: {'label': getLatexForString('With out decay'), 'color': '#5AF522', 'type': '-'}}
         experimentsData = {JustifyExponentialDecay.with_decay: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyExponentialDecay.without_decay: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
@@ -325,8 +325,8 @@ class JustifyExponentialDecay:
         
     @staticmethod
     def runExperiment():
-#        JustifyExponentialDecay().generateExperimentData(withOutDecay=False)
-        JustifyExponentialDecay().plotJustifyExponentialDecay()
+        JustifyExponentialDecay().generateExperimentData(withOutDecay=True)
+#        JustifyExponentialDecay().plotJustifyExponentialDecay()
 #        JustifyExponentialDecay().analyzeJustifyExponentialDecay()
 
 class JustifyTrie:
@@ -416,13 +416,7 @@ class JustifyNotUsingVanillaLSH:
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
 #    JustifyMemoryPruning.runExperiment()
-#    JustifyExponentialDecay.runExperiment()
+    JustifyExponentialDecay.runExperiment()
 #    JustifyTrie.runExperiment()
-    JustifyNotUsingVanillaLSH.runExperiment()
-
-#    for data in FileIO.iterateJsonFromFile('temp/dimensions_need_analysis_2'):
-#            if 'dimensions' in data['iteration_parameters']: 
-#                dimension = data['iteration_parameters']['dimensions']
-#                if dimension==76819:
-#                    print dimension
-##                    FileIO.writeToFileAsJson(data,'temp_data')
+#    JustifyNotUsingVanillaLSH.runExperiment()
+    
