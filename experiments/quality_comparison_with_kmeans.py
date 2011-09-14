@@ -15,7 +15,7 @@ from library.classes import Settings
 from library.plotting import getLatexForString
 from library.file_io import FileIO
 from library.nlp import getWordsFromRawEnglishMessage, getPhrases
-from settings import experts_twitter_stream_settings
+from settings import experts_twitter_stream_settings, default_experts_twitter_stream_settings
 from itertools import groupby
 from operator import itemgetter
 from matplotlib import pyplot as plt
@@ -30,6 +30,10 @@ experts_twitter_stream_settings['min_phrase_length'] = 1
 experts_twitter_stream_settings['max_phrase_length'] = 1
 experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
 
+default_experts_twitter_stream_settings['min_phrase_length'] = 1
+default_experts_twitter_stream_settings['max_phrase_length'] = 1
+default_experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
+
 #plotSettings = {
 #                 'k_means':{'label': 'k-Means', 'color': '#FF1800'}, 
 #                 'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#00C322'},
@@ -40,6 +44,7 @@ plotSettings = {
                  'k_means':{'label': 'k-Means', 'color': '#FD0006'}, 
                  'mr_k_means': {'label': 'MR k-Means', 'color': '#5AF522'},
                  'streaming_lsh': {'label': 'Streaming-LSH', 'color': '#7109AA'},
+                 'default_streaming_lsh': {'label': 'Default-Streaming-LSH', 'color': '#8299FF'},
                  }
 
 def extractArraysFromFile(file, percentage=1.0):
@@ -52,6 +57,7 @@ class TweetsFile:
     stats_file = clustering_quality_experts_folder+'quality_stats'
     mr_stats_file = clustering_quality_experts_folder+'mr_quality_stats'
     combined_stats_file = clustering_quality_experts_folder+'combined_stats_file'
+    default_stats_file = clustering_quality_experts_folder+'default_stats_file'
     def __init__(self, length, forGeneration=False, **stream_settings):
         self.length=length
         self.stream_settings = stream_settings
@@ -140,6 +146,15 @@ class TweetsFile:
                                       'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
                                       TweetsFile.mr_stats_file)
     @staticmethod
+    def generateStatsForDefaultStreamSettings():
+        for i in [10**3, 10**4, 10**5]: 
+            for j in range(1, 10):
+                print 'Generating stats for: ',i*j
+                tf = TweetsFile(i*j, **default_experts_twitter_stream_settings)
+                FileIO.writeToFileAsJson({'streaming_lsh': tf.generateStatsForStreamingLSHClustering(), 
+                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
+                                          TweetsFile.default_stats_file)
+    @staticmethod
     def plotClusteringSpeed(saveFig=True):
         dataToPlot = {'k_means': {'x': [], 'y': []}, 'mr_k_means': {'x': [], 'y': []}, 'streaming_lsh': {'x': [], 'y': []}}
         for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
@@ -198,7 +213,8 @@ if __name__ == '__main__':
 #    TweetsFile.generateStatsForClusteringQuality()
 #    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
-    TweetsFile.plotClusteringSpeed()
+    TweetsFile.generateStatsForDefaultStreamSettings()
+#    TweetsFile.plotClusteringSpeed()
 #    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()
