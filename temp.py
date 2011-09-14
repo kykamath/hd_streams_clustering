@@ -69,6 +69,18 @@
 #        pool.map(innerMeth, xrange(10))
 #
 #C.meth()
-from library.math_modified import getLargestPrimeLesserThan
+#from library.math_modified import getLargestPrimeLesserThan
+#
+#for dimensions in range(10**4,21*10**4,10**4): print dimensions, getLargestPrimeLesserThan(dimensions)
 
-for dimensions in range(10**4,21*10**4,10**4): print dimensions, getLargestPrimeLesserThan(dimensions)
+import math
+import matplotlib.pyplot as plt
+dataX, dataY = [], []
+for i in range(0,100):
+    if i!=0:
+        y = i*0.01
+        dataX.append(y), dataY.append(y*math.log(y))
+plt.plot(dataX, dataY)
+plt.show()
+
+#        print y*math.log(y)

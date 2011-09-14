@@ -179,7 +179,7 @@ class JustifyDimensionsEstimation():
         plt.savefig('justifyDimensionsEstimation.pdf')
         
     def plotJustifyDimensionsEstimation2(self):
-        pltInfo =  {JustifyDimensionsEstimation.top_n_dimension: {'label': getLatexForString('Temporally significant dimensions'), 'color': '#7109AA', 'type': '-'}, JustifyDimensionsEstimation.first_n_dimension: {'label': getLatexForString('Top dimensions by occurrence'), 'color': '#5AF522', 'type': '-'}}
+        pltInfo =  {JustifyDimensionsEstimation.top_n_dimension: {'label': getLatexForString('Temporally significant'), 'color': '#7109AA', 'type': '-'}, JustifyDimensionsEstimation.first_n_dimension: {'label': getLatexForString('By occurrence'), 'color': '#5AF522', 'type': '-'}}
 #        experimentsData = {JustifyMemoryPruning.with_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyMemoryPruning.without_memory_pruning: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
         experimentsData = {JustifyDimensionsEstimation.top_n_dimension: defaultdict(dict), JustifyDimensionsEstimation.first_n_dimension: defaultdict(dict)}
         for data in FileIO.iterateJsonFromFile(JustifyDimensionsEstimation.stats_file_2):
@@ -188,19 +188,26 @@ class JustifyDimensionsEstimation():
             dimension = data['iteration_parameters']['dimensions']
             type = data['iteration_parameters']['type']
             if dimension not in experimentsData[type]: experimentsData[type][dimension] = {'iteration_time': [], 'quality': [], 'total_clusters': []}
-            experimentsData[type][dimension]['iteration_time'].append(data['iteration_time']), experimentsData[type][dimension]['quality'].append(data['purity']), experimentsData[type][dimension]['total_clusters'].append(data['iteration_parameters']['total_clusters'])
+            experimentsData[type][dimension]['iteration_time'].append(data['iteration_time']), experimentsData[type][dimension]['quality'].append(data['purity']), experimentsData[type][dimension]['total_clusters'].append(data['no_of_clusters'])
         lshData = dict([(k, np.mean(experimentsData[JustifyDimensionsEstimation.top_n_dimension][76819][k])) for k in experimentsData[JustifyDimensionsEstimation.top_n_dimension][76819]])
         del experimentsData[JustifyDimensionsEstimation.top_n_dimension][76819]
         print lshData
         plotData = {JustifyDimensionsEstimation.top_n_dimension: defaultdict(list), JustifyDimensionsEstimation.first_n_dimension: defaultdict(list)}
         for type in experimentsData:
             for dimension in sorted(experimentsData[type]): plotData[type]['dataX'].append(dimension); [plotData[type][k].append(np.mean(experimentsData[type][dimension][k])) for k in experimentsData[type][dimension]]
-#        plt.subplot(211); 
-#        for type in experimentsData:
-#            plt.plot([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['iteration_time'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2);
-#        plt.plot([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['iteration_time']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819 dimensions'), lw=2);
-#        
-#        plt.subplot(212); 
+        plt.subplot(311); 
+        for type in experimentsData:
+            plt.semilogy([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['total_clusters'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2);
+        plt.semilogy([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['total_clusters']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819 dimensions'), lw=2);
+        plt.ylim(ymin=1)
+        
+        plt.subplot(312); 
+        for type in experimentsData:
+            plt.semilogy([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['iteration_time'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2);
+        plt.semilogy([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['iteration_time']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819'), lw=2);
+        plt.ylim(ymin=1, ymax=1500)
+        plt.legend(loc=2, ncol=2)
+        plt.subplot(313); 
         for type in experimentsData:
             plt.plot([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['quality'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2);
         plt.ylabel('$Mean\ purity\ per\ iteration$'); 
@@ -208,7 +215,6 @@ class JustifyDimensionsEstimation():
         plt.xlabel('$\#\ number\ of\ dimensions\ (10^3)$')
         plt.plot([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['quality']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819 dimensions'), lw=2);
         plt.ylim(ymin=0.80,ymax=1.0)
-        plt.legend(loc=3)
         plt.savefig('justifyDimensionsEstimation2.pdf')
         
     @staticmethod
@@ -325,8 +331,8 @@ class JustifyExponentialDecay:
         
     @staticmethod
     def runExperiment():
-        JustifyExponentialDecay().generateExperimentData(withOutDecay=False)
-#        JustifyExponentialDecay().plotJustifyExponentialDecay()
+#        JustifyExponentialDecay().generateExperimentData(withOutDecay=False)
+        JustifyExponentialDecay().plotJustifyExponentialDecay()
 #        JustifyExponentialDecay().analyzeJustifyExponentialDecay()
 
 class JustifyTrie:
@@ -414,9 +420,9 @@ class JustifyNotUsingVanillaLSH:
         JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
-#    JustifyDimensionsEstimation.runExperiment()
+    JustifyDimensionsEstimation.runExperiment()
 #    JustifyMemoryPruning.runExperiment()
-    JustifyExponentialDecay.runExperiment()
+#    JustifyExponentialDecay.runExperiment()
 #    JustifyTrie.runExperiment()
 #    JustifyNotUsingVanillaLSH.runExperiment()
     
