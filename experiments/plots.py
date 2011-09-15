@@ -36,4 +36,5 @@ def plotQuality():
     print 'opt', np.mean(optQuality)
     print 'un opt', np.mean(unOptQuality)
 if __name__ == '__main__':
-    plotQuality()
+#    plotQuality()
+    plotTime()

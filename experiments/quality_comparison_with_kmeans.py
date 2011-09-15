@@ -57,7 +57,7 @@ class TweetsFile:
     stats_file = clustering_quality_experts_folder+'quality_stats'
     mr_stats_file = clustering_quality_experts_folder+'mr_quality_stats'
     combined_stats_file = clustering_quality_experts_folder+'combined_stats_file'
-    default_stats_file = clustering_quality_experts_folder+'default_stats_file_bak'
+    default_stats_file = clustering_quality_experts_folder+'default_stats_file'
     def __init__(self, length, forGeneration=False, **stream_settings):
         self.length=length
         self.stream_settings = stream_settings
