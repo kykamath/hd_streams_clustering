@@ -14,7 +14,7 @@ from library.clustering import EvaluationMetrics
 from twitter_streams_clustering import TwitterIterators, getExperts,\
     TwitterCrowdsSpecificMethods
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
-from algorithms_performance import emptyClusterAnalysisMethod
+from algorithms_performance import emptyClusterAnalysisMethod, emptyClusterFilteringMethod
 from settings import Settings
 
 OPTIMIZED_ID = 'optimized'
@@ -35,6 +35,7 @@ class TweetsFile:
         self.stream_settings = stream_settings
         self.stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
         self.stream_settings['cluster_analysis_method'] = emptyClusterAnalysisMethod
+        self.stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
         self.fileName = clustering_quality_experts_folder+'data/'+str(length)
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
     def _getExpertClasses(self, cluster): return [self.expertsToClassMap[user.lower()] for user in cluster if user.lower() in self.expertsToClassMap]
