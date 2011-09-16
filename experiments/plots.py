@@ -32,16 +32,16 @@ class TweetsFile:
         self.stream_settings = stream_settings
         self.fileName = clustering_quality_experts_folder+'data/'+str(length)
         self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
-        if not forGeneration: self.documents = list(self._tweetIterator())
-    def _tweetIterator(self):
-            userMap = {}
-            for tweet in TwitterIterators.iterateFromFile(self.fileName+'.gz'):
-                user = tweet['user']['screen_name']
-                phrases = [phrase.replace(' ', unique_string) for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), self.stream_settings['min_phrase_length'], self.stream_settings['max_phrase_length'])]
-                if phrases:
-                    if user not in userMap: userMap[user] = ' '.join(phrases)
-                    else: userMap[user]+= ' ' + ' '.join(phrases)
-            return userMap.iteritems()
+#        if not forGeneration: self.documents = list(self._tweetIterator())
+#    def _tweetIterator(self):
+#            userMap = {}
+#            for tweet in TwitterIterators.iterateFromFile(self.fileName+'.gz'):
+#                user = tweet['user']['screen_name']
+#                phrases = [phrase.replace(' ', unique_string) for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), self.stream_settings['min_phrase_length'], self.stream_settings['max_phrase_length'])]
+#                if phrases:
+#                    if user not in userMap: userMap[user] = ' '.join(phrases)
+#                    else: userMap[user]+= ' ' + ' '.join(phrases)
+#            return userMap.iteritems()
     def _getExpertClasses(self, cluster): return [self.expertsToClassMap[user.lower()] for user in cluster if user.lower() in self.expertsToClassMap]
     def getEvaluationMetrics(self, documentClusters, timeDifference):
         iterationData =  {'no_of_documents':self.length, 'no_of_clusters': len(documentClusters), 'iteration_time': timeDifference, 'clusters': documentClusters}
@@ -52,16 +52,9 @@ class TweetsFile:
         return iterationData
     def generateStatsForStreamingLSHClustering(self):
         print 'Streaming LSH'
-#        def _getDocumentFromTuple((user, text)):
-#            vector, words = Vector(), text.split()
-#            for word in words[1:]:
-#                if word not in vector: vector[word]=1
-#                else: vector[word]+=1
-#            return Document(user, vector)
         clustering=HDStreaminClustering(**self.stream_settings)
         ts = time.time()
-#        for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
-        clustering.cluster(self.documents)
+        clustering.cluster(TwitterIterators.iterateFromFile(self.fileName+'.gz'))
         te = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
         return self.getEvaluationMetrics(documentClusters, te-ts)
@@ -97,6 +90,6 @@ if __name__ == '__main__':
 #    plotTime()
 
     tf = TweetsFile(1000, **default_experts_twitter_stream_settings)
-    for i in TwitterIterators.iterateFromFile(tf.fileName+'.gz'):
-        print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(i, **default_experts_twitter_stream_settings)
-#    print tf.generateStatsForStreamingLSHClustering()
+#    for i in TwitterIterators.iterateFromFile(tf.fileName+'.gz'):
+#        print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(i, **default_experts_twitter_stream_settings)
+    print tf.generateStatsForStreamingLSHClustering()
