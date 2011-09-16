@@ -5,7 +5,8 @@ Created on Jul 12, 2011
 '''
 import sys, os, time
 sys.path.append('../')
-from twitter_streams_clustering import TwitterIterators, getExperts
+from twitter_streams_clustering import TwitterIterators, getExperts,\
+    TwitterCrowdsSpecificMethods
 from library.mr_algorithms.kmeans import KMeans
 from library.clustering import KMeansClustering, EvaluationMetrics, Clustering
 from library.vector import Vector

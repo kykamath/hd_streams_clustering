@@ -4,6 +4,7 @@ Created on Sep 14, 2011
 @author: kykamath
 '''
 import sys, os, time
+from classes import Stream
 sys.path.append('../')
 from library.file_io import FileIO
 import matplotlib.pyplot as plt
@@ -79,13 +80,28 @@ class TweetsFile:
         te = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
         return self.getEvaluationMetrics(documentClusters, te-ts)
+    def generateStatsForHDLSHClustering(self):
+        print 'HD LSH'
+        def getDocuments():
+            documents = []
+            for data in TwitterIterators.iterateFromFile(self.fileName+'.gz'): 
+                message = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(data, **self.stream_settings)
+                documents.append(Stream(message.streamId, message))
+            return documents
+        documents = getDocuments()
+        clustering=HDStreaminClustering(**self.stream_settings)
+        ts = time.time()
+        for tweet in documents: clustering.getClusterAndUpdateExistingClusters(tweet)
+        te = time.time()
+        documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
+        return self.getEvaluationMetrics(documentClusters, te-ts)
     @staticmethod
     def generateStatsFor(streamSettings):
         for i in [10**3, 10**4, 10**5]: 
             for j in range(1, 10):
                 print 'Exerpiments for:', i*j
                 tf = TweetsFile(i*j, **streamSettings)
-                iteration_data = tf.generateStatsForStreamingLSHClustering()
+                iteration_data = tf.generateStatsForHDLSHClustering()
                 FileIO.writeToFileAsJson({'iteration_data': iteration_data, 
                                           'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
                                           streamSettings['status_file'])
