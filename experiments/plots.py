@@ -24,7 +24,7 @@ def iterateData():
     for nonOptimzed, optimized in zip(FileIO.iterateJsonFromFile('default_stats_file'), FileIO.iterateJsonFromFile('quality_stats')): yield nonOptimzed, optimized
 
 default_experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-default_experts_twitter_stream_settings['cluster_analysis_method'] = emptyClusterAnalysisMethod
+#default_experts_twitter_stream_settings['cluster_analysis_method'] = emptyClusterAnalysisMethod
 class TweetsFile:
     stats_file = clustering_quality_experts_folder+'quality_stats'
     default_stats_file = clustering_quality_experts_folder+'default_stats_file'
