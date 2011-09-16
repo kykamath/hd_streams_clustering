@@ -3,6 +3,8 @@ Created on Sep 14, 2011
 
 @author: kykamath
 '''
+import sys, os, time
+sys.path.append('../')
 from library.file_io import FileIO
 import matplotlib.pyplot as plt
 import numpy as np
