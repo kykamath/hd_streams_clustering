@@ -20,11 +20,12 @@ from settings import Settings
 OPTIMIZED_ID = 'optimized'
 UN_OPTIMIZED_ID = 'un_optimized'
 
+clustering_quality_hd_experiments_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_hd_experiments_folder/'
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
 clustering_quality_experts_ssa_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
 
-experts_twitter_stream_settings['status_file'] = clustering_quality_experts_folder+'optimized_stats_file'
-default_experts_twitter_stream_settings['status_file'] = clustering_quality_experts_folder+'unoptomized_stats_file'
+experts_twitter_stream_settings['status_file'] = clustering_quality_hd_experiments_folder+'optimized_stats_file'
+default_experts_twitter_stream_settings['status_file'] = clustering_quality_hd_experiments_folder+'unoptomized_stats_file'
 
 class DataIterators:
     @staticmethod
@@ -67,7 +68,6 @@ class TweetsFile:
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
     def generateStatsForStreamingLSHClustering(self):
-        print 'Streaming LSH'
         clustering=HDStreaminClustering(**self.stream_settings)
         ts = time.time()
         clustering.cluster(TwitterIterators.iterateFromFile(self.fileName+'.gz'))
@@ -75,11 +75,11 @@ class TweetsFile:
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
         return self.getEvaluationMetrics(documentClusters, te-ts)
     @staticmethod
-    def generateStatsFor(streamSettings = experts_twitter_stream_settings):
+    def generateStatsFor(streamSettings):
         for i in [10**3, 10**4, 10**5]: 
             for j in range(1, 10):
+                print 'Exerpiments for:', i*j
                 tf = TweetsFile(i*j, **streamSettings)
-                print tf.generateStatsForStreamingLSHClustering()
                 FileIO.writeToFileAsJson({OPTIMIZED_ID: tf.generateStatsForStreamingLSHClustering(), 
                                           'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
                                           streamSettings['status_file'])
@@ -113,6 +113,7 @@ if __name__ == '__main__':
 #    plotQuality()
 #    plotTime()
     TweetsFile.generateStatsFor(experts_twitter_stream_settings)
-#    for d in DataIterators.kmeans(): 
+#    TweetsFile.generateStatsFor(default_experts_twitter_stream_settings)
+#    for d in DataIterators.cdamr(): 
 #        del d['clusters']
 #        print d
