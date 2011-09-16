@@ -12,7 +12,7 @@ import numpy as np
 from settings import default_experts_twitter_stream_settings, experts_twitter_stream_settings
 from library.clustering import EvaluationMetrics
 from twitter_streams_clustering import TwitterIterators, getExperts,\
-    TwitterCrowdsSpecificMethods, 
+    TwitterCrowdsSpecificMethods
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from algorithms_performance import emptyClusterAnalysisMethod, emptyClusterFilteringMethod
 from settings import Settings
