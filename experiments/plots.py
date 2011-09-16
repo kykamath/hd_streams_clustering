@@ -11,7 +11,8 @@ from hd_streams_clustering import HDStreaminClustering
 import numpy as np
 from settings import default_experts_twitter_stream_settings
 from library.clustering import EvaluationMetrics
-from twitter_streams_clustering import TwitterIterators, getExperts
+from twitter_streams_clustering import TwitterIterators, getExperts,\
+    TwitterCrowdsSpecificMethods
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
@@ -20,6 +21,8 @@ unique_string = ':ilab:'
 def iterateData():
 #    for nonOptimzed, optimized in zip(FileIO.iterateJsonFromFile(TweetsFile.default_stats_file), FileIO.iterateJsonFromFile(TweetsFile.stats_file)): yield nonOptimzed, optimized
     for nonOptimzed, optimized in zip(FileIO.iterateJsonFromFile('default_stats_file'), FileIO.iterateJsonFromFile('quality_stats')): yield nonOptimzed, optimized
+
+default_experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
 
 class TweetsFile:
     stats_file = clustering_quality_experts_folder+'quality_stats'
