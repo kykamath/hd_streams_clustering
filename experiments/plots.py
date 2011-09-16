@@ -80,9 +80,11 @@ class TweetsFile:
             for j in range(1, 10):
                 print 'Exerpiments for:', i*j
                 tf = TweetsFile(i*j, **streamSettings)
-                FileIO.writeToFileAsJson({OPTIMIZED_ID: tf.generateStatsForStreamingLSHClustering(), 
+                iteration_data = tf.generateStatsForStreamingLSHClustering()
+                FileIO.writeToFileAsJson({'iteration_data': iteration_data, 
                                           'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
                                           streamSettings['status_file'])
+                print iteration_data
 
 def plotTime():
     dataX, optTime, unOptTime = [], [], []
