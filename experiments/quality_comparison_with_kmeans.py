@@ -121,6 +121,9 @@ class TweetsFile:
 #                documents.append(Stream(message.streamId, message))
 #            return documents
 #        documents = getDocuments()
+        self.stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+        self.stream_settings['cluster_analysis_method'] = emptyClusterAnalysisMethod
+        self.stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
         clustering=HDStreaminClustering(**self.stream_settings)
         ts = time.time()
         for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
