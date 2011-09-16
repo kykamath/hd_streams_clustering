@@ -135,7 +135,7 @@ class TweetsFile:
 #                documents.append(Stream(message.streamId, message))
                 yield _getDocumentFromTuple((tweet['user']['screen_name'], tweet['text']))
 #                documents.append(_getDocumentFromTuple((tweet['user']['screen_name'], tweet['text'])))
-            return documents
+#            return documents
         documents = getDocuments()
         self.stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
         self.stream_settings['cluster_analysis_method'] = emptyClusterAnalysisMethod
