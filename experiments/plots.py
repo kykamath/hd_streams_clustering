@@ -15,6 +15,10 @@ from twitter_streams_clustering import TwitterIterators, getExperts,\
     TwitterCrowdsSpecificMethods
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from algorithms_performance import emptyClusterAnalysisMethod
+from settings import Settings
+
+OPTIMIZED_ID = 'optimized'
+UN_OPTIMIZED_ID = 'un_optimized'
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
 
@@ -55,9 +59,10 @@ class TweetsFile:
             for j in range(1, 10):
                 tf = TweetsFile(i*j, **streamSettings)
                 print tf.generateStatsForStreamingLSHClustering()
-                print streamSettings['status_file']
+                FileIO.writeToFileAsJson({OPTIMIZED_ID: tf.generateStatsForStreamingLSHClustering(), 
+                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
+                                          streamSettings['status_file'])
 
-    
 def plotTime():
     dataX, optTime, unOptTime = [], [], []
     for nonOptimzed, optimized in iterateData():
@@ -87,8 +92,3 @@ if __name__ == '__main__':
 #    plotQuality()
 #    plotTime()
     TweetsFile.generateStatsFor(experts_twitter_stream_settings)
-
-#    tf = TweetsFile(10000, **experts_twitter_stream_settings)
-##    for i in TwitterIterators.iterateFromFile(tf.fileName+'.gz'):
-##        print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(i, **default_experts_twitter_stream_settings)
-#    print tf.generateStatsForStreamingLSHClustering()
