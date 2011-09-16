@@ -7,6 +7,7 @@ import sys, os, time
 sys.path.append('../')
 from library.file_io import FileIO
 import matplotlib.pyplot as plt
+from hd_streams_clustering import HDStreaminClustering
 import numpy as np
 from settings import default_experts_twitter_stream_settings
 from library.clustering import EvaluationMetrics
@@ -46,6 +47,21 @@ class TweetsFile:
         iterationData['purity'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.purity)
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
+    def generateStatsForStreamingLSHClustering(self):
+        print 'Streaming LSH'
+#        def _getDocumentFromTuple((user, text)):
+#            vector, words = Vector(), text.split()
+#            for word in words[1:]:
+#                if word not in vector: vector[word]=1
+#                else: vector[word]+=1
+#            return Document(user, vector)
+        clustering=HDStreaminClustering(**self.stream_settings)
+        ts = time.time()
+#        for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
+        clustering.cluster(self.documents)
+        te = time.time()
+        documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
+        return self.getEvaluationMetrics(documentClusters, te-ts)
 
     
 def plotTime():
@@ -78,5 +94,6 @@ if __name__ == '__main__':
 #    plotTime()
 
     tf = TweetsFile(1000, **default_experts_twitter_stream_settings)
-    for i in tf.documents:
-        print i
+#    for i in tf.documents:
+#        print i
+    print tf.generateStatsForStreamingLSHClustering()
