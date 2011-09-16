@@ -27,6 +27,7 @@ clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clus
 hd_clustering_performance_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/hd_clustering_performance/'
 
 CDA_IT = 'cda_it'
+CDA = 'cda'
 
 def iterateTweetUsersAfterCombiningTweets(fileName, **stream_settings):
         dataForAggregation = defaultdict(Vector)
@@ -62,20 +63,19 @@ class GenerateStats():
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=stream_settings['cluster_filter_threshold']]
         return Evaluation.getEvaluationMetrics(noOfTweets, documentClusters, te-ts)
     @staticmethod
-    def generateStatsForCDA(noOfTweets, **stream_settings):
-        for length, fileName in GenerateStats.lengthAndFileIterator(): 
-            print 'Generating stats for: ',length
-            performance = GenerateStats.performanceForCDAAt(length, fileName, **experts_twitter_stream_settings)
-            print performance
-#            stats = {CDA_IT: performance, 'settings': Settings.getSerialzedObject(experts_twitter_stream_settings)}
-#            FileIO.writeToFileAsJson(stats, getPerformanceFile(CDA_IT))
-    @staticmethod
     def generateStatsForCDAIT():
         for length, fileName in GenerateStats.lengthAndFileIterator(): 
             print 'Generating stats for: ',length
             performance = GenerateStats.performanceForCDAITAt(length, fileName, **experts_twitter_stream_settings)
             stats = {CDA_IT: performance, 'settings': Settings.getSerialzedObject(experts_twitter_stream_settings)}
             FileIO.writeToFileAsJson(stats, getPerformanceFile(CDA_IT))
+    @staticmethod
+    def generateStatsForCDA():
+        for length, fileName in GenerateStats.lengthAndFileIterator(): 
+            print 'Generating stats for: ',length
+            performance = GenerateStats.performanceForCDAAt(length, fileName, **experts_twitter_stream_settings)
+            stats = {CDA: performance, 'settings': Settings.getSerialzedObject(experts_twitter_stream_settings)}
+            FileIO.writeToFileAsJson(stats, getPerformanceFile(CDA))
     
 if __name__ == '__main__':
 #    GenerateStats.generateStatsForCDAIT()
