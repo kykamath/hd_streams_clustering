@@ -5,6 +5,8 @@ Created on Jul 12, 2011
 '''
 import sys, os, time
 sys.path.append('../')
+from experiments.algorithms_performance import emptyClusterAnalysisMethod,\
+    emptyClusterFilteringMethod
 from hd_streams_clustering import HDStreaminClustering
 from classes import Stream
 from twitter_streams_clustering import TwitterIterators, getExperts,\
