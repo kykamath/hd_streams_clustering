@@ -5,6 +5,7 @@ Created on Jul 12, 2011
 '''
 import sys, os, time
 sys.path.append('../')
+from hd_streams_clustering import HDStreaminClustering
 from classes import Stream
 from twitter_streams_clustering import TwitterIterators, getExperts,\
     TwitterCrowdsSpecificMethods
@@ -120,7 +121,7 @@ class TweetsFile:
 #                documents.append(Stream(message.streamId, message))
 #            return documents
 #        documents = getDocuments()
-        clustering=StreamingLSHClustering(**self.stream_settings)
+        clustering=HDStreaminClustering(**self.stream_settings)
         ts = time.time()
         for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
         te = time.time()
