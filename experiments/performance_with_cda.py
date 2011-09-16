@@ -56,8 +56,8 @@ class GenerateStats():
         return Evaluation.getEvaluationMetrics(noOfTweets, documentClusters, te-ts)
     @staticmethod
     def performanceForCDAAt(noOfTweets, fileName, **stream_settings):
-        ts = time.time()
         clustering=HDStreaminClustering(**stream_settings)
+        ts = time.time()
         clustering.cluster(TwitterIterators.iterateFromFile(fileName))
         te = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=stream_settings['cluster_filter_threshold']]
