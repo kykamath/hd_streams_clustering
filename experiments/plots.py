@@ -12,7 +12,7 @@ import numpy as np
 from settings import default_experts_twitter_stream_settings, experts_twitter_stream_settings
 from library.clustering import EvaluationMetrics
 from twitter_streams_clustering import TwitterIterators, getExperts,\
-    TwitterCrowdsSpecificMethods
+    TwitterCrowdsSpecificMethods, 
 from library.nlp import getPhrases, getWordsFromRawEnglishMessage
 from algorithms_performance import emptyClusterAnalysisMethod, emptyClusterFilteringMethod
 from settings import Settings
@@ -68,9 +68,14 @@ class TweetsFile:
         iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
         return iterationData
     def generateStatsForStreamingLSHClustering(self):
+        def getDocuments():
+            documents = []
+            for data in TwitterIterators.iterateFromFile(self.fileName+'.gz'): documents.append(TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(data))
+            return documents
+        documents = getDocuments()
         clustering=HDStreaminClustering(**self.stream_settings)
         ts = time.time()
-        clustering.cluster(TwitterIterators.iterateFromFile(self.fileName+'.gz'))
+        clustering.cluster(documents)
         te = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
         return self.getEvaluationMetrics(documentClusters, te-ts)
@@ -116,6 +121,6 @@ if __name__ == '__main__':
 #    plotTime()
     TweetsFile.generateStatsFor(experts_twitter_stream_settings)
 #    TweetsFile.generateStatsFor(default_experts_twitter_stream_settings)
-#    for d in DataIterators.cdamr(): 
+#    for d in DataIterators.optimized(): 
 #        del d['clusters']
 #        print d
