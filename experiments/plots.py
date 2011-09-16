@@ -4,8 +4,8 @@ Created on Sep 14, 2011
 @author: kykamath
 '''
 import sys, os, time
-from classes import Stream
 sys.path.append('../')
+from classes import Stream
 from library.file_io import FileIO
 import matplotlib.pyplot as plt
 from hd_streams_clustering import HDStreaminClustering
