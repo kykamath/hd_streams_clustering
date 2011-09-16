@@ -112,7 +112,7 @@ def plotQuality():
 if __name__ == '__main__':
 #    plotQuality()
 #    plotTime()
-#    TweetsFile.generateStatsFor(experts_twitter_stream_settings)
-    for d in DataIterators.optimized(): 
-        del d['clusters']
-        print d
+    TweetsFile.generateStatsFor(experts_twitter_stream_settings)
+#    for d in DataIterators.optimized(): 
+#        del d['clusters']
+#        print d
