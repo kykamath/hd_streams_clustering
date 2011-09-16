@@ -14,6 +14,7 @@ from library.vector import Vector
 from nltk.metrics.distance import jaccard_distance
 from operator import itemgetter
 from library.file_io import FileIO
+from library.clustering import EvaluationMetrics
 
 def getExperts(byScreenName=False):
     usersList, usersData = {}, defaultdict(list)
@@ -23,6 +24,21 @@ def getExperts(byScreenName=False):
             if byScreenName: usersList[user[0]] = {'id': user[1], 'class':k}
             else: usersList[user[1]] = {'screen_name': user[0], 'class':k} 
     return usersList
+
+class Evaluation:
+    expertsToClassMap = None
+    @staticmethod
+    def getExpertClasses(cluster): 
+        if not Evaluation.expertsToClassMap: Evaluation.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
+        return [Evaluation.expertsToClassMap[user.lower()] for user in cluster if user.lower() in Evaluation.expertsToClassMap]
+    @staticmethod
+    def getEvaluationMetrics(documentClusters, timeDifference):
+        iterationData =  {'no_of_clusters': len(documentClusters), 'iteration_time': timeDifference, 'clusters': documentClusters}
+        clustersForEvaluation = [Evaluation.getExpertClasses(cluster) for cluster in documentClusters]
+        iterationData['nmi'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.nmi)
+        iterationData['purity'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.purity)
+        iterationData['f1'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.f1)
+        return iterationData
 
 class TwitterIterators:
     '''
