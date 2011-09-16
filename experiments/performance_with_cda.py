@@ -37,22 +37,24 @@ def iterateTweetUsersAfterCombiningTweets(fileName, **stream_settings):
         
 class GenerateStats():
     @staticmethod
-    def lengthIterator(): return (i*j for i in [10**3, 10**4, 10**5] for j in range(1, 10))
+    def lengthAndFileIterator(): return ((i*j, clustering_quality_experts_folder+'data/%s.gz'%str(i*j)) for i in [10**3, 10**4, 10**5] for j in range(1, 10))
     @staticmethod
-    def performanceForCDAITAt(noOfTweets, **stream_settings):
-        print 'SSA'
+    def performanceForCDAITAt(noOfTweets, fileName, **stream_settings):
         inputDataFileName = clustering_quality_experts_folder+'data/%s.gz'%str(noOfTweets)
         ts = time.time()
         sstObject = SimilarStreamAggregation(dict(iterateTweetUsersAfterCombiningTweets(inputDataFileName, **stream_settings)), stream_settings['ssa_threshold'])
         sstObject.estimate()
         documentClusters = list(sstObject.iterateClusters())
         te = time.time()
-        return Evaluation.getEvaluationMetrics(documentClusters, te-ts) 
+        return Evaluation.getEvaluationMetrics(noOfTweets, documentClusters, te-ts)
+    @staticmethod
+    def performanceForCDA(noOfTweets, **stream_settings):
+        inputDataFileName = clustering_quality_experts_folder+'data/%s.gz'%str(noOfTweets)
     @staticmethod
     def generateStatsForCDAIT():
-        for length in GenerateStats.lengthIterator(): 
+        for length, fileName in GenerateStats.lengthAndFileIterator(): 
             print 'Generating stats for: ',length
-            performance = GenerateStats.performanceForCDAITAt(length, **experts_twitter_stream_settings)
+            performance = GenerateStats.performanceForCDAITAt(length, fileName, **experts_twitter_stream_settings)
             print performance
 #            stats = {CDA_IT: performance, 'settings': Settings.getSerialzedObject(experts_twitter_stream_settings)}
 #            FileIO.writeToFileAsJson(stats, CDA_IT_PERFORMANCE_FILE)

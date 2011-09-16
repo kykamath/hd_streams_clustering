@@ -32,8 +32,8 @@ class Evaluation:
         if not Evaluation.expertsToClassMap: Evaluation.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
         return [Evaluation.expertsToClassMap[user.lower()] for user in cluster if user.lower() in Evaluation.expertsToClassMap]
     @staticmethod
-    def getEvaluationMetrics(documentClusters, timeDifference):
-        iterationData =  {'no_of_clusters': len(documentClusters), 'iteration_time': timeDifference, 'clusters': documentClusters}
+    def getEvaluationMetrics(noOfTweets, documentClusters, timeDifference):
+        iterationData =  {'no_of_tweets': noOfTweets, 'no_of_clusters': len(documentClusters), 'iteration_time': timeDifference, 'clusters': documentClusters}
         clustersForEvaluation = [Evaluation.getExpertClasses(cluster) for cluster in documentClusters]
         iterationData['nmi'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.nmi)
         iterationData['purity'] = EvaluationMetrics.getValueForClusters(clustersForEvaluation, EvaluationMetrics.purity)
