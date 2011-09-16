@@ -121,16 +121,19 @@ class TweetsFile:
             documents = []
             for tweet in TwitterIterators.iterateFromFile(self.fileName+'.gz'): 
 #                message = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(data, **self.stream_settings)
-                tweetTime = getDateTimeObjectFromTweetTimestamp(tweet['created_at'])
-                message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
-                message.vector = Vector()
-                for word in tweet['text'].split()[1:]:
-                    if word not in message.vector: message.vector[word]=1
-                    else: message.vector[word]+=1
+
+#                tweetTime = getDateTimeObjectFromTweetTimestamp(tweet['created_at'])
+#                message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
+#                message.vector = Vector()
+#                for word in tweet['text'].split()[1:]:
+#                    if word not in message.vector: message.vector[word]=1
+#                    else: message.vector[word]+=1
+                    
 #                for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), twitter_stream_settings['min_phrase_length'], twitter_stream_settings['max_phrase_length']):
 #                    if phrase not in message.vector: message.vector[phrase]=0
 #                    message.vector[phrase]+=1
-                documents.append(Stream(message.streamId, message))
+#                documents.append(Stream(message.streamId, message))
+                documents.append(_getDocumentFromTuple(tweet['user']['screen_name'], tweet['text']))
             return documents
         documents = getDocuments()
         self.stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
