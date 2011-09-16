@@ -70,7 +70,7 @@ class TweetsFile:
     def generateStatsForStreamingLSHClustering(self):
         def getDocuments():
             documents = []
-            for data in TwitterIterators.iterateFromFile(self.fileName+'.gz'): documents.append(TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(data))
+            for data in TwitterIterators.iterateFromFile(self.fileName+'.gz'): documents.append(TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(data, self.stream_settings))
             return documents
         documents = getDocuments()
         clustering=HDStreaminClustering(**self.stream_settings)
