@@ -129,8 +129,8 @@ class TweetsFile:
         clustering=HDStreaminClustering(**self.stream_settings)
         ts = time.time()
 #        for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
-        clustering.cluster([_getDocumentFromTuple(d) for d in self.documents])
-#        clustering.cluster(documents)
+#        clustering.cluster([_getDocumentFromTuple(d) for d in self.documents])
+        clustering.cluster(documents)
         te = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
         return self.getEvaluationMetrics(documentClusters, te-ts)
