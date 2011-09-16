@@ -133,7 +133,7 @@ class TweetsFile:
 #                    if phrase not in message.vector: message.vector[phrase]=0
 #                    message.vector[phrase]+=1
 #                documents.append(Stream(message.streamId, message))
-                documents.append(_getDocumentFromTuple((tweet['user']['screen_name'], tweet['text']))
+                documents.append(_getDocumentFromTuple((tweet['user']['screen_name'], tweet['text'])))
             return documents
         documents = getDocuments()
         self.stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
