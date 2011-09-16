@@ -97,6 +97,6 @@ if __name__ == '__main__':
 #    plotTime()
 
     tf = TweetsFile(1000, **default_experts_twitter_stream_settings)
-    for i in tf.documents:
+    for i in TwitterIterators.iterateFromFile(tf.fileName+'.gz'):
         print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(i)
 #    print tf.generateStatsForStreamingLSHClustering()
