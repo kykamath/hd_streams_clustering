@@ -42,6 +42,10 @@ def iterateTweetUsersAfterCombiningTweets(fileName, **stream_settings):
         for k, v in dataForAggregation.iteritems(): yield k, v
         
 def getPerformanceFile(algorithmId): return hd_clustering_performance_folder+algorithmId
+def iteratePerformanceFrom(id): 
+    for data in FileIO.iterateJsonFromFile(getPerformanceFile(id)): 
+        del data[id]['clusters']
+        yield data[id]
         
 class GenerateStats():
     @staticmethod
@@ -78,5 +82,8 @@ class GenerateStats():
             FileIO.writeToFileAsJson(stats, getPerformanceFile(CDA))
     
 if __name__ == '__main__':
-#    GenerateStats.generateStatsForCDAIT()
-    GenerateStats.generateStatsForCDA()
+    GenerateStats.generateStatsForCDAIT()
+#    GenerateStats.generateStatsForCDA()
+    
+#    for d in iteratePerformanceFrom(CDA_IT):
+#        print d
