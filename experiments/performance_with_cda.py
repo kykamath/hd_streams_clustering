@@ -21,7 +21,6 @@ clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clus
 hd_clustering_performance_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/hd_clustering_performance/'
 
 CDA_IT = 'cda_it'
-CDA_IT_PERFORMANCE_FILE = hd_clustering_performance_folder+CDA_IT
 
 def iterateTweetUsersAfterCombiningTweets(fileName, **stream_settings):
         dataForAggregation = defaultdict(Vector)
@@ -34,6 +33,8 @@ def iterateTweetUsersAfterCombiningTweets(fileName, **stream_settings):
                 textIdVector[textToIdMap[phrase]]=textVector[phrase]
             dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
         for k, v in dataForAggregation.iteritems(): yield k, v
+        
+def getPerformanceFile(algorithmId): return hd_clustering_performance_folder+algorithmId
         
 class GenerateStats():
     @staticmethod
@@ -55,9 +56,8 @@ class GenerateStats():
         for length, fileName in GenerateStats.lengthAndFileIterator(): 
             print 'Generating stats for: ',length
             performance = GenerateStats.performanceForCDAITAt(length, fileName, **experts_twitter_stream_settings)
-            print performance
-#            stats = {CDA_IT: performance, 'settings': Settings.getSerialzedObject(experts_twitter_stream_settings)}
-#            FileIO.writeToFileAsJson(stats, CDA_IT_PERFORMANCE_FILE)
+            stats = {CDA_IT: performance, 'settings': Settings.getSerialzedObject(experts_twitter_stream_settings)}
+            FileIO.writeToFileAsJson(stats, getPerformanceFile(CDA_IT))
     
 if __name__ == '__main__':
     GenerateStats.generateStatsForCDAIT()
