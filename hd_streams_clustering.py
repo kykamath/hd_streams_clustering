@@ -61,7 +61,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         self.convertDataToMessageMethod=stream_settings['convert_data_to_message_method']
         
         DataStreamMethods.messageInOrderVariable = None
-    
+    @timeit
     def cluster(self, dataIterator):
         i=0
         for data in dataIterator:
