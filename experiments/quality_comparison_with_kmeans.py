@@ -5,6 +5,7 @@ Created on Jul 12, 2011
 '''
 import sys, os, time
 sys.path.append('../')
+from classes import Stream
 from twitter_streams_clustering import TwitterIterators, getExperts,\
     TwitterCrowdsSpecificMethods
 from library.mr_algorithms.kmeans import KMeans
@@ -104,6 +105,21 @@ class TweetsFile:
         te = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
         return self.getEvaluationMetrics(documentClusters, te-ts)
+    def generateStatsForHDLSHClustering(self):
+        print 'HD LSH'
+        def getDocuments():
+            documents = []
+            for data in TwitterIterators.iterateFromFile(self.fileName+'.gz'): 
+                message = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(data, **self.stream_settings)
+                documents.append(Stream(message.streamId, message))
+            return documents
+        documents = getDocuments()
+        clustering=StreamingLSHClustering(**self.stream_settings)
+        ts = time.time()
+        for tweet in documents: clustering.getClusterAndUpdateExistingClusters(tweet)
+        te = time.time()
+        documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
+        return self.getEvaluationMetrics(documentClusters, te-ts)
     def generateStatsForKMeansMRClustering(self):
         ts = time.time()
         documentClusters = list(KMeans.cluster(hdfsPath+'%s'%self.length, 
@@ -134,7 +150,7 @@ class TweetsFile:
             for j in range(1, 10): 
                 print 'Generating stats for: ',i*j
                 tf = TweetsFile(i*j, **experts_twitter_stream_settings)
-                print tf.generateStatsForStreamingLSHClustering()
+                print tf.generateStatsForHDLSHClustering()
 #                FileIO.writeToFileAsJson({'k_means': tf.generateStatsForKMeansClustering(), 
 #                                          'streaming_lsh': tf.generateStatsForStreamingLSHClustering(), 
 #                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
