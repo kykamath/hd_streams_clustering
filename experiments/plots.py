@@ -21,13 +21,33 @@ OPTIMIZED_ID = 'optimized'
 UN_OPTIMIZED_ID = 'un_optimized'
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
+clustering_quality_experts_ssa_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
 
 experts_twitter_stream_settings['status_file'] = clustering_quality_experts_folder+'optimized_stats_file'
 default_experts_twitter_stream_settings['status_file'] = clustering_quality_experts_folder+'unoptomized_stats_file'
 
+class DataIterators:
+    @staticmethod
+    def kmeans(): 
+        for data in FileIO.iterateJsonFromFile(clustering_quality_experts_folder+'quality_stats'): yield data['k_means']
+    @staticmethod
+    def kmeansmr(): 
+        for data in FileIO.iterateJsonFromFile(clustering_quality_experts_folder+'mr_quality_stats'): yield data['mr_k_means']
+    @staticmethod
+    def cdait(): 
+        for data in FileIO.iterateJsonFromFile(clustering_quality_experts_ssa_folder+'quality_stats'): yield data['ssa']
+    @staticmethod
+    def cdamr(): 
+        for data in FileIO.iterateJsonFromFile(clustering_quality_experts_ssa_folder+'quality_stats'): yield data['ssa_mr']
+    @staticmethod
+    def optimized(): 
+        for data in FileIO.iterateJsonFromFile(clustering_quality_experts_ssa_folder+'quality_stats'): yield data['streaming_lsh']
+    @staticmethod
+    def unoptimized(): pass
+
 def iterateData():
-#    for nonOptimzed, optimized in zip(FileIO.iterateJsonFromFile(TweetsFile.default_stats_file), FileIO.iterateJsonFromFile(TweetsFile.stats_file)): yield nonOptimzed, optimized
-    for nonOptimzed, optimized in zip(FileIO.iterateJsonFromFile('default_stats_file'), FileIO.iterateJsonFromFile('quality_stats')): yield nonOptimzed, optimized
+    for nonOptimzed, optimized in zip(FileIO.iterateJsonFromFile(TweetsFile.default_stats_file), FileIO.iterateJsonFromFile(TweetsFile.stats_file)): yield nonOptimzed, optimized
+#    for nonOptimzed, optimized in zip(FileIO.iterateJsonFromFile('default_stats_file'), FileIO.iterateJsonFromFile('quality_stats')): yield nonOptimzed, optimized
 
 class TweetsFile:
     def __init__(self, length, forGeneration=False, **stream_settings):
@@ -93,3 +113,6 @@ if __name__ == '__main__':
 #    plotQuality()
 #    plotTime()
     TweetsFile.generateStatsFor(experts_twitter_stream_settings)
+#    for d in DataIterators.cdait(): 
+#        del d['clusters']
+#        print d
