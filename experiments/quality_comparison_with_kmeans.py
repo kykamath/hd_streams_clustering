@@ -150,7 +150,7 @@ class TweetsFile:
             for j in range(1, 10): 
                 print 'Generating stats for: ',i*j
                 tf = TweetsFile(i*j, **experts_twitter_stream_settings)
-                print tf.generateStatsForHDLSHClustering()
+                print tf.generateStatsForStreamingLSHClustering()
 #                FileIO.writeToFileAsJson({'k_means': tf.generateStatsForKMeansClustering(), 
 #                                          'streaming_lsh': tf.generateStatsForStreamingLSHClustering(), 
 #                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
