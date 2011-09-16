@@ -82,8 +82,8 @@ class GenerateStats():
             FileIO.writeToFileAsJson(stats, getPerformanceFile(CDA))
     
 if __name__ == '__main__':
-    GenerateStats.generateStatsForCDAIT()
-#    GenerateStats.generateStatsForCDA()
+#    GenerateStats.generateStatsForCDAIT()
+    GenerateStats.generateStatsForCDA()
     
 #    for d in iteratePerformanceFrom(CDA_IT):
 #        print d
