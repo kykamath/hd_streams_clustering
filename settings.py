@@ -82,12 +82,12 @@ houston_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/housto
 # Settings for expert specific streams with default values.
 default_experts_twitter_stream_settings = Settings()
 default_experts_twitter_stream_settings.update(twitter_stream_settings)
-default_experts_twitter_stream_settings.dimensions = 199999
+default_experts_twitter_stream_settings.dimensions = 19997
 default_experts_twitter_stream_settings.stream_id = 'default_experts_twitter_stream'
 default_experts_twitter_stream_settings.plot_color = '#0085F2'
 default_experts_twitter_stream_settings.plot_label = 'Un-optimized experts stream'
-default_experts_twitter_stream_settings.dimension_update_frequency_in_seconds=time_unit_in_seconds*5
-default_experts_twitter_stream_settings.max_phrase_inactivity_time_in_seconds=time_unit_in_seconds*30
+default_experts_twitter_stream_settings.dimension_update_frequency_in_seconds=time_unit_in_seconds*12
+default_experts_twitter_stream_settings.max_phrase_inactivity_time_in_seconds=time_unit_in_seconds*107
 default_experts_twitter_stream_settings.cluster_filter_threshold = 2
 default_experts_twitter_stream_settings.cluster_inactivity_time_in_seconds=time_unit_in_seconds*15
 default_experts_twitter_stream_settings.twitter_users_tweets_folder='%susers/tweets/'%twitterDataFolder
@@ -96,4 +96,4 @@ default_experts_twitter_stream_settings.lsh_clusters_folder='%slsh_crowds/defaul
 default_experts_twitter_stream_settings.parameter_estimation_folder='%slsh_crowds/default_experts_stream/parameter_estimation/'%twitterDataFolder
 
 if __name__ == '__main__':
-    print getLargestPrimeLesserThan(200000)
+    print getLargestPrimeLesserThan(20000)
