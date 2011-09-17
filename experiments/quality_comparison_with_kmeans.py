@@ -129,26 +129,6 @@ class TweetsFile:
                 if word not in vector: vector[word]=1
                 else: vector[word]+=1
             return Document(user, vector)
-#        def getDocuments():
-#            documents = []
-#            for tweet in TwitterIterators.iterateFromFile(self.fileName+'.gz'): 
-##                message = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(data, **self.stream_settings)
-#
-##                tweetTime = getDateTimeObjectFromTweetTimestamp(tweet['created_at'])
-##                message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
-##                message.vector = Vector()
-##                for word in tweet['text'].split()[1:]:
-##                    if word not in message.vector: message.vector[word]=1
-##                    else: message.vector[word]+=1
-#                    
-##                for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), twitter_stream_settings['min_phrase_length'], twitter_stream_settings['max_phrase_length']):
-##                    if phrase not in message.vector: message.vector[phrase]=0
-##                    message.vector[phrase]+=1
-##                documents.append(Stream(message.streamId, message))
-#                yield _getDocumentFromTuple((tweet['user']['screen_name'], tweet['text']))
-#                documents.append(_getDocumentFromTuple((tweet['user']['screen_name'], tweet['text'])))
-#            return documents
-#        documents = getDocuments()
         self.stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
         self.stream_settings['cluster_analysis_method'] = emptyClusterAnalysisMethod
         self.stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
@@ -194,9 +174,18 @@ class TweetsFile:
             for j in range(1, 10): 
                 print 'Generating stats for: ',i*j
                 tf = TweetsFile(i*j, **experts_twitter_stream_settings)
+                FileIO.writeToFileAsJson({'k_means': tf.generateStatsForKMeansClustering(), 
+                                          'streaming_lsh': tf.generateStatsForStreamingLSHClustering(), 
+                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
+                                          TweetsFile.stats_file)
+    @staticmethod
+    def generateStatsForOptimized():
+        for i in [10**3, 10**4, 10**5]: 
+            for j in range(1, 10): 
+                print 'Generating stats for: ',i*j
+                tf = TweetsFile(i*j, **experts_twitter_stream_settings)
                 print tf.generateStatsForHDLSHClustering()
-#                FileIO.writeToFileAsJson({'k_means': tf.generateStatsForKMeansClustering(), 
-#                                          'streaming_lsh': tf.generateStatsForStreamingLSHClustering(), 
+#                FileIO.writeToFileAsJson({'streaming_lsh': tf.generateStatsForHDLSHClustering(), 
 #                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
 #                                          TweetsFile.stats_file)
     @staticmethod
@@ -272,7 +261,8 @@ class TweetsFile:
                 
 if __name__ == '__main__':
 #    [TweetsFile(i*j, forGeneration=True, **experts_twitter_stream_settings).generate() for i in [10**2] for j in range(1, 10)]
-    TweetsFile.generateStatsForClusteringQuality()
+#    TweetsFile.generateStatsForClusteringQuality()
+    TweetsFile.generateStatsForOptimized()
 #    TweetsFile.generateStatsForMRKMeansClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateStatsForDefaultStreamSettings()

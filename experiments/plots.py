@@ -137,6 +137,6 @@ if __name__ == '__main__':
 #    plotTime()
 #    TweetsFile.generateStatsFor(experts_twitter_stream_settings)
 #    TweetsFile.generateStatsFor(default_experts_twitter_stream_settings)
-    for d in DataIterators.cdait(): 
+    for d in DataIterators.cdamr(): 
         del d['clusters']
         print d
