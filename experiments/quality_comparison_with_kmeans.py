@@ -87,10 +87,9 @@ class TweetsFile:
                 userMap[user]['user'] = {'screen_name': user}
                 userMap[user]['id'] = tweet['id']
                 userMap[user]['created_at'] = tweet['created_at']
+                if 'text' not in userMap[user]: userMap[user]['text'] = ' '
                 phrases = [phrase.replace(' ', unique_string) for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), self.stream_settings['min_phrase_length'], self.stream_settings['max_phrase_length'])]
-                if phrases:
-                    if 'text' not in userMap[user]: userMap[user]['text'] = ' '.join(phrases)
-                    else: userMap[user]['text']+= ' ' + ' '.join(phrases)
+                if phrases: userMap[user]['text']+= ' ' + ' '.join(phrases)
             return userMap.iteritems()
     def _getExpertClasses(self, cluster): return [self.expertsToClassMap[user.lower()] for user in cluster if user.lower() in self.expertsToClassMap]
     def getEvaluationMetrics(self, documentClusters, timeDifference):
@@ -153,7 +152,10 @@ class TweetsFile:
         self.stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
         self.stream_settings['cluster_analysis_method'] = emptyClusterAnalysisMethod
         self.stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
-        self.documents = list(self._tweetWithTimestampIterator())
+        self.documents = [tw[1] for tw in list(self._tweetWithTimestampIterator()) if tw[1]['text'].strip()!='']
+#        for d in self.documents: 
+#            print d
+#            print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(d, **self.stream_settings)
         clustering=HDStreaminClustering(**self.stream_settings)
         ts = time.time()
 #        for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
