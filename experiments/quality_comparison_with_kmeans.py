@@ -29,6 +29,7 @@ from collections import defaultdict
 import numpy as np
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
+hd_clustering_performance_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/hd_clustering_performance/'
 clustering_quality_experts_mr_folder = clustering_quality_experts_folder+'mr_data/'
 hdfsPath='hdfs:///user/kykamath/lsh_experts_data/'
 unique_string = ':ilab:'
@@ -184,10 +185,9 @@ class TweetsFile:
             for j in range(1, 10): 
                 print 'Generating stats for: ',i*j
                 tf = TweetsFile(i*j, **experts_twitter_stream_settings)
-                print tf.generateStatsForHDLSHClustering()
-#                FileIO.writeToFileAsJson({'streaming_lsh': tf.generateStatsForHDLSHClustering(), 
-#                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
-#                                          TweetsFile.stats_file)
+                FileIO.writeToFileAsJson({'streaming_lsh': tf.generateStatsForHDLSHClustering(), 
+                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
+                                          hd_clustering_performance_folder+'cda')
 
     @staticmethod
     def generateStatsForUnOptimized():
@@ -279,8 +279,8 @@ if __name__ == '__main__':
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()
 
-#    TweetsFile.generateStatsForOptimized()
-    TweetsFile.generateStatsForUnOptimized()
+    TweetsFile.generateStatsForOptimized()
+#    TweetsFile.generateStatsForUnOptimized()
     
     
     
