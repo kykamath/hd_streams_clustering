@@ -4,7 +4,6 @@ Created on Sep 14, 2011
 @author: kykamath
 '''
 import sys, os, time
-from experiments.algorithms_performance import movingAverage
 sys.path.append('../')
 from classes import Stream
 from library.file_io import FileIO
@@ -178,6 +177,7 @@ if __name__ == '__main__':
 #    CompareAlgorithms.runningTimes(('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
 
     CompareAlgorithms.quality('purity', ('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
+    CompareAlgorithms.quality('nmi', ('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
 #    for d in DataIterators.cdamr(): 
 #        del d['clusters']
 #        print d
