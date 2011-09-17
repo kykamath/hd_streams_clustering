@@ -24,6 +24,7 @@ UN_OPTIMIZED_ID = 'un_optimized'
 clustering_quality_hd_experiments_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_hd_experiments_folder/'
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
 clustering_quality_experts_ssa_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_ssa_folder/'
+hd_clustering_performance_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/hd_clustering_performance/'
 
 experts_twitter_stream_settings['status_file'] = clustering_quality_hd_experiments_folder+'optimized_stats_file'
 default_experts_twitter_stream_settings['status_file'] = clustering_quality_hd_experiments_folder+'unoptomized_stats_file'
@@ -43,7 +44,7 @@ class DataIterators:
         for data in FileIO.iterateJsonFromFile(clustering_quality_experts_ssa_folder+'quality_stats'): yield data['ssa_mr']
     @staticmethod
     def optimized(): 
-        for data in FileIO.iterateJsonFromFile(clustering_quality_experts_ssa_folder+'quality_stats'): yield data['streaming_lsh']
+        for data in FileIO.iterateJsonFromFile(hd_clustering_performance_folder+'cda'): yield data['streaming_lsh']
     @staticmethod
     def unoptimized(): pass
 
@@ -137,6 +138,6 @@ if __name__ == '__main__':
 #    plotTime()
 #    TweetsFile.generateStatsFor(experts_twitter_stream_settings)
 #    TweetsFile.generateStatsFor(default_experts_twitter_stream_settings)
-    for d in DataIterators.cdamr(): 
+    for d in DataIterators.optimized(): 
         del d['clusters']
         print d
