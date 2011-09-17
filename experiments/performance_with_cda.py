@@ -17,6 +17,7 @@ from library.file_io import FileIO
 from hd_streams_clustering import HDStreaminClustering
 from experiments.algorithms_performance import emptyClusterAnalysisMethod,\
     emptyClusterFilteringMethod
+import matplotlib.pyplot as plt
 
 experts_twitter_stream_settings['ssa_threshold']=0.75
 experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
@@ -28,6 +29,11 @@ hd_clustering_performance_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clust
 
 CDA_IT = 'cda_it'
 CDA = 'cda'
+
+algorithm_info = {
+                  CDA: {'label': 'CDA', 'color': 'k'},
+                  CDA_IT: {'label': 'CDA-IT', 'color': 'b'}
+                  }
 
 def iterateTweetUsersAfterCombiningTweets(fileName, **stream_settings):
         dataForAggregation = defaultdict(Vector)
@@ -80,10 +86,21 @@ class GenerateStats():
             performance = GenerateStats.performanceForCDAAt(length, fileName, **experts_twitter_stream_settings)
             stats = {CDA: performance, 'settings': Settings.getSerialzedObject(experts_twitter_stream_settings)}
             FileIO.writeToFileAsJson(stats, getPerformanceFile(CDA))
+            
+class CompareAlgorithms:
+    @staticmethod
+    def runningTimes(*algorithmIds):
+        for id in algorithmIds:
+            dataX, dataY = [], []
+            for data in iteratePerformanceFrom(id): dataX.append(data['no_of_tweets']), dataY.append(data['iteration_time'])
+            plt.plot(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'])
+        plt.legend()
+        plt.show()
     
 if __name__ == '__main__':
 #    GenerateStats.generateStatsForCDAIT()
-    GenerateStats.generateStatsForCDA()
+#    GenerateStats.generateStatsForCDA()
     
-#    for d in iteratePerformanceFrom(CDA_IT):
+#    for d in iteratePerformanceFrom(CDA):
 #        print d
+    CompareAlgorithms.runningTimes(CDA, CDA_IT)

@@ -117,34 +117,34 @@ class TweetsFile:
                 if word not in vector: vector[word]=1
                 else: vector[word]+=1
             return Document(user, vector)
-        def getDocuments():
-            documents = []
-            for tweet in TwitterIterators.iterateFromFile(self.fileName+'.gz'): 
-#                message = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(data, **self.stream_settings)
-
-#                tweetTime = getDateTimeObjectFromTweetTimestamp(tweet['created_at'])
-#                message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
-#                message.vector = Vector()
-#                for word in tweet['text'].split()[1:]:
-#                    if word not in message.vector: message.vector[word]=1
-#                    else: message.vector[word]+=1
-                    
-#                for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), twitter_stream_settings['min_phrase_length'], twitter_stream_settings['max_phrase_length']):
-#                    if phrase not in message.vector: message.vector[phrase]=0
-#                    message.vector[phrase]+=1
-#                documents.append(Stream(message.streamId, message))
-                yield _getDocumentFromTuple((tweet['user']['screen_name'], tweet['text']))
+#        def getDocuments():
+#            documents = []
+#            for tweet in TwitterIterators.iterateFromFile(self.fileName+'.gz'): 
+##                message = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(data, **self.stream_settings)
+#
+##                tweetTime = getDateTimeObjectFromTweetTimestamp(tweet['created_at'])
+##                message = Message(tweet['user']['screen_name'], tweet['id'], tweet['text'], tweetTime)
+##                message.vector = Vector()
+##                for word in tweet['text'].split()[1:]:
+##                    if word not in message.vector: message.vector[word]=1
+##                    else: message.vector[word]+=1
+#                    
+##                for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), twitter_stream_settings['min_phrase_length'], twitter_stream_settings['max_phrase_length']):
+##                    if phrase not in message.vector: message.vector[phrase]=0
+##                    message.vector[phrase]+=1
+##                documents.append(Stream(message.streamId, message))
+#                yield _getDocumentFromTuple((tweet['user']['screen_name'], tweet['text']))
 #                documents.append(_getDocumentFromTuple((tweet['user']['screen_name'], tweet['text'])))
 #            return documents
-        documents = getDocuments()
+#        documents = getDocuments()
         self.stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
         self.stream_settings['cluster_analysis_method'] = emptyClusterAnalysisMethod
         self.stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
         clustering=HDStreaminClustering(**self.stream_settings)
         ts = time.time()
 #        for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
-#        clustering.cluster([_getDocumentFromTuple(d) for d in self.documents])
-        clustering.cluster(documents)
+        clustering.cluster([_getDocumentFromTuple(d) for d in self.documents])
+#        clustering.cluster(documents)
         te = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
         return self.getEvaluationMetrics(documentClusters, te-ts)
