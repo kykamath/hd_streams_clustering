@@ -168,8 +168,8 @@ if __name__ == '__main__':
 #    TweetsFile.generateStatsFor(experts_twitter_stream_settings)
 #    TweetsFile.generateStatsFor(default_experts_twitter_stream_settings)
 
-    CompareAlgorithms.runningTimes(('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
-#    CompareAlgorithms.quality('nmi', ('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
+#    CompareAlgorithms.runningTimes(('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
+    CompareAlgorithms.quality('purity', ('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
 #    for d in DataIterators.optimized(): 
 #        del d['clusters']
 #        print d
