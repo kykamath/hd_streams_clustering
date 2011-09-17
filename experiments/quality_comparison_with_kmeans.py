@@ -194,11 +194,14 @@ class TweetsFile:
         for i in [10**3, 10**4, 10**5]: 
             for j in range(1, 10): 
                 print 'Generating stats for: ',i*j
-                default_experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
+#                default_experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
                 tf = TweetsFile(i*j, **default_experts_twitter_stream_settings)
-                FileIO.writeToFileAsJson({'streaming_lsh': tf.generateStatsForHDLSHClustering(), 
+                performance = tf.generateStatsForHDLSHClustering()
+                FileIO.writeToFileAsJson({'streaming_lsh': performance,
                                           'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
                                           hd_clustering_performance_folder+'cda_unopt')
+                del performance['clusters']
+                print performance
                 
     @staticmethod
     def generateStatsForMRKMeansClusteringQuality():
