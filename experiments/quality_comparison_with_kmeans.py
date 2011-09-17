@@ -194,8 +194,11 @@ class TweetsFile:
         for i in [10**3, 10**4, 10**5]: 
             for j in range(1, 10): 
                 print 'Generating stats for: ',i*j
+                default_experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
                 tf = TweetsFile(i*j, **default_experts_twitter_stream_settings)
-                print tf.generateStatsForHDLSHClustering()
+                FileIO.writeToFileAsJson({'streaming_lsh': tf.generateStatsForHDLSHClustering(), 
+                                          'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
+                                          hd_clustering_performance_folder+'cda_unopt')
                 
     @staticmethod
     def generateStatsForMRKMeansClusteringQuality():
@@ -205,6 +208,7 @@ class TweetsFile:
             FileIO.writeToFileAsJson({'mr_k_means': tf.generateStatsForKMeansMRClustering(), 
                                       'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
                                       TweetsFile.mr_stats_file)
+        
     @staticmethod
     def generateStatsForDefaultStreamSettings():
         for i in [10**3, 10**4, 10**5]: 
@@ -279,8 +283,8 @@ if __name__ == '__main__':
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()
 
-    TweetsFile.generateStatsForOptimized()
-#    TweetsFile.generateStatsForUnOptimized()
+#    TweetsFile.generateStatsForOptimized()
+    TweetsFile.generateStatsForUnOptimized()
     
     
     
