@@ -150,7 +150,7 @@ class CompareAlgorithms:
             dataX, dataY = [], []
             for data in iterator:
                 dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
-            plt.plot(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'])
+            plt.semilogx(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'])
         plt.legend()
 #        plt.show()
         plt.savefig('running_times.eps')
