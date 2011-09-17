@@ -4,6 +4,7 @@ Created on Sep 14, 2011
 @author: kykamath
 '''
 import sys, os, time
+from experiments.algorithms_performance import movingAverage
 sys.path.append('../')
 from classes import Stream
 from library.file_io import FileIO
@@ -120,7 +121,11 @@ CDA = 'cda'
 
 algorithm_info = {
                   'cda': {'label': 'opt', 'color': 'k'},
-                  'cda_unopt': {'label': 'unopt', 'color': 'b'}
+                  'cda_unopt': {'label': 'unopt', 'color': 'b'},
+                  'cda_it': {'label': 'cda_it', 'color': 'm'},
+                  'cda_mr': {'label': 'cda_mr', 'color': 'y'},
+                  'kmeans': {'label': 'kmeans', 'color': 'r'},
+                  'kmeans_mr': {'label': 'kmeans_mr', 'color': 'g'}
                   }
 
 class DataIterators:
@@ -150,7 +155,7 @@ class CompareAlgorithms:
             dataX, dataY = [], []
             for data in iterator:
                 dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
-            plt.semilogx(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'])
+            plt.plot(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'])
         plt.legend()
 #        plt.show()
         plt.savefig('running_times.eps')
@@ -168,8 +173,11 @@ if __name__ == '__main__':
 #    TweetsFile.generateStatsFor(experts_twitter_stream_settings)
 #    TweetsFile.generateStatsFor(default_experts_twitter_stream_settings)
 
+#    CompareAlgorithms.runningTimes(('kmeans', DataIterators.kmeans()), ('cda', DataIterators.optimized()), ('kmeans_mr', DataIterators.kmeansmr()), ('cda_unopt', DataIterators.unoptimized()))
+#    CompareAlgorithms.runningTimes(('cda_it', DataIterators.cdait()), ('cda', DataIterators.optimized()), ('cda_mr', DataIterators.cdamr()), ('cda_unopt', DataIterators.unoptimized()))
 #    CompareAlgorithms.runningTimes(('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
-    CompareAlgorithms.quality('nmi', ('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
+
+    CompareAlgorithms.quality('purity', ('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
 #    for d in DataIterators.cdamr(): 
 #        del d['clusters']
 #        print d
