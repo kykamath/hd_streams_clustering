@@ -77,18 +77,18 @@ class HDStreaminClustering(StreamingLSHClustering):
                 self.getClusterAndUpdateExistingClusters(streamObject)
 #            self.getClusterAndUpdateExistingClusters(message)
 
-#    def getClusterAndUpdateExistingClusters(self, stream):
-#        predictedCluster = self.getClusterForDocument(stream)
-#        '''
-#        Do not remove this comment. Might need this if StreamCluster is used again in future.
-#        if predictedCluster!=None: self.clusters[predictedCluster].addStream(stream, **self.stream_settings)
-#        '''
-#        if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream, **self.stream_settings)
-#        else:
-#            newCluster = StreamCluster(stream)
-#            newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
-#            for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
-#            self.clusters[newCluster.clusterId] = newCluster
+    def getClusterAndUpdateExistingClusters(self, stream):
+        predictedCluster = self.getClusterForDocument(stream)
+        '''
+        Do not remove this comment. Might need this if StreamCluster is used again in future.
+        if predictedCluster!=None: self.clusters[predictedCluster].addStream(stream, **self.stream_settings)
+        '''
+        if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream, **self.stream_settings)
+        else:
+            newCluster = StreamCluster(stream)
+            newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
+            for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
+            self.clusters[newCluster.clusterId] = newCluster
 #    def resetDatastructures(self, occuranceTime):
 #        '''
 #        1. Reset signature permutation trie.
