@@ -63,34 +63,32 @@ class HDStreaminClustering(StreamingLSHClustering):
         DataStreamMethods.messageInOrderVariable = None
 
     def cluster(self, dataIterator):
-#        i=0
         for data in dataIterator:
-            message = self.convertDataToMessageMethod(data, **self.stream_settings)
-#            message = data
-            if DataStreamMethods.messageInOrder(message.timeStamp):
-                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
-                if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
-                else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
-                streamObject=self.streamIdToStreamObjectMap[message.streamId]
-                self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-#                i+=1
-#                print i, streamObject.lastMessageTime
-                self.getClusterAndUpdateExistingClusters(streamObject)
+#            message = self.convertDataToMessageMethod(data, **self.stream_settings)
+            message = data
+#            if DataStreamMethods.messageInOrder(message.timeStamp):
+#                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
+#                if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
+#                else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
+#                streamObject=self.streamIdToStreamObjectMap[message.streamId]
+#                self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+#                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+#                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+#                self.getClusterAndUpdateExistingClusters(streamObject)
+            self.getClusterAndUpdateExistingClusters(message)
 
-    def getClusterAndUpdateExistingClusters(self, stream):
-        predictedCluster = self.getClusterForDocument(stream)
-        '''
-        Do not remove this comment. Might need this if StreamCluster is used again in future.
-        if predictedCluster!=None: self.clusters[predictedCluster].addStream(stream, **self.stream_settings)
-        '''
-        if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream, **self.stream_settings)
-        else:
-            newCluster = StreamCluster(stream)
-            newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
-            for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
-            self.clusters[newCluster.clusterId] = newCluster
+#    def getClusterAndUpdateExistingClusters(self, stream):
+#        predictedCluster = self.getClusterForDocument(stream)
+#        '''
+#        Do not remove this comment. Might need this if StreamCluster is used again in future.
+#        if predictedCluster!=None: self.clusters[predictedCluster].addStream(stream, **self.stream_settings)
+#        '''
+#        if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream, **self.stream_settings)
+#        else:
+#            newCluster = StreamCluster(stream)
+#            newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
+#            for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
+#            self.clusters[newCluster.clusterId] = newCluster
 #    def resetDatastructures(self, occuranceTime):
 #        '''
 #        1. Reset signature permutation trie.
