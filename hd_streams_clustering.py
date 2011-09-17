@@ -64,8 +64,8 @@ class HDStreaminClustering(StreamingLSHClustering):
 
     def cluster(self, dataIterator):
         for data in dataIterator:
-#            message = self.convertDataToMessageMethod(data, **self.stream_settings)
-            message = data
+            message = self.convertDataToMessageMethod(data, **self.stream_settings)
+#            message = data
 #            if DataStreamMethods.messageInOrder(message.timeStamp):
 #                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
 #                if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)

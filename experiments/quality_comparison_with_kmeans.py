@@ -25,6 +25,7 @@ from settings import experts_twitter_stream_settings, default_experts_twitter_st
 from itertools import groupby
 from operator import itemgetter
 from matplotlib import pyplot as plt
+from collections import defaultdict
 import numpy as np
 
 clustering_quality_experts_folder = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/'
@@ -78,6 +79,18 @@ class TweetsFile:
                 if phrases:
                     if user not in userMap: userMap[user] = ' '.join(phrases)
                     else: userMap[user]+= ' ' + ' '.join(phrases)
+            return userMap.iteritems()
+    def _tweetWithTimestampIterator(self):
+            userMap = defaultdict(dict)
+            for tweet in TwitterIterators.iterateFromFile(self.fileName+'.gz'):
+                user = tweet['user']['screen_name']
+                userMap[user]['user'] = {'screen_name': user}
+                userMap[user]['id'] = tweet['id']
+                userMap[user]['created_at'] = tweet['created_at']
+                phrases = [phrase.replace(' ', unique_string) for phrase in getPhrases(getWordsFromRawEnglishMessage(tweet['text']), self.stream_settings['min_phrase_length'], self.stream_settings['max_phrase_length'])]
+                if phrases:
+                    if 'text' not in userMap[user]: userMap[user]['text'] = ' '.join(phrases)
+                    else: userMap[user]['text']+= ' ' + ' '.join(phrases)
             return userMap.iteritems()
     def _getExpertClasses(self, cluster): return [self.expertsToClassMap[user.lower()] for user in cluster if user.lower() in self.expertsToClassMap]
     def getEvaluationMetrics(self, documentClusters, timeDifference):
@@ -140,11 +153,12 @@ class TweetsFile:
         self.stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
         self.stream_settings['cluster_analysis_method'] = emptyClusterAnalysisMethod
         self.stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
+        self.documents = list(self._tweetWithTimestampIterator())
         clustering=HDStreaminClustering(**self.stream_settings)
         ts = time.time()
 #        for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))
-        clustering.cluster([_getDocumentFromTuple(d) for d in self.documents])
-#        clustering.cluster(documents)
+#        clustering.cluster([_getDocumentFromTuple(d) for d in self.documents])
+        clustering.cluster(self.documents)
         te = time.time()
         documentClusters = [cluster.documentsInCluster.keys() for k, cluster in clustering.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=self.stream_settings['cluster_filter_threshold']]
         return self.getEvaluationMetrics(documentClusters, te-ts)
