@@ -174,10 +174,10 @@ if __name__ == '__main__':
 
 #    CompareAlgorithms.runningTimes(('kmeans', DataIterators.kmeans()), ('cda', DataIterators.optimized()), ('kmeans_mr', DataIterators.kmeansmr()), ('cda_unopt', DataIterators.unoptimized()))
 #    CompareAlgorithms.runningTimes(('cda_it', DataIterators.cdait()), ('cda', DataIterators.optimized()), ('cda_mr', DataIterators.cdamr()), ('cda_unopt', DataIterators.unoptimized()))
-    CompareAlgorithms.runningTimes(('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
+#    CompareAlgorithms.runningTimes(('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
 
-#    CompareAlgorithms.quality('purity', ('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
-#    CompareAlgorithms.quality('nmi', ('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
+    CompareAlgorithms.quality('purity', ('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
+    CompareAlgorithms.quality('nmi', ('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
 #    for d in DataIterators.cdamr(): 
 #        del d['clusters']
 #        print d
