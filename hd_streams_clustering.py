@@ -67,7 +67,7 @@ class HDStreaminClustering(StreamingLSHClustering):
             message = self.convertDataToMessageMethod(data, **self.stream_settings)
 #            message = data
             if DataStreamMethods.messageInOrder(message.timeStamp):
-#                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
+                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
                 if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
                 else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
                 streamObject=self.streamIdToStreamObjectMap[message.streamId]
