@@ -152,7 +152,8 @@ class CompareAlgorithms:
                 dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
             plt.plot(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'])
         plt.legend()
-        plt.show()
+#        plt.show()
+        plt.savefig('running_times.eps')
     
     @staticmethod
     def quality(quality_type, *iterators):
