@@ -156,9 +156,6 @@ class TweetsFile:
         self.documents = [ tw[0] for tw in 
                           sorted([(t, getDateTimeObjectFromTweetTimestamp(t['created_at']))  for t in self.documents], key=itemgetter(0))
                           ]
-#        for d in self.documents: 
-#            print d
-#            print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(d, **self.stream_settings)
         clustering=HDStreaminClustering(**self.stream_settings)
         ts = time.time()
 #        for tweet in self.documents: clustering.getClusterAndUpdateExistingClusters(_getDocumentFromTuple(tweet))

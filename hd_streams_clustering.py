@@ -66,15 +66,15 @@ class HDStreaminClustering(StreamingLSHClustering):
         for data in dataIterator:
             message = self.convertDataToMessageMethod(data, **self.stream_settings)
 #            message = data
-#            if DataStreamMethods.messageInOrder(message.timeStamp):
+            if DataStreamMethods.messageInOrder(message.timeStamp):
 #                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
-            if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
-            else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
-            streamObject=self.streamIdToStreamObjectMap[message.streamId]
+                if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
+                else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
+                streamObject=self.streamIdToStreamObjectMap[message.streamId]
 #                self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
 #                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
 #                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-            self.getClusterAndUpdateExistingClusters(streamObject)
+                self.getClusterAndUpdateExistingClusters(streamObject)
 #            self.getClusterAndUpdateExistingClusters(message)
 
 #    def getClusterAndUpdateExistingClusters(self, stream):
