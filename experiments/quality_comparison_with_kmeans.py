@@ -153,6 +153,9 @@ class TweetsFile:
         self.stream_settings['cluster_analysis_method'] = emptyClusterAnalysisMethod
         self.stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
         self.documents = [tw[1] for tw in list(self._tweetWithTimestampIterator()) if tw[1]['text'].strip()!='']
+        self.documents = [ tw[0] for tw in 
+                          sorted([(t, getDateTimeObjectFromTweetTimestamp(t['created_at']))  for t in self.documents], key=itemgetter(0))
+                          ]
 #        for d in self.documents: 
 #            print d
 #            print TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(d, **self.stream_settings)
