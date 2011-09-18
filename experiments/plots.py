@@ -94,7 +94,7 @@ if __name__ == '__main__':
                                    ('kmeans', DataIterators.kmeans()), 
                                    ('kmeans_mr', DataIterators.kmeansmr()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=3, file_name='running_time_kmeans.eps',
+                                   loc=2, file_name='running_time_kmeans.eps',
                                    title='Running time comparison of Streaming-CDA with k-Means'
                                 )
 #    CompareAlgorithms.runningTimes(('cda_it', DataIterators.cdait()), ('cda', DataIterators.optimized()), ('cda_mr', DataIterators.cdamr()), ('cda_unopt', DataIterators.unoptimized()))
