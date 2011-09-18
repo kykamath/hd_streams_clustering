@@ -4,6 +4,7 @@ Created on Sep 14, 2011
 @author: kykamath
 '''
 import sys, os, time
+from library.plotting import getLatexForString
 sys.path.append('../')
 from classes import Stream
 from library.file_io import FileIO
@@ -64,12 +65,16 @@ class CompareAlgorithms:
     def runningTimes(*iterators, **kwargs):
         loc = kwargs.get('loc', 1)
         fileName = kwargs.get('file_name', 'running_times.eps')
+        xmax = kwargs.get('xmax', None)
+        title = kwargs.get('title', None)
         for id, iterator in iterators:
             dataX, dataY = [], []
             for data in iterator:
                 dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
-            plt.plot(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
+            plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
         plt.legend(loc=loc)
+        plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
+        if xmax: plt.xlim(xmax=xmax)
         plt.savefig(fileName)
         
     @staticmethod
@@ -89,7 +94,8 @@ if __name__ == '__main__':
                                    ('kmeans', DataIterators.kmeans()), 
                                    ('kmeans_mr', DataIterators.kmeansmr()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=3, file_name='running_time_kmeans.eps'
+                                   loc=3, file_name='running_time_kmeans.eps',
+                                   title='Running time comparison of Streaming-CDA with k-Means'
                                 )
 #    CompareAlgorithms.runningTimes(('cda_it', DataIterators.cdait()), ('cda', DataIterators.optimized()), ('cda_mr', DataIterators.cdamr()), ('cda_unopt', DataIterators.unoptimized()))
 #    CompareAlgorithms.runningTimes(('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
