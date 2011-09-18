@@ -71,7 +71,7 @@ class CompareAlgorithms:
         for id, iterator in iterators:
             dataX, dataY = [], []
             for data in iterator:
-                dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
+                if data['no_of_documents'] <= xmax: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
             plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
         plt.legend(loc=loc)
         plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
@@ -104,7 +104,7 @@ if __name__ == '__main__':
                                    ('cda_it', DataIterators.cdait()), 
                                    ('cda_mr', DataIterators.cdamr()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_cda.eps',
+                                   loc=2, file_name='running_time_cda.eps', xmin=800, xmax=550000,
                                    title='Running time comparison of Streaming-CDA with other CDA'
                                 )
     
