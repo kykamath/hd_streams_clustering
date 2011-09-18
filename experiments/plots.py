@@ -72,7 +72,8 @@ class CompareAlgorithms:
         for id, iterator in iterators:
             dataX, dataY = [], []
             for data in iterator:
-                if data['no_of_documents'] <= xmax: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
+                if xmax and data['no_of_documents'] <= xmax: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
+                else: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
             if log: plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
             else: plt.semilogx(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
         plt.legend(loc=loc)
