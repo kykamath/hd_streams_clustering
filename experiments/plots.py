@@ -58,7 +58,7 @@ class DataIterators:
         for data in FileIO.iterateJsonFromFile(hd_clustering_performance_folder+'cda'): yield data['streaming_lsh']
     @staticmethod
     def unoptimized(): 
-        for data in FileIO.iterateJsonFromFile(hd_clustering_performance_folder+'cda_unopt_bak2'): yield data['streaming_lsh']
+        for data in FileIO.iterateJsonFromFile(hd_clustering_performance_folder+'cda_unopt'): yield data['streaming_lsh']
 
 class CompareAlgorithms:
     @staticmethod
@@ -75,7 +75,7 @@ class CompareAlgorithms:
                 if xmax and data['no_of_documents'] <= xmax: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
                 else: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
             if log: plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
-            else: plt.semilogx(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
+            else: plt.plot(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
         plt.legend(loc=loc)
         plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
         if xmax: plt.xlim(xmax=xmax) 
