@@ -92,21 +92,21 @@ if __name__ == '__main__':
 #    TweetsFile.generateStatsFor(experts_twitter_stream_settings)
 #    TweetsFile.generateStatsFor(default_experts_twitter_stream_settings)
 
-#    CompareAlgorithms.runningTimes(
-#                                   ('kmeans', DataIterators.kmeans()), 
-#                                   ('kmeans_mr', DataIterators.kmeansmr()), 
-#                                   ('cda_unopt', DataIterators.unoptimized()),
-#                                   loc=2, file_name='running_time_kmeans.eps', xmin=800, xmax=95000,
-#                                   title='Running time comparison of Streaming-CDA with k-Means'
-#                                )
-    
     CompareAlgorithms.runningTimes(
-                                   ('cda_it', DataIterators.cdait()), 
-                                   ('cda_mr', DataIterators.cdamr()), 
+                                   ('kmeans', DataIterators.kmeans()), 
+                                   ('kmeans_mr', DataIterators.kmeansmr()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_cda.eps', xmin=800, xmax=550000,
-                                   title='Running time comparison of Streaming-CDA with other CDA'
+                                   loc=2, file_name='running_time_kmeans.eps', xmin=800, xmax=95000,
+                                   title='Running time comparison of Streaming-CDA with k-Means'
                                 )
+    
+#    CompareAlgorithms.runningTimes(
+#                                   ('cda_it', DataIterators.cdait()), 
+#                                   ('cda_mr', DataIterators.cdamr()), 
+#                                   ('cda_unopt', DataIterators.unoptimized()),
+#                                   loc=2, file_name='running_time_cda.eps', xmin=800, xmax=550000,
+#                                   title='Running time comparison of Streaming-CDA with other CDA'
+#                                )
     
 #    CompareAlgorithms.runningTimes(('cda_it', DataIterators.cdait()), ('cda', DataIterators.optimized()), ('cda_mr', DataIterators.cdamr()), ('cda_unopt', DataIterators.unoptimized()))
 #    CompareAlgorithms.runningTimes(('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
