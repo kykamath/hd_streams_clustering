@@ -58,7 +58,7 @@ class DataIterators:
         for data in FileIO.iterateJsonFromFile(hd_clustering_performance_folder+'cda'): yield data['streaming_lsh']
     @staticmethod
     def unoptimized(): 
-        for data in FileIO.iterateJsonFromFile(hd_clustering_performance_folder+'cda_unopt'): yield data['streaming_lsh']
+        for data in FileIO.iterateJsonFromFile(hd_clustering_performance_folder+'cda_unopt_bak2'): yield data['streaming_lsh']
 
 class CompareAlgorithms:
     @staticmethod
