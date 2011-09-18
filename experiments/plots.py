@@ -32,7 +32,7 @@ default_experts_twitter_stream_settings['status_file'] = clustering_quality_hd_e
 
 
 algorithm_info = {
-                  'cda': {'label': 'opt', 'color': 'k'},
+                  'cda': {'label': 'Optimized Streaming-CDA', 'color': '#56F2F5'},
                   'cda_unopt': {'label': 'Streaming-CDA', 'color': '#7109AA'},
                   'cda_it': {'label': 'Iterative CDA', 'color': '#FD0006'},
                   'cda_mr': {'label': 'MR CDA', 'color': '#5AF522'},
@@ -66,13 +66,15 @@ class CompareAlgorithms:
         loc = kwargs.get('loc', 1)
         fileName = kwargs.get('file_name', 'running_times.eps')
         xmax = kwargs.get('xmax', None)
+        log = kwargs.get('log', True)
         xmin = kwargs.get('xmin', None)
         title = kwargs.get('title', None)
         for id, iterator in iterators:
             dataX, dataY = [], []
             for data in iterator:
                 if data['no_of_documents'] <= xmax: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
-            plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
+            if log: plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
+            else: plt.semilogx(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2)
         plt.legend(loc=loc)
         plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
         if xmax: plt.xlim(xmax=xmax) 
@@ -87,18 +89,14 @@ class CompareAlgorithms:
             print id, np.mean(dataY)
 
 if __name__ == '__main__':
-#    plotQuality()
-#    plotTime()
-#    TweetsFile.generateStatsFor(experts_twitter_stream_settings)
-#    TweetsFile.generateStatsFor(default_experts_twitter_stream_settings)
 
-    CompareAlgorithms.runningTimes(
-                                   ('kmeans', DataIterators.kmeans()), 
-                                   ('kmeans_mr', DataIterators.kmeansmr()), 
-                                   ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_kmeans.eps', xmin=800, xmax=95000,
-                                   title='Running time comparison of Streaming-CDA with k-Means'
-                                )
+#    CompareAlgorithms.runningTimes(
+#                                   ('kmeans', DataIterators.kmeans()), 
+#                                   ('kmeans_mr', DataIterators.kmeansmr()), 
+#                                   ('cda_unopt', DataIterators.unoptimized()),
+#                                   loc=2, file_name='running_time_kmeans.eps', xmin=800, xmax=95000,
+#                                   title='Running time comparison of Streaming-CDA with k-Means'
+#                                )
     
 #    CompareAlgorithms.runningTimes(
 #                                   ('cda_it', DataIterators.cdait()), 
@@ -107,6 +105,13 @@ if __name__ == '__main__':
 #                                   loc=2, file_name='running_time_cda.eps', xmin=800, xmax=550000,
 #                                   title='Running time comparison of Streaming-CDA with other CDA'
 #                                )
+
+    CompareAlgorithms.runningTimes(
+                                   ('cda', DataIterators.optimized()), 
+                                   ('cda_unopt', DataIterators.unoptimized()),
+                                   loc=2, file_name='running_time_opt_unopt_cda.eps',
+                                   title='Running time comparison between optimized and un-optimized CDA'
+                                )
     
 #    CompareAlgorithms.runningTimes(('cda_it', DataIterators.cdait()), ('cda', DataIterators.optimized()), ('cda_mr', DataIterators.cdamr()), ('cda_unopt', DataIterators.unoptimized()))
 #    CompareAlgorithms.runningTimes(('cda', DataIterators.optimized()), ('cda_unopt', DataIterators.unoptimized()))
