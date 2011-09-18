@@ -110,7 +110,7 @@ if __name__ == '__main__':
     CompareAlgorithms.runningTimes(
                                    ('cda', DataIterators.optimized()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_opt_unopt_cda.eps',
+                                   loc=2, file_name='running_time_opt_unopt_cda.eps', xmin=800, log=False,
                                    title='Running time comparison between optimized and un-optimized CDA'
                                 )
     
