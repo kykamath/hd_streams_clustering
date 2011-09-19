@@ -128,17 +128,18 @@ class CompareAlgorithms:
         
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        rectsKmeans = ax.bar(ind, kmeans, width, color='r')
-        rectsCdaIt = ax.bar(ind+width, cda_it, width, color='y')
-        rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='g')
-        rectsCda = ax.bar(ind+3*width, cda, width, color='b')
+        rectsKmeans = ax.bar(ind, kmeans, width, color='#FF7A7A', label='k-Means')#, hatch='\\')
+        rectsCdaIt = ax.bar(ind+width, cda_it, width, color='#FF7AEB', label='Iterative CDA')#, hatch='/')
+        rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='#7A7AFF', label='Streaming-CDA')#, hatch='-')
+        rectsCda = ax.bar(ind+3*width, cda, width, color='#B0B0B0', label='Optimized Streaming-CDA')#, hatch='x')
         
         ax.set_ylabel('Score')
         ax.set_title('Quality of crowds discovered')
         ax.set_xticks(ind+width)
         ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
         
-        plt.show()
+        plt.legend(loc=8, ncol=2)
+        plt.savefig('crowds_quality.pdf')
         
 if __name__ == '__main__':
 #    CompareAlgorithms.runningTimes(
