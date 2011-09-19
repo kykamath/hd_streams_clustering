@@ -115,6 +115,31 @@ class CompareAlgorithms:
                 else: dataY.append(data[quality_type])
             print id, '%0.2f'%np.mean(dataY[2:])
             
+    @staticmethod
+    def plotQuality():
+        kmeans = (0.79, 0.78, 0.80, 0.80, 0.79)
+        cda_it = (0.98, 0.93, 0.81, 0.84, 0.79)
+        cda_unopt = (0.95, 0.85, 0.86, 0.84, 0.87)
+        cda = (0.96, 0.88, 0.86, 0.85, 0.88)
+        
+        N = len(kmeans)
+        ind = np.arange(N)  # the x locations for the groups
+        width = 0.20       # the width of the bars
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        rectsKmeans = ax.bar(ind, kmeans, width, color='r')
+        rectsCdaIt = ax.bar(ind+width, cda_it, width, color='y')
+        rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='g')
+        rectsCda = ax.bar(ind+3*width, cda, width, color='b')
+        
+        ax.set_ylabel('Score')
+        ax.set_title('Quality of crowds discovered')
+        ax.set_xticks(ind+width)
+        ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
+        
+        plt.show()
+        
 if __name__ == '__main__':
 #    CompareAlgorithms.runningTimes(
 #                                   ('kmeans', DataIterators.kmeans()), 
@@ -139,10 +164,11 @@ if __name__ == '__main__':
 #                                   title='Running time performance after parameters estimation.'
 #                                )
     
-    CompareAlgorithms.quality('purity', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()))
-    CompareAlgorithms.quality('nmi', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()))
-    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='f1')
-    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='precision')
-    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='recall')
+#    CompareAlgorithms.quality('purity', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()))
+#    CompareAlgorithms.quality('nmi', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()))
+#    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='f1')
+#    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='precision')
+#    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='recall')
     
+    CompareAlgorithms.plotQuality()
 
