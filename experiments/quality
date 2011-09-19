@@ -1,0 +1,25 @@
+purity
+kmeans 0.79
+cda_it 0.98
+cda_unopt 0.95
+cda 0.96
+nmi
+kmeans 0.78
+cda_it 0.93
+cda_unopt 0.85
+cda 0.88
+f1
+kmeans 0.80
+cda_it 0.81
+cda_unopt 0.86
+cda 0.86
+precision
+kmeans 0.80
+cda_it 0.84
+cda_unopt 0.84
+cda 0.85
+recall
+kmeans 0.79
+cda_it 0.79
+cda_unopt 0.87
+cda 0.88
