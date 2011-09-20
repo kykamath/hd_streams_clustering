@@ -245,7 +245,7 @@ class TweetsFile:
             purity (0.96 0.00)
             nmi (0.87 0.00)
         '''
-        del plotSettings['mr_k_means']
+        del plotSettings['mr_k_means']; del plotSettings['default_streaming_lsh']
         speedStats = dict([(k, {'f1': [], 'nmi': [], 'purity': []}) for k in plotSettings])
         for data in FileIO.iterateJsonFromFile(TweetsFile.combined_stats_file):
             for k in speedStats:
@@ -267,8 +267,8 @@ class TweetsFile:
         plt.title(getLatexForString('Clustering quality comparison for Streaming LSH with k-Means'))
         plt.xticks(ind+width, ('$F$', '$Precision$', '$Recall$', '$Purity$', '$NMI$') )
         plt.legend( [r[0] for r in rects], [plotSettings[k]['label'] for k in plotSettings], loc=4 )
-#        plt.show()
-        plt.savefig('qualityComparisonWithKMeans.pdf')
+        plt.show()
+#        plt.savefig('qualityComparisonWithKMeans.pdf')
     @staticmethod
     def generateCombinedStatsFile():
         for normalData, mrData in zip(FileIO.iterateJsonFromFile(TweetsFile.stats_file), FileIO.iterateJsonFromFile(TweetsFile.mr_stats_file)):
@@ -282,12 +282,12 @@ if __name__ == '__main__':
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateStatsForDefaultStreamSettings()
 #    TweetsFile.plotClusteringSpeed()
-#    TweetsFile.getClusteringQuality()
+    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()
 
 #    TweetsFile.generateStatsForOptimized()
-    TweetsFile.generateStatsForUnOptimized()
+#    TweetsFile.generateStatsForUnOptimized()
     
     
     

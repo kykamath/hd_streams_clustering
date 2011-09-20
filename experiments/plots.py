@@ -25,7 +25,7 @@ default_experts_twitter_stream_settings['status_file'] = clustering_quality_hd_e
 
 
 algorithm_info = {
-                  'cda': {'label': 'Optimized Streaming-CDA', 'color': '#56F2F5', 'marker': 's'},
+                  'cda': {'label': 'Tailored Streaming-CDA', 'color': '#56F2F5', 'marker': 's'},
                   'cda_unopt': {'label': 'Streaming-CDA', 'color': '#7109AA', 'marker': '*'},
                   'cda_it': {'label': 'Iterative CDA', 'color': '#FD0006', 'marker': 'o'},
                   'cda_mr': {'label': 'MR CDA', 'color': '#5AF522', 'marker': '>'},
@@ -36,7 +36,7 @@ algorithm_info = {
 class DataIterators:
     @staticmethod
     def kmeans(): 
-        for data in FileIO.iterateJsonFromFile(clustering_quality_experts_folder+'quality_stats'): yield data['k_means']
+        for data in FileIO.iterateJsonFromFile(clustering_quality_experts_folder+'combined_stats_file'): yield data['k_means']
     @staticmethod
     def kmeansmr(): 
         for data in FileIO.iterateJsonFromFile(clustering_quality_experts_folder+'mr_quality_stats'): yield data['mr_k_means']
@@ -83,6 +83,7 @@ class CompareAlgorithms:
         semilog = kwargs.get('log', False)
         xmin = kwargs.get('xmin', None)
         title = kwargs.get('title', None)
+        dataX, dataYValues = [], []
         for id, iterator in iterators:
             dataX, dataY = [], []
             for data in iterator:
@@ -90,6 +91,12 @@ class CompareAlgorithms:
                 else: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
             if not semilog: plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
             else: plt.plot(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
+            dataYValues.append(dataY)
+        
+        dataDifference = []
+        for i in range(len(dataX)): dataDifference.append(dataYValues[1][i] - dataYValues[0][i])
+        plt.plot(dataX, dataDifference, label='Difference', lw=2)
+        
         plt.legend(loc=loc)
         plt.xlabel(getLatexForString('\# of documents (10^4)')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
         locs,labels = plt.xticks()
@@ -97,6 +104,7 @@ class CompareAlgorithms:
         if xmax: plt.xlim(xmax=xmax) 
         if xmin: plt.xlim(xmin=xmin) 
         plt.savefig(fileName)
+#        plt.show()
         
     @staticmethod
     def quality(quality_type, *iterators, **kwargs):
@@ -117,26 +125,35 @@ class CompareAlgorithms:
             
     @staticmethod
     def plotQuality():
-        kmeans = (0.79, 0.78, 0.80, 0.80, 0.79)
-        cda_it = (0.98, 0.93, 0.81, 0.84, 0.79)
-        cda_unopt = (0.95, 0.85, 0.86, 0.84, 0.87)
-        cda = (0.96, 0.88, 0.86, 0.85, 0.88)
+#        kmeans = (0.79, 0.78, 0.80, 0.80, 0.79)
+#        cda_it = (0.98, 0.93, 0.81, 0.84, 0.79)
+#        cda_unopt = (0.95, 0.85, 0.86, 0.84, 0.87)
+#        cda = (0.96, 0.88, 0.86, 0.85, 0.88)
+        kmeans = (0.79, 0.78)
+        cda_it = (0.98, 0.93)
+        cda_unopt = (0.95, 0.85)
+        cda = (0.96, 0.88)
         
         N = len(kmeans)
         ind = np.arange(N)  # the x locations for the groups
-        width = 0.20       # the width of the bars
+        width = 0.1       # the width of the bars
         
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        rectsKmeans = ax.bar(ind, kmeans, width, color='#FF7A7A', label='k-Means')#, hatch='\\')
-        rectsCdaIt = ax.bar(ind+width, cda_it, width, color='#FF7AEB', label='Iterative CDA')#, hatch='/')
-        rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='#7A7AFF', label='Streaming-CDA')#, hatch='-')
-        rectsCda = ax.bar(ind+3*width, cda, width, color='#B0B0B0', label='Optimized Streaming-CDA')#, hatch='x')
+#        rectsKmeans = ax.bar(ind, kmeans, width, color='#FF7A7A', label='k-Means', hatch='\\')
+#        rectsCdaIt = ax.bar(ind+width, cda_it, width, color='#FF7AEB', label='Iterative CDA', hatch='/')
+#        rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='#7A7AFF', label='Streaming-CDA', hatch='-')
+#        rectsCda = ax.bar(ind+3*width, cda, width, color='#B0B0B0', label='Tailored Streaming-CDA', hatch='x')
+        rectsKmeans = ax.bar(ind, kmeans, width, color='#DCDCDC', label='k-Means', hatch='\\')
+        rectsCdaIt = ax.bar(ind+width, cda_it, width, color='#808080', label='Iterative CDA', hatch='/')
+        rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='#778899', label='Streaming-CDA', hatch='-')
+        rectsCda = ax.bar(ind+3*width, cda, width, color='#2F4F4F', label='Tailored Streaming-CDA', hatch='x')
         
         ax.set_ylabel('Score')
         ax.set_title('Quality of crowds discovered')
         ax.set_xticks(ind+width)
-        ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
+#        ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
+        ax.set_xticklabels(('Purity', 'NMI'))
         
         plt.legend(loc=8, ncol=2)
         plt.savefig('crowds_quality.pdf')
