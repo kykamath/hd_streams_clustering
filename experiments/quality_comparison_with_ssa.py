@@ -92,6 +92,7 @@ class TweetsFile:
 #        for length in [1000000, 1100000, 1200000, 1300000, 1400000]: 
         for length in [150]:
             fileName = clustering_quality_experts_folder+str(length)
+            print fileName
             i = 0
             for tweet in TwitterIterators.iterateTweetsFromExperts():
                 FileIO.writeToFileAsJson(tweet, fileName)
