@@ -88,7 +88,7 @@ class TweetsFile:
         return self.getEvaluationMetrics(documentClusters, te-ts)
     @staticmethod
     def generateDocsForSSAMR():
-        for length in [500000, 600000, 700000, 800000, 900000]: 
+        for length in [1000000, 1100000, 1200000, 1300000, 1400000]: 
             tf = TweetsFile(length, **experts_twitter_stream_settings)
             iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
             print 'Generating data for ', iteration_file
@@ -211,11 +211,11 @@ class QualityComparisonWithKMeans():
         
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
-#    TweetsFile.generateDocsForSSAMR()
+    TweetsFile.generateDocsForSSAMR()
 #    TweetsFile.copyUnzippedSSADataToHadoop()
 
-    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
+#    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
 #    QualityComparisonWithSSA.plotClusteringSpeed()
 #    QualityComparisonWithSSA.plotClusteringQuality()
 #    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
-    QualityComparisonWithSSA.plotSpeedWithKMeansAndSSA()
+#    QualityComparisonWithSSA.plotSpeedWithKMeansAndSSA()

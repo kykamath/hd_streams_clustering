@@ -125,14 +125,14 @@ class CompareAlgorithms:
             
     @staticmethod
     def plotQuality():
-#        kmeans = (0.79, 0.78, 0.80, 0.80, 0.79)
-#        cda_it = (0.98, 0.93, 0.81, 0.84, 0.79)
-#        cda_unopt = (0.95, 0.85, 0.86, 0.84, 0.87)
-#        cda = (0.96, 0.88, 0.86, 0.85, 0.88)
-        kmeans = (0.79, 0.78)
-        cda_it = (0.98, 0.93)
-        cda_unopt = (0.95, 0.85)
-        cda = (0.96, 0.88)
+        kmeans = (0.79, 0.78, 0.80, 0.80, 0.79)
+        cda_it = (0.98, 0.93, 0.81, 0.84, 0.79)
+        cda_unopt = (0.95, 0.85, 0.86, 0.84, 0.87)
+        cda = (0.96, 0.88, 0.86, 0.85, 0.88)
+#        kmeans = (0.79, 0.78)
+#        cda_it = (0.98, 0.93)
+#        cda_unopt = (0.95, 0.85)
+#        cda = (0.96, 0.88)
         
         N = len(kmeans)
         ind = np.arange(N)  # the x locations for the groups
@@ -152,8 +152,8 @@ class CompareAlgorithms:
         ax.set_ylabel(getLatexForString('Score'))
         ax.set_title(getLatexForString('Quality of crowds discovered'))
         ax.set_xticks(ind+width)
-#        ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
-        ax.set_xticklabels((getLatexForString('Purity'), getLatexForString('NMI')))
+        ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
+#        ax.set_xticklabels((getLatexForString('Purity'), getLatexForString('NMI')))
         
         plt.legend(loc=8, ncol=2)
         plt.savefig('crowds_quality.pdf')
@@ -188,5 +188,5 @@ if __name__ == '__main__':
 #    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='precision')
 #    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='recall')
     
-#    CompareAlgorithms.plotQuality()
+    CompareAlgorithms.plotQuality()
 
