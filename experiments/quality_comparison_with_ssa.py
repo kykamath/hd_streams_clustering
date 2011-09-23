@@ -98,7 +98,7 @@ class TweetsFile:
                 FileIO.writeToFileAsJson(tweet, fileName)
                 i+=1
                 if i==length: break
-#            os.system('gzip %s'%fileName)
+            os.system('gzip %s'%fileName)
     @staticmethod
     def generateDocsForSSAMR():
         for length in [1000000, 1100000, 1200000, 1300000, 1400000]: 
