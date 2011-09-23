@@ -12,7 +12,8 @@ from library.clustering import EvaluationMetrics
 from experiments.ssa.ssa import SimilarStreamAggregation,\
     StreamSimilarityAggregationMR
 from collections import defaultdict
-from twitter_streams_clustering import getExperts, TwitterCrowdsSpecificMethods
+from twitter_streams_clustering import getExperts, TwitterCrowdsSpecificMethods,\
+    TwitterIterators
 from settings import experts_twitter_stream_settings
 from library.twitter import TweetFiles
 from library.vector import Vector
@@ -86,6 +87,17 @@ class TweetsFile:
                                                                        jobconf={'mapred.map.tasks':25, 'mapred.task.timeout': 7200000, 'mapred.reduce.tasks':25}))
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
+    @staticmethod
+    def generateDocsByLength():
+#        for length in [1000000, 1100000, 1200000, 1300000, 1400000]: 
+        for length in [150]:
+            fileName = clustering_quality_experts_folder+str(length)
+            i = 0
+            for tweet in TwitterIterators.iterateTweetsFromExperts():
+                FileIO.writeToFileAsJson(tweet, fileName)
+                i+=1
+                if i==length: break
+#            os.system('gzip %s'%fileName)
     @staticmethod
     def generateDocsForSSAMR():
         for length in [1000000, 1100000, 1200000, 1300000, 1400000]: 
@@ -211,7 +223,8 @@ class QualityComparisonWithKMeans():
         
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
-    TweetsFile.generateDocsForSSAMR()
+#    TweetsFile.generateDocsForSSAMR()
+    TweetsFile.generateDocsByLength()
 #    TweetsFile.copyUnzippedSSADataToHadoop()
 
 #    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
