@@ -4,7 +4,7 @@ Created on Jun 25, 2011
 @author: kykamath
 '''
 from classes import UtilityMethods, Stream, VectorUpdateMethods, StreamCluster
-from library.classes import GeneralMethods, FixedIntervalMethod, timeit
+from library.classes import FixedIntervalMethod, timeit
 from streaming_lsh.streaming_lsh_clustering import StreamingLSHClustering
 
 #previousSet = set()

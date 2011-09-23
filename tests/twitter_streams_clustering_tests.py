@@ -7,8 +7,7 @@ import unittest, sys
 sys.path.append('../')
 from library.vector import Vector
 from classes import StreamCluster, Message, Stream
-from library.twitter import getStringRepresentationForTweetTimestamp,\
-    getDateTimeObjectFromTweetTimestamp
+from library.twitter import getStringRepresentationForTweetTimestamp
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods
 from settings import twitter_stream_settings
 from datetime import datetime
