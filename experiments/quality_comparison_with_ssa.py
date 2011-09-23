@@ -89,8 +89,8 @@ class TweetsFile:
         return self.getEvaluationMetrics(documentClusters, te-ts)
     @staticmethod
     def generateDocsByLength():
-#        for length in [1000000, 1100000, 1200000, 1300000, 1400000]: 
-        for length in [150]:
+        for length in [1000000, 1100000, 1200000, 1300000, 1400000]: 
+#        for length in [150]:
             fileName = clustering_quality_experts_folder+'data/%s'%str(length)
             print fileName
             i = 0
