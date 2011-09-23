@@ -1,7 +1,7 @@
 =====================
 HD Streams Clustering
 =====================
-:Description: A Python project to cluster a collection of high-dimensional text streams.
+:Description: A _ Python project to cluster a collection of high-dimensional text streams.
 :Author: Krishna Y. Kamath
 
 About

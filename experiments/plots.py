@@ -26,11 +26,11 @@ default_experts_twitter_stream_settings['status_file'] = clustering_quality_hd_e
 
 algorithm_info = {
                   'cda': {'label': 'Tailored Streaming-CDA', 'color': '#56F2F5', 'marker': 's'},
-                  'cda_unopt': {'label': 'Streaming-CDA', 'color': '#7109AA', 'marker': '*'},
+                  'cda_unopt': {'label': 'Stream-CDA', 'color': '#7109AA', 'marker': '*'},
                   'cda_it': {'label': 'Iterative CDA', 'color': '#FD0006', 'marker': 'o'},
                   'cda_mr': {'label': 'MR CDA', 'color': '#5AF522', 'marker': '>'},
-                  'kmeans': {'label': 'k-Means', 'color': '#FD0006', 'marker': 'o'},
-                  'kmeans_mr': {'label': 'MR k-Means', 'color': '#5AF522', 'marker': '>'}
+                  'kmeans': {'label': 'k-means', 'color': '#FD0006', 'marker': 'o'},
+                  'kmeans_mr': {'label': 'MR k-means', 'color': '#5AF522', 'marker': '>'}
                   }
 
 class DataIterators:
@@ -140,39 +140,39 @@ class CompareAlgorithms:
         
         fig = plt.figure()
         ax = fig.add_subplot(111)
-#        rectsKmeans = ax.bar(ind, kmeans, width, color='#FF7A7A', label='k-Means', hatch='\\')
+#        rectsKmeans = ax.bar(ind, kmeans, width, color='#FF7A7A', label='k-means', hatch='\\')
 #        rectsCdaIt = ax.bar(ind+width, cda_it, width, color='#FF7AEB', label='Iterative CDA', hatch='/')
-#        rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='#7A7AFF', label='Streaming-CDA', hatch='-')
-#        rectsCda = ax.bar(ind+3*width, cda, width, color='#B0B0B0', label='Tailored Streaming-CDA', hatch='x')
-        rectsKmeans = ax.bar(ind, kmeans, width, color='#DCDCDC', label='k-Means', hatch='\\')
-        rectsCdaIt = ax.bar(ind+width, cda_it, width, color='#808080', label='Iterative CDA', hatch='/')
-        rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='#778899', label='Streaming-CDA', hatch='-')
-        rectsCda = ax.bar(ind+3*width, cda, width, color='#2F4F4F', label='Tailored Streaming-CDA', hatch='x')
+#        rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='#7A7AFF', label='Stream-CDA', hatch='-')
+#        rectsCda = ax.bar(ind+3*width, cda, width, color='#B0B0B0', label='Tailored Stream-CDA', hatch='x')
+        rectsKmeans = ax.bar(ind, kmeans, width, color='#DCDCDC', label=getLatexForString('k-means'), hatch='\\')
+        rectsCdaIt = ax.bar(ind+width, cda_it, width, color='#808080', label=getLatexForString('Iterative CDA'), hatch='/')
+        rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='#778899', label=getLatexForString('Stream-CDA'), hatch='-')
+        rectsCda = ax.bar(ind+3*width, cda, width, color='#2F4F4F', label=getLatexForString('Tailored Stream-CDA'), hatch='x')
         
-        ax.set_ylabel('Score')
-        ax.set_title('Quality of crowds discovered')
+        ax.set_ylabel(getLatexForString('Score'))
+        ax.set_title(getLatexForString('Quality of crowds discovered'))
         ax.set_xticks(ind+width)
 #        ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
-        ax.set_xticklabels(('Purity', 'NMI'))
+        ax.set_xticklabels((getLatexForString('Purity'), getLatexForString('NMI')))
         
         plt.legend(loc=8, ncol=2)
         plt.savefig('crowds_quality.pdf')
         
 if __name__ == '__main__':
-#    CompareAlgorithms.runningTimes(
-#                                   ('kmeans', DataIterators.kmeans()), 
-#                                   ('kmeans_mr', DataIterators.kmeansmr()), 
-#                                   ('cda_unopt', DataIterators.unoptimized()),
-#                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=97000,
-#                                   title='Running time comparison of Streaming-CDA with k-Means'
-#                                )
+    CompareAlgorithms.runningTimes(
+                                   ('kmeans', DataIterators.kmeans()), 
+                                   ('kmeans_mr', DataIterators.kmeansmr()), 
+                                   ('cda_unopt', DataIterators.unoptimized()),
+                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=97000,
+                                   title='Running time comparison of Stream-CDA with k-means'
+                                )
     
 #    CompareAlgorithms.runningTimes(
 #                                   ('cda_it', DataIterators.cdait()), 
 #                                   ('cda_mr', DataIterators.cdamr()), 
 #                                   ('cda_unopt', DataIterators.unoptimized()),
 #                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=550000,
-#                                   title='Running time comparison of Streaming-CDA with other CDA'
+#                                   title='Running time comparison of Stream-CDA with other CDA'
 #                                )
 
 #    CompareAlgorithms.runningTimesWithCDA(
@@ -188,5 +188,5 @@ if __name__ == '__main__':
 #    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='precision')
 #    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='recall')
     
-    CompareAlgorithms.plotQuality()
+#    CompareAlgorithms.plotQuality()
 
