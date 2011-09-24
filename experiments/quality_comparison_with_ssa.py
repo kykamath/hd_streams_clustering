@@ -125,7 +125,7 @@ class QualityComparisonWithSSA:
             print 'Generating stats for: ',length
             tf = TweetsFile(length, **experts_twitter_stream_settings)
 #            stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
-            stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
+            stats = {'ssa_mr': tf.getStatsForSSAMR(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
             FileIO.writeToFileAsJson(stats, TweetsFile.stats_file)
     @staticmethod
     def plotClusteringSpeed(saveFig=True):
