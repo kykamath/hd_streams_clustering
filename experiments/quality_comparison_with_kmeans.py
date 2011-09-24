@@ -182,10 +182,11 @@ class TweetsFile:
     @staticmethod
     def generateStatsForOptimized():
 #        for i in [10**3, 10**4, 10**5]: 
-        for i in [10**6]:
-            for j in range(1, 10): 
-                print 'Generating stats for: ',i*j
-                tf = TweetsFile(i*j, **experts_twitter_stream_settings)
+        for length in [1000000, 1100000, 1200000]: 
+#        for i in [10**6]:
+#            for j in range(1, 10): 
+                print 'Generating stats for: ', length
+                tf = TweetsFile(length, **experts_twitter_stream_settings)
                 FileIO.writeToFileAsJson({'streaming_lsh': tf.generateStatsForHDLSHClustering(), 
                                           'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
                                           hd_clustering_performance_folder+'cda')
@@ -193,11 +194,12 @@ class TweetsFile:
     @staticmethod
     def generateStatsForUnOptimized():
 #        for i in [10**3, 10**4, 10**5]: 
-        for i in [10**6]: 
-            for j in range(1, 10): 
-                print 'Generating stats for: ',i*j
+        for length in [1000000, 1100000, 1200000]: 
+#        for i in [10**6]:
+#            for j in range(1, 10): 
+                print 'Generating stats for: ', length
 #                default_experts_twitter_stream_settings['cluster_filtering_method'] = emptyClusterFilteringMethod
-                tf = TweetsFile(i*j, **default_experts_twitter_stream_settings)
+                tf = TweetsFile(length, **default_experts_twitter_stream_settings)
                 performance = tf.generateStatsForHDLSHClustering()
                 FileIO.writeToFileAsJson({'streaming_lsh': performance,
                                           'settings': Settings.getSerialzedObject(tf.stream_settings)}, 
@@ -284,11 +286,11 @@ if __name__ == '__main__':
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateStatsForDefaultStreamSettings()
 #    TweetsFile.plotClusteringSpeed()
-    TweetsFile.getClusteringQuality()
+#    TweetsFile.getClusteringQuality()
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()
 
-#    TweetsFile.generateStatsForOptimized()
+    TweetsFile.generateStatsForOptimized()
 #    TweetsFile.generateStatsForUnOptimized()
     
     
