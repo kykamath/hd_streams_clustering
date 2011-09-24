@@ -107,7 +107,8 @@ class TweetsFile:
 #            print 'Generating data for ', iteration_file
 #            with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(tf._iterateUserDocuments(),2)]
 #            os.system('gzip %s'%iteration_file)
-            os.system('hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath))
+            print 'hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath)
+#            os.system('hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath))
     @staticmethod
     def copyUnzippedSSADataToHadoop():
         for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
