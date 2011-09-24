@@ -102,11 +102,11 @@ class TweetsFile:
     @staticmethod
     def generateDocsForSSAMR():
         for length in [1000000, 1100000, 1200000]: 
-            tf = TweetsFile(length, **experts_twitter_stream_settings)
+#            tf = TweetsFile(length, **experts_twitter_stream_settings)
             iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
-            print 'Generating data for ', iteration_file
-            with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(tf._iterateUserDocuments(),2)]
-            os.system('gzip %s'%iteration_file)
+#            print 'Generating data for ', iteration_file
+#            with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(tf._iterateUserDocuments(),2)]
+#            os.system('gzip %s'%iteration_file)
             os.system('hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath))
     @staticmethod
     def copyUnzippedSSADataToHadoop():
