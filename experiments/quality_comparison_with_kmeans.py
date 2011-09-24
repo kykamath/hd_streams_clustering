@@ -290,8 +290,8 @@ if __name__ == '__main__':
 #    TweetsFile.generateDocumentForMRClustering()
 #    TweetsFile.generateCombinedStatsFile()
 
-    TweetsFile.generateStatsForOptimized()
-#    TweetsFile.generateStatsForUnOptimized()
+#    TweetsFile.generateStatsForOptimized()
+    TweetsFile.generateStatsForUnOptimized()
     
     
     
