@@ -120,10 +120,12 @@ class TweetsFile:
 class QualityComparisonWithSSA:
     @staticmethod
     def generateStatsForQualityComparisonWithSSA():
-        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+#        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+        for length in [1000000, 1100000, 1200000]: 
             print 'Generating stats for: ',length
             tf = TweetsFile(length, **experts_twitter_stream_settings)
-            stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
+#            stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
+            stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
             FileIO.writeToFileAsJson(stats, TweetsFile.stats_file)
     @staticmethod
     def plotClusteringSpeed(saveFig=True):
