@@ -73,8 +73,8 @@ class CompareAlgorithms:
         plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
         if xmax: plt.xlim(xmax=xmax) 
         if xmin: plt.xlim(xmin=xmin) 
-#        plt.savefig(fileName)
-        plt.show()
+        plt.savefig(fileName)
+#        plt.show()
         
     @staticmethod
     def runningTimesWithCDA(*iterators, **kwargs):
@@ -164,7 +164,7 @@ if __name__ == '__main__':
                                    ('kmeans', DataIterators.kmeans()), 
                                    ('kmeans_mr', DataIterators.kmeansmr()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800,
+                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=1100000,
                                    title='Running time comparison of Stream-CDA with k-means'
                                 )
     
@@ -172,7 +172,7 @@ if __name__ == '__main__':
 #                                   ('cda_it', DataIterators.cdait()), 
 #                                   ('cda_mr', DataIterators.cdamr()), 
 #                                   ('cda_unopt', DataIterators.unoptimized()),
-#                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=550000,
+#                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=1100000,
 #                                   title='Running time comparison of Stream-CDA with other CDA'
 #                                )
 
