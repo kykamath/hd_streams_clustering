@@ -111,7 +111,8 @@ class TweetsFile:
             os.system('hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath))
     @staticmethod
     def copyUnzippedSSADataToHadoop():
-        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+#        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+        for length in [1000000, 1100000]: 
             iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
             print 'Copying file for %s'%length
             os.system('gunzip %s.gz'%iteration_file)
@@ -229,9 +230,9 @@ if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    TweetsFile.generateDocsForSSAMR()
 #    TweetsFile.generateDocsByLength()
-#    TweetsFile.copyUnzippedSSADataToHadoop()
+    TweetsFile.copyUnzippedSSADataToHadoop()
 
-    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
+#    QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
 #    QualityComparisonWithSSA.plotClusteringSpeed()
 #    QualityComparisonWithSSA.plotClusteringQuality()
 #    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
