@@ -160,35 +160,19 @@ class CompareAlgorithms:
         plt.savefig('crowds_quality.pdf')
         
 if __name__ == '__main__':
-<<<<<<< HEAD
-=======
-    CompareAlgorithms.runningTimes(
-                                   ('kmeans', DataIterators.kmeans()), 
-                                   ('kmeans_mr', DataIterators.kmeansmr()), 
-                                   ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=1100000,
-                                   title='Running time comparison of Stream-CDA with k-means'
-                                )
-    
->>>>>>> e44c33090134d7f8fa77f8a03f7cdfc16ed98bcf
 #    CompareAlgorithms.runningTimes(
 #                                   ('kmeans', DataIterators.kmeans()), 
 #                                   ('kmeans_mr', DataIterators.kmeansmr()), 
 #                                   ('cda_unopt', DataIterators.unoptimized()),
-<<<<<<< HEAD
-#                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=97000,
+#                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=1100000,
 #                                   title='Running time comparison of Stream-CDA with k-means'
-=======
-#                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=1100000,
-#                                   title='Running time comparison of Stream-CDA with other CDA'
->>>>>>> e44c33090134d7f8fa77f8a03f7cdfc16ed98bcf
 #                                )
     
     CompareAlgorithms.runningTimes(
                                    ('cda_it', DataIterators.cdait()), 
                                    ('cda_mr', DataIterators.cdamr()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=550000,
+                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=1100000,
                                    title='Running time comparison of Stream-CDA with other CDA'
                                 )
 
