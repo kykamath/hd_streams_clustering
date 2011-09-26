@@ -89,7 +89,8 @@ class CompareAlgorithms:
         for id, iterator in iterators:
             dataX, dataY = [], []
             for data in iterator:
-                if xmax and data['no_of_documents'] <= xmax and data['no_of_documents']!=900000: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
+                print data['no_of_documents']
+                if xmax and data['no_of_documents'] <= xmax: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
                 else: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
             if not semilog: plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
             else: plt.plot(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
