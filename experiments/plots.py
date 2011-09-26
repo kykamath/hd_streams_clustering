@@ -66,8 +66,9 @@ class CompareAlgorithms:
         for id, iterator in iterators:
             dataX, dataY = [], []
             for data in iterator:
-                if xmax and data['no_of_documents'] <= xmax: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
-                else: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
+                if data['no_of_documents']!=900000:
+                    if xmax and data['no_of_documents'] <= xmax: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
+                    else: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
             if not semilog: plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
             else: plt.semilogx(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
         plt.legend(loc=loc)
@@ -89,8 +90,9 @@ class CompareAlgorithms:
         for id, iterator in iterators:
             dataX, dataY = [], []
             for data in iterator:
-                if xmax and data['no_of_documents'] <= xmax and data['no_of_documents']!=1100000: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
-                else: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
+                if data['no_of_documents']!=900000:
+                    if xmax and data['no_of_documents'] <= xmax: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
+                    else: dataX.append(data['no_of_documents']), dataY.append(data['iteration_time'])
             if not semilog: plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
             else: plt.plot(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
             dataYValues.append(dataY)
@@ -98,6 +100,7 @@ class CompareAlgorithms:
         dataDifference = []
         for i in range(len(dataX)): dataDifference.append(dataYValues[1][i] - dataYValues[0][i])
         plt.plot(dataX, dataDifference, label='Difference', lw=2)
+#        for i, j in zip(dataX, dataDifference): print i,j
         
         plt.legend(loc=loc)
         plt.xlabel(getLatexForString('\# of documents (10^4)')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
@@ -165,7 +168,7 @@ if __name__ == '__main__':
 #                                   ('kmeans', DataIterators.kmeans()), 
 #                                   ('kmeans_mr', DataIterators.kmeansmr()), 
 #                                   ('cda_unopt', DataIterators.unoptimized()),
-#                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=1100000,
+#                                   loc=2, file_name='running_time_kmeans.eps', xmin=800, xmax=1100000,
 #                                   title='Running time comparison of Stream-CDA with k-means'
 #                                )
     
@@ -173,14 +176,14 @@ if __name__ == '__main__':
 #                                   ('cda_it', DataIterators.cdait()), 
 #                                   ('cda_mr', DataIterators.cdamr()), 
 #                                   ('cda_unopt', DataIterators.unoptimized()),
-#                                   loc=2, file_name='running_time_cda.eps', xmin=800, xmax=1100000,
+#                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=1100000,
 #                                   title='Running time comparison of Stream-CDA with other CDA'
 #                                )
 
     CompareAlgorithms.runningTimesWithCDA(
                                    ('cda', DataIterators.optimized()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_opt_unopt_cda.pdf', xmin=55000, xmax=1100000, log=True,
+                                   loc=2, file_name='running_time_opt_unopt_cda.eps', xmin=55000, xmax=1100000, log=True,
                                    title='Running time performance after parameters estimation.'
                                 )
     
