@@ -180,7 +180,7 @@ if __name__ == '__main__':
     CompareAlgorithms.runningTimesWithCDA(
                                    ('cda', DataIterators.optimized()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_opt_unopt_cda.pdf', xmin=55000, xmax=1100000, log=True,
+                                   loc=2, file_name='running_time_opt_unopt_cda.eps', xmin=55000, xmax=1100000, log=True,
                                    title='Running time performance after parameters estimation.'
                                 )
     
