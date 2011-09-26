@@ -159,21 +159,21 @@ class CompareAlgorithms:
         plt.savefig('crowds_quality.pdf')
         
 if __name__ == '__main__':
-    CompareAlgorithms.runningTimes(
-                                   ('kmeans', DataIterators.kmeans()), 
-                                   ('kmeans_mr', DataIterators.kmeansmr()), 
-                                   ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=97000,
-                                   title='Running time comparison of Stream-CDA with k-means'
-                                )
-    
 #    CompareAlgorithms.runningTimes(
-#                                   ('cda_it', DataIterators.cdait()), 
-#                                   ('cda_mr', DataIterators.cdamr()), 
+#                                   ('kmeans', DataIterators.kmeans()), 
+#                                   ('kmeans_mr', DataIterators.kmeansmr()), 
 #                                   ('cda_unopt', DataIterators.unoptimized()),
-#                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=550000,
-#                                   title='Running time comparison of Stream-CDA with other CDA'
+#                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=97000,
+#                                   title='Running time comparison of Stream-CDA with k-means'
 #                                )
+    
+    CompareAlgorithms.runningTimes(
+                                   ('cda_it', DataIterators.cdait()), 
+                                   ('cda_mr', DataIterators.cdamr()), 
+                                   ('cda_unopt', DataIterators.unoptimized()),
+                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=550000,
+                                   title='Running time comparison of Stream-CDA with other CDA'
+                                )
 
 #    CompareAlgorithms.runningTimesWithCDA(
 #                                   ('cda', DataIterators.optimized()), 
