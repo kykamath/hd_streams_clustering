@@ -42,7 +42,8 @@ class DataIterators:
         for data in FileIO.iterateJsonFromFile(clustering_quality_experts_folder+'mr_quality_stats'): yield data['mr_k_means']
     @staticmethod
     def cdait(): 
-        for data in FileIO.iterateJsonFromFile(clustering_quality_experts_ssa_folder+'quality_stats'): yield data['ssa']
+        for data in FileIO.iterateJsonFromFile(clustering_quality_experts_ssa_folder+'quality_stats'): 
+            if 'ssa' in data: yield data['ssa']
     @staticmethod
     def cdamr(): 
         for data in FileIO.iterateJsonFromFile(clustering_quality_experts_ssa_folder+'quality_stats'): yield data['ssa_mr']
