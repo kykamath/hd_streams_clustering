@@ -74,6 +74,7 @@ class CompareAlgorithms:
         if xmax: plt.xlim(xmax=xmax) 
         if xmin: plt.xlim(xmin=xmin) 
         plt.savefig(fileName)
+#        plt.show()
         
     @staticmethod
     def runningTimesWithCDA(*iterators, **kwargs):
@@ -125,14 +126,14 @@ class CompareAlgorithms:
             
     @staticmethod
     def plotQuality():
-#        kmeans = (0.79, 0.78, 0.80, 0.80, 0.79)
-#        cda_it = (0.98, 0.93, 0.81, 0.84, 0.79)
-#        cda_unopt = (0.95, 0.85, 0.86, 0.84, 0.87)
-#        cda = (0.96, 0.88, 0.86, 0.85, 0.88)
-        kmeans = (0.79, 0.78)
-        cda_it = (0.98, 0.93)
-        cda_unopt = (0.95, 0.85)
-        cda = (0.96, 0.88)
+        kmeans = (0.79, 0.78, 0.80, 0.80, 0.79)
+        cda_it = (0.98, 0.93, 0.81, 0.84, 0.79)
+        cda_unopt = (0.95, 0.85, 0.86, 0.84, 0.87)
+        cda = (0.96, 0.88, 0.86, 0.85, 0.88)
+#        kmeans = (0.79, 0.78)
+#        cda_it = (0.98, 0.93)
+#        cda_unopt = (0.95, 0.85)
+#        cda = (0.96, 0.88)
         
         N = len(kmeans)
         ind = np.arange(N)  # the x locations for the groups
@@ -152,19 +153,35 @@ class CompareAlgorithms:
         ax.set_ylabel(getLatexForString('Score'))
         ax.set_title(getLatexForString('Quality of crowds discovered'))
         ax.set_xticks(ind+width)
-#        ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
-        ax.set_xticklabels((getLatexForString('Purity'), getLatexForString('NMI')))
+        ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
+#        ax.set_xticklabels((getLatexForString('Purity'), getLatexForString('NMI')))
         
         plt.legend(loc=8, ncol=2)
         plt.savefig('crowds_quality.pdf')
         
 if __name__ == '__main__':
+<<<<<<< HEAD
+=======
+    CompareAlgorithms.runningTimes(
+                                   ('kmeans', DataIterators.kmeans()), 
+                                   ('kmeans_mr', DataIterators.kmeansmr()), 
+                                   ('cda_unopt', DataIterators.unoptimized()),
+                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=1100000,
+                                   title='Running time comparison of Stream-CDA with k-means'
+                                )
+    
+>>>>>>> e44c33090134d7f8fa77f8a03f7cdfc16ed98bcf
 #    CompareAlgorithms.runningTimes(
 #                                   ('kmeans', DataIterators.kmeans()), 
 #                                   ('kmeans_mr', DataIterators.kmeansmr()), 
 #                                   ('cda_unopt', DataIterators.unoptimized()),
+<<<<<<< HEAD
 #                                   loc=2, file_name='running_time_kmeans.pdf', xmin=800, xmax=97000,
 #                                   title='Running time comparison of Stream-CDA with k-means'
+=======
+#                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=1100000,
+#                                   title='Running time comparison of Stream-CDA with other CDA'
+>>>>>>> e44c33090134d7f8fa77f8a03f7cdfc16ed98bcf
 #                                )
     
     CompareAlgorithms.runningTimes(

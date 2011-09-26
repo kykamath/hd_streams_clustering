@@ -183,7 +183,10 @@ class Plot:
         plt.ylabel(getLatexForString('\# of crowds'))
         plt.title(getLatexForString('Crowd lifespan distribution'))
         plt.legend()
-        if returnAxisValuesOnly: plt.show()
+        plt.xlim(xmax=160) 
+        plt.savefig('crowdLifeSpanDistribution.pdf')
+        plt.savefig('crowdLifeSpanDistribution.eps')
+#        if returnAxisValuesOnly: plt.show()
     def crowdSizeDistribution(self, returnAxisValuesOnly=True):
         AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
         y,x= np.histogram([AnalyzeData.crowdMap[crowd].crowdSize for crowd in AnalyzeData.crowdMap], bins=15)
@@ -192,7 +195,10 @@ class Plot:
         plt.ylabel(getLatexForString('\# of crowds'))
         plt.title(getLatexForString('Crowd size distribution'))
         plt.legend()
-        if returnAxisValuesOnly: plt.show()
+        plt.xlim(xmax=300) 
+        plt.savefig('crowdSizeDistribution.pdf')
+        plt.savefig('crowdSizeDistribution.eps')
+#        if returnAxisValuesOnly: plt.show()
     def crowdSizeToLifeSpanPlot(self, returnAxisValuesOnly=True):
         AnalyzeData.reset(), AnalyzeData.constructCrowdDataStructures(self.stream_settings['data_iterator'])
         crowdSizeX, lifeSpanY = [], []
@@ -318,10 +324,10 @@ if __name__ == '__main__':
 #    GenerateHoustonTweetsData.generateHoustonData()
 #    generateClusters()
 
-#    experts_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateExpertClusters
-#    houston_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateHoustonClusters
+    experts_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateExpertClusters
+    houston_twitter_stream_settings['data_iterator'] = ClusterIterators.iterateHoustonClusters
     
-#    Plot.getLifeSpanDistributionPlot()
+    Plot.getLifeSpanDistributionPlot()
 #    Plot.getCrowdSizeDistributionPlot()
 #    Plot.getCrowdSizeToLifeSpanPlot()
 #    Plot(**experts_twitter_stream_settings).sampleCrowds()
@@ -329,7 +335,7 @@ if __name__ == '__main__':
 #    Plot(**experts_twitter_stream_settings).sampleCrowdUsers()
 #    Plot(**experts_twitter_stream_settings).sampleCrowdHierarchy()
     
-    print 'Experts stats'
-    getStreamStats(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,30)))
-    print 'Houston stats'
-    getStreamStats(TwitterIterators.iterateTweetsFromHouston(houstonDataStartTime=datetime(2010,11,1), houstonDataEndTime=datetime(2010,11,12)))
+#    print 'Experts stats'
+#    getStreamStats(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,30)))
+#    print 'Houston stats'
+#    getStreamStats(TwitterIterators.iterateTweetsFromHouston(houstonDataStartTime=datetime(2010,11,1), houstonDataEndTime=datetime(2010,11,12)))

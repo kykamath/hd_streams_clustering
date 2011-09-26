@@ -12,7 +12,8 @@ from library.clustering import EvaluationMetrics
 from experiments.ssa.ssa import SimilarStreamAggregation,\
     StreamSimilarityAggregationMR
 from collections import defaultdict
-from twitter_streams_clustering import getExperts, TwitterCrowdsSpecificMethods
+from twitter_streams_clustering import getExperts, TwitterCrowdsSpecificMethods,\
+    TwitterIterators
 from settings import experts_twitter_stream_settings
 from library.twitter import TweetFiles
 from library.vector import Vector
@@ -87,17 +88,31 @@ class TweetsFile:
         te = time.time()
         return self.getEvaluationMetrics(documentClusters, te-ts)
     @staticmethod
+    def generateDocsByLength():
+        for length in [1500000]: 
+#        for length in [150]:
+            fileName = clustering_quality_experts_folder+'data/%s'%str(length)
+            print fileName
+            i = 0
+            for tweet in TwitterIterators.iterateTweetsFromExperts():
+                FileIO.writeToFileAsJson(tweet, fileName)
+                i+=1
+                if i==length: break
+#            os.system('gzip %s'%fileName)
+    @staticmethod
     def generateDocsForSSAMR():
-        for length in [500000, 600000, 700000, 800000, 900000]: 
+        for length in [1000000, 1100000, 1200000]: 
             tf = TweetsFile(length, **experts_twitter_stream_settings)
             iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
             print 'Generating data for ', iteration_file
             with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(tf._iterateUserDocuments(),2)]
             os.system('gzip %s'%iteration_file)
+            print 'hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath)
             os.system('hadoop fs -put %s.gz %s'%(iteration_file, hdfsPath))
     @staticmethod
     def copyUnzippedSSADataToHadoop():
-        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+#        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+        for length in [1000000, 1100000]: 
             iteration_file = clustering_quality_experts_ssa_mr_folder+str(length)
             print 'Copying file for %s'%length
             os.system('gunzip %s.gz'%iteration_file)
@@ -106,10 +121,12 @@ class TweetsFile:
 class QualityComparisonWithSSA:
     @staticmethod
     def generateStatsForQualityComparisonWithSSA():
-        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+#        for length in [i*j for i in 10**3, 10**4, 10**5 for j in range(1, 10)]: 
+        for length in [1000000]: 
             print 'Generating stats for: ',length
             tf = TweetsFile(length, **experts_twitter_stream_settings)
-            stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
+#            stats = {'ssa': tf.getStatsForSSA(), 'ssa_mr': tf.getStatsForSSAMR(), 'streaming_lsh': KMeansTweetsFile(length, **experts_twitter_stream_settings).generateStatsForStreamingLSHClustering(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
+            stats = {'ssa_mr': tf.getStatsForSSAMR(), 'settings': Settings.getSerialzedObject(tf.stream_settings)}
             FileIO.writeToFileAsJson(stats, TweetsFile.stats_file)
     @staticmethod
     def plotClusteringSpeed(saveFig=True):
@@ -212,10 +229,11 @@ class QualityComparisonWithKMeans():
 if __name__ == '__main__':
     experts_twitter_stream_settings['ssa_threshold']=0.75
 #    TweetsFile.generateDocsForSSAMR()
+#    TweetsFile.generateDocsByLength()
 #    TweetsFile.copyUnzippedSSADataToHadoop()
 
     QualityComparisonWithSSA.generateStatsForQualityComparisonWithSSA()
 #    QualityComparisonWithSSA.plotClusteringSpeed()
 #    QualityComparisonWithSSA.plotClusteringQuality()
 #    QualityComparisonWithSSA.plotQualityWithKMeansAndSSA()
-    QualityComparisonWithSSA.plotSpeedWithKMeansAndSSA()
+#    QualityComparisonWithSSA.plotSpeedWithKMeansAndSSA()
