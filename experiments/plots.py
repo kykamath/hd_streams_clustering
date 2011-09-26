@@ -169,20 +169,20 @@ if __name__ == '__main__':
 #                                   title='Running time comparison of Stream-CDA with k-means'
 #                                )
     
-    CompareAlgorithms.runningTimes(
-                                   ('cda_it', DataIterators.cdait()), 
-                                   ('cda_mr', DataIterators.cdamr()), 
-                                   ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_cda.eps', xmin=800, xmax=1100000,
-                                   title='Running time comparison of Stream-CDA with other CDA'
-                                )
-
-#    CompareAlgorithms.runningTimesWithCDA(
-#                                   ('cda', DataIterators.optimized()), 
+#    CompareAlgorithms.runningTimes(
+#                                   ('cda_it', DataIterators.cdait()), 
+#                                   ('cda_mr', DataIterators.cdamr()), 
 #                                   ('cda_unopt', DataIterators.unoptimized()),
-#                                   loc=2, file_name='running_time_opt_unopt_cda.pdf', xmin=55000, xmax=10**6, log=True,
-#                                   title='Running time performance after parameters estimation.'
+#                                   loc=2, file_name='running_time_cda.eps', xmin=800, xmax=1100000,
+#                                   title='Running time comparison of Stream-CDA with other CDA'
 #                                )
+
+    CompareAlgorithms.runningTimesWithCDA(
+                                   ('cda', DataIterators.optimized()), 
+                                   ('cda_unopt', DataIterators.unoptimized()),
+                                   loc=2, file_name='running_time_opt_unopt_cda.pdf', xmin=55000, xmax=10**6, log=True,
+                                   title='Running time performance after parameters estimation.'
+                                )
     
 #    CompareAlgorithms.quality('purity', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()))
 #    CompareAlgorithms.quality('nmi', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()))
