@@ -173,7 +173,7 @@ if __name__ == '__main__':
                                    ('cda_it', DataIterators.cdait()), 
                                    ('cda_mr', DataIterators.cdamr()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=1100000,
+                                   loc=2, file_name='running_time_cda.eps', xmin=800, xmax=1100000,
                                    title='Running time comparison of Stream-CDA with other CDA'
                                 )
 
