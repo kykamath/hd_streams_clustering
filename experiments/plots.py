@@ -3,14 +3,14 @@ Created on Sep 14, 2011
 
 @author: kykamath
 '''
+import sys
+sys.path.append('../')
 from library.file_io import FileIO
 from library.plotting import getLatexForString
 from settings import default_experts_twitter_stream_settings, \
     experts_twitter_stream_settings
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
-sys.path.append('../')
 
 OPTIMIZED_ID = 'optimized'
 UN_OPTIMIZED_ID = 'un_optimized'
