@@ -75,9 +75,13 @@ class HDStreaminClustering(StreamingLSHClustering):
                 self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
 #                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+
+                ### Code for experiments
                 if i%1000==0: self.stream_settings['cluster_analysis_method'](hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 print i
                 i+=1
+                ###
+                
                 self.getClusterAndUpdateExistingClusters(streamObject)
 #            self.getClusterAndUpdateExistingClusters(message)
 

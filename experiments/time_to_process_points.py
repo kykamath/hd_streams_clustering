@@ -22,6 +22,8 @@ experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
 previousTime = None
 evaluation = Evaluation()
 
+stream_cda_stats_file = time_to_process_points+'stream_cda'
+
 def generateData():
     i = 0
     for line in TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz'):
@@ -33,17 +35,9 @@ def fileIterator():
     
 def clusterAnalysis(hdStreamClusteringObject, currentMessageTime):
     global evaluation, previousTime
-    currentTime = time.time()
-#    documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
-#    iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime)
-    print ' ******************* ', str(currentTime-previousTime)
+    iteration_data = {'iteration_time': time.time()-previousTime, 'type': 'stream-cda'}
     previousTime = time.time()
-    time.sleep(5)
-#    print iteration_data
-#    FileIO.writeToFileAsJson(iteration_data, JustifyDimensionsEstimation.stats_file)
-#    del iteration_data['clusters']
-#    print currentMessageTime, iteration_data
-#    if experts_twitter_stream_settings['dimensions']!=76819 and 2*experts_twitter_stream_settings['dimensions']<=len(hdStreamClusteringObject.phraseTextToPhraseObjectMap): raise Exception
+    FileIO.writeToFileAsJson(iteration_data, stream_cda_stats_file)
 
 def getStatsForCDA():
     global previousTime
