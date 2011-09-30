@@ -63,6 +63,7 @@ class HDStreaminClustering(StreamingLSHClustering):
         DataStreamMethods.messageInOrderVariable = None
 
     def cluster(self, dataIterator):
+        i = 1
         for data in dataIterator:
             message = self.convertDataToMessageMethod(data, **self.stream_settings)
 #            message = data
@@ -73,7 +74,9 @@ class HDStreaminClustering(StreamingLSHClustering):
                 streamObject=self.streamIdToStreamObjectMap[message.streamId]
                 self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+#                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+                if i%50000==0: self.clusterAnalysisMethod(hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+                print i
                 self.getClusterAndUpdateExistingClusters(streamObject)
 #            self.getClusterAndUpdateExistingClusters(message)
 
