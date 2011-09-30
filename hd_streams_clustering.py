@@ -77,7 +77,7 @@ class HDStreaminClustering(StreamingLSHClustering):
 #                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
 
                 ### Code for experiments
-                if i%1000==0: self.stream_settings['cluster_analysis_method'](hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+                if i%1000==0: self.stream_settings['cluster_analysis_method'](hdStreamClusteringObject=self, currentMessageTime=message.timeStamp, numberOfMessages=i)
                 print i
                 i+=1
                 ###

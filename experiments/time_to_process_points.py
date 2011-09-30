@@ -22,7 +22,7 @@ experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
 previousTime = None
 evaluation = Evaluation()
 
-stream_cda_stats_file = time_to_process_points+'stream_cda'
+stream_cda_stats_file = time_to_process_points+'stats/stream_cda'
 
 def generateData():
     i = 0
@@ -33,9 +33,9 @@ def generateData():
 def fileIterator(): 
     for id in xrange(20): yield FileIO.iterateJsonFromFile(time_to_process_points+'%s'%id)
     
-def clusterAnalysis(hdStreamClusteringObject, currentMessageTime):
+def clusterAnalysis(hdStreamClusteringObject, currentMessageTime, numberOfMessages):
     global evaluation, previousTime
-    iteration_data = {'iteration_time': time.time()-previousTime, 'type': 'stream-cda'}
+    iteration_data = {'iteration_time': time.time()-previousTime, 'type': 'stream-cda', 'number_of_messages': numberOfMessages}
     previousTime = time.time()
     FileIO.writeToFileAsJson(iteration_data, stream_cda_stats_file)
 
