@@ -46,6 +46,7 @@ def clusterAnalysis(hdStreamClusteringObject, currentMessageTime):
 #    if experts_twitter_stream_settings['dimensions']!=76819 and 2*experts_twitter_stream_settings['dimensions']<=len(hdStreamClusteringObject.phraseTextToPhraseObjectMap): raise Exception
 
 def getStatsForCDA():
+    global previousTime
     previousTime = time.time()
     experts_twitter_stream_settings['cluster_analysis_method'] = clusterAnalysis
     HDStreaminClustering(**experts_twitter_stream_settings).cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
