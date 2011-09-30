@@ -50,4 +50,5 @@ def getStatsForCDA():
 
 #generateData()
 
-for l in fileIterator(): print l
+#for l in fileIterator(): print l
+getStatsForCDA()
