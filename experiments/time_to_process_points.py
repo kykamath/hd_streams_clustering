@@ -36,7 +36,7 @@ def clusterAnalysis(hdStreamClusteringObject, currentMessageTime):
     currentTime = time.time()
 #    documentClusters = [cluster.documentsInCluster.keys() for k, cluster in hdStreamClusteringObject.clusters.iteritems() if len(cluster.documentsInCluster.keys())>=experts_twitter_stream_settings['cluster_filter_threshold']]
 #    iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime)
-    print ' ******************* ', currentTime-previousTime
+    print ' ******************* ', str(currentTime-previousTime)
     previousTime = time.time()
     time.sleep(5000)
 #    print iteration_data
