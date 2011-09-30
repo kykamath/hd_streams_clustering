@@ -38,7 +38,7 @@ def clusterAnalysis(hdStreamClusteringObject, currentMessageTime):
 #    iteration_data = evaluation.getEvaluationMetrics(documentClusters, currentTime-previousTime)
     print ' ******************* ', str(currentTime-previousTime)
     previousTime = time.time()
-    time.sleep(5000)
+    time.sleep(5)
 #    print iteration_data
 #    FileIO.writeToFileAsJson(iteration_data, JustifyDimensionsEstimation.stats_file)
 #    del iteration_data['clusters']
@@ -47,9 +47,10 @@ def clusterAnalysis(hdStreamClusteringObject, currentMessageTime):
 
 def getStatsForCDA():
     global previousTime
-    previousTime = time.time()
     experts_twitter_stream_settings['cluster_analysis_method'] = clusterAnalysis
-    HDStreaminClustering(**experts_twitter_stream_settings).cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
+    clustering = HDStreaminClustering(**experts_twitter_stream_settings)
+    previousTime = time.time()
+    clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
 
 #generateData()
 
