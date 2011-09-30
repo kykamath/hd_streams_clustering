@@ -12,6 +12,6 @@ def generateData():
     for line in TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz'):
         FileIO.writeToFileAsJson(line, time_to_process_points+'%s'%(i/50000))
         i+=1
-        if i==10: break
+#        if i==10: break
 
 generateData()
