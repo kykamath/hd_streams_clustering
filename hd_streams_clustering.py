@@ -188,3 +188,12 @@ class HDSkipStreamClustering(StreamingLSHClustering):
                 i+=1
 #                self.getClusterAndUpdateExistingClusters(streamObject)
 #            self.getClusterAndUpdateExistingClusters(message)
+
+    def getClusterAndUpdateExistingClusters(self, stream):
+        predictedCluster = self.getClusterForDocument(stream)
+        if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream, **self.stream_settings)
+        else:
+            newCluster = StreamCluster(stream)
+            newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
+            for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
+            self.clusters[newCluster.clusterId] = newCluster
