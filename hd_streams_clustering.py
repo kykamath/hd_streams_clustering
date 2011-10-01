@@ -111,7 +111,7 @@ class HDDelayedClustering(StreamingLSHClustering):
         self.clustersFilteringFrequency = stream_settings['cluster_filtering_frequency_in_seconds']
 
         self.updateDimensionsMethod = FixedIntervalMethod(stream_settings.get('update_dimensions_method', DataStreamMethods.updateDimensions), self.dimensionsUpdatingFrequency)
-        self.clusteringMethod = FixedIntervalMethod(stream_settings.get('cluster_analysis_method', DataStreamMethods.clusteringMethod), self.clusteringFrequency)
+        self.clusteringMethod = FixedIntervalMethod(stream_settings.get('clustering_method', DataStreamMethods.clusteringMethod), self.clusteringFrequency)
         self.clusterAnalysisMethod = FixedIntervalMethod(stream_settings.get('cluster_analysis_method', DataStreamMethods.clusterAnalysisMethod), self.clustersAnalysisFrequency)
         self.clusterFilteringMethod = FixedIntervalMethod(stream_settings.get('cluster_filtering_method', DataStreamMethods.clusterFilteringMethod), self.clustersFilteringFrequency)
         
