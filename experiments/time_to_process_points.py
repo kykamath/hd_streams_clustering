@@ -50,6 +50,7 @@ def clusterAnalysis(hdStreamClusteringObject, currentMessageTime, numberOfMessag
 def getStatsForCDA():
     global previousTime
     default_experts_twitter_stream_settings['cluster_analysis_method'] = clusterAnalysis
+    default_experts_twitter_stream_settings['cluster_analysis_frequency_in_seconds'] = 30
     clustering = HDSkipStreamClustering(**default_experts_twitter_stream_settings)
     previousTime = time.time()
     clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
