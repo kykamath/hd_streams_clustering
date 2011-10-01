@@ -95,7 +95,7 @@ class HDStreaminClustering(StreamingLSHClustering):
     
 class HDDelayedClustering(StreamingLSHClustering):
     def __init__(self, **stream_settings):
-        super(HDStreaminClustering, self).__init__(**stream_settings)
+#        super(HDStreaminClustering, self).__init__(**stream_settings)
         self.stream_settings = stream_settings
         self.phraseTextToPhraseObjectMap, self.streamIdToStreamObjectMap = {}, {}
         
