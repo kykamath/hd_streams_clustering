@@ -177,14 +177,15 @@ class HDSkipStreamClustering(StreamingLSHClustering):
                 UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
                 if message.streamId not in self.streamIdToStreamObjectMap: 
                     self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
-#                    self.getClusterAndUpdateExistingClusters(self.streamIdToStreamObjectMap[message.streamId])
+                    self.getClusterAndUpdateExistingClusters(self.streamIdToStreamObjectMap[message.streamId])
                 else: 
                     previousStreamObject=Vector(vectorInitialValues=self.streamIdToStreamObjectMap[message.streamId])
                     self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
                     streamObject=self.streamIdToStreamObjectMap[message.streamId]
                     distance = Vector.euclideanDistance(streamObject, previousStreamObject)
-                    print i, len(self.clusters), distance
-#                    if distance>10: self.getClusterAndUpdateExistingClusters(self.streamIdToStreamObjectMap[message.streamId])
+                    if distance>3.5: 
+                        print i, len(self.clusters), distance
+                        self.getClusterAndUpdateExistingClusters(self.streamIdToStreamObjectMap[message.streamId])
 
 #                self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
 #                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
