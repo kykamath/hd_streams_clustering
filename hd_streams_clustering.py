@@ -77,13 +77,16 @@ class HDStreaminClustering(StreamingLSHClustering):
 #            message = data
             if DataStreamMethods.messageInOrder(message.timeStamp):
                 UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
-                if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
+                if message.streamId not in self.streamIdToStreamObjectMap: 
+                    self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
+                    self.getClusterAndUpdateExistingClusters(self.streamIdToStreamObjectMap[message.streamId])
                 else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
                 streamObject=self.streamIdToStreamObjectMap[message.streamId]
                 self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-                self.getClusterAndUpdateExistingClusters(streamObject)
+                print i, len(self.clusters)
+#                self.getClusterAndUpdateExistingClusters(streamObject)
 #            self.getClusterAndUpdateExistingClusters(message)
 
     def getClusterAndUpdateExistingClusters(self, stream):
@@ -132,7 +135,7 @@ class HDDelayedClustering(StreamingLSHClustering):
                 streamObject=self.streamIdToStreamObjectMap[message.streamId]
                 print i, len(self.streamIdToStreamObjectMap)
                 i+=1
-                if i%50000==0: DataStreamMethods.clusteringMethod(self, self.stream_Settings, message.timeStamp)
+                if i%50000==0: DataStreamMethods.clusteringMethod(self, self.stream_settings, message.timeStamp)
 #                self.clusteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, stream_Settings=self.stream_settings, currentMessageTime=message.timeStamp)
                 self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)

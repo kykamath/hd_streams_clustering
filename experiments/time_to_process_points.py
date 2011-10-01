@@ -49,7 +49,7 @@ def getStatsForCDA():
 #generateData()
 
 #for l in fileIterator(): print l
-#getStatsForCDA()
+getStatsForCDA()
 
-clustering = HDDelayedClustering(**default_experts_twitter_stream_settings)
-clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
+#clustering = HDDelayedClustering(**default_experts_twitter_stream_settings)
+#clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
