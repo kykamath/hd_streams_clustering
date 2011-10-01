@@ -132,9 +132,10 @@ class HDDelayedClustering(StreamingLSHClustering):
                 streamObject=self.streamIdToStreamObjectMap[message.streamId]
                 print i, len(self.streamIdToStreamObjectMap)
                 i+=1
-                self.clusteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, stream_Settings=self.stream_settings, currentMessageTime=message.timeStamp)
+                if i%50000==0: DataStreamMethods.clusteringMethod(self, self.stream_Settings, message.timeStamp)
+#                self.clusteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, stream_Settings=self.stream_settings, currentMessageTime=message.timeStamp)
                 self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
-#                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 
     def getClusterAndUpdateExistingClusters(self, stream):
