@@ -9,7 +9,8 @@ from library.twitter import TweetFiles
 from library.file_io import FileIO
 from settings import default_experts_twitter_stream_settings
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods
-from hd_streams_clustering import HDStreaminClustering, HDDelayedClustering
+from hd_streams_clustering import HDStreaminClustering,\
+    HDSkipStreamClustering
 from experiments.algorithms_performance import Evaluation
 import time
 
@@ -42,7 +43,7 @@ def clusterAnalysis(hdStreamClusteringObject, currentMessageTime, numberOfMessag
 def getStatsForCDA():
     global previousTime
     default_experts_twitter_stream_settings['cluster_analysis_method'] = clusterAnalysis
-    clustering = HDStreaminClustering(**default_experts_twitter_stream_settings)
+    clustering = HDSkipStreamClustering(**default_experts_twitter_stream_settings)
     previousTime = time.time()
     clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
 
