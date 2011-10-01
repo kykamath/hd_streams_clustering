@@ -42,8 +42,14 @@ class DataStreamMethods:
         DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
     @staticmethod
     def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): print 'shdnt come here'
+    @timeit
     @staticmethod
-    def clusteringMethod(hdStreamClusteringObject, currentMessageTime): pass
+    def clusteringMethod(hdStreamClusteringObject, stream_Settings, currentMessageTime): 
+        print 'clustering'
+        clustering = StreamingLSHClustering(**stream_Settings)
+        for stream in hdStreamClusteringObject.streamIdToStreamObjectMap.values(): clustering.getClusterAndUpdateExistingClusters(stream)
+        print len(clustering.clusters)
+             
 
 class HDStreaminClustering(StreamingLSHClustering):
     def __init__(self, **stream_settings):
@@ -126,3 +132,7 @@ class HDDelayedClustering(StreamingLSHClustering):
                 streamObject=self.streamIdToStreamObjectMap[message.streamId]
                 print i, len(self.streamIdToStreamObjectMap)
                 i+=1
+                self.clusteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, stream_Settings=self.stream_settings, currentMessageTime=message.timeStamp)
+                self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+                self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
