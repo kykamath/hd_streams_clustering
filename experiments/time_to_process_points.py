@@ -7,17 +7,17 @@ import sys
 sys.path.append('../')
 from library.twitter import TweetFiles
 from library.file_io import FileIO
-from settings import experts_twitter_stream_settings
+from settings import default_experts_twitter_stream_settings
 from twitter_streams_clustering import TwitterCrowdsSpecificMethods
-from hd_streams_clustering import HDStreaminClustering
+from hd_streams_clustering import HDStreaminClustering, HDDelayedClustering
 from experiments.algorithms_performance import Evaluation
 import time
 
 time_to_process_points = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/time_to_process_points/'
-experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
-experts_twitter_stream_settings['min_phrase_length'] = 1
-experts_twitter_stream_settings['max_phrase_length'] = 1
-experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
+default_experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+default_experts_twitter_stream_settings['min_phrase_length'] = 1
+default_experts_twitter_stream_settings['max_phrase_length'] = 1
+default_experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
 
 previousTime = None
 evaluation = Evaluation()
@@ -41,12 +41,15 @@ def clusterAnalysis(hdStreamClusteringObject, currentMessageTime, numberOfMessag
 
 def getStatsForCDA():
     global previousTime
-    experts_twitter_stream_settings['cluster_analysis_method'] = clusterAnalysis
-    clustering = HDStreaminClustering(**experts_twitter_stream_settings)
+    default_experts_twitter_stream_settings['cluster_analysis_method'] = clusterAnalysis
+    clustering = HDStreaminClustering(**default_experts_twitter_stream_settings)
     previousTime = time.time()
     clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
 
 #generateData()
 
 #for l in fileIterator(): print l
-getStatsForCDA()
+#getStatsForCDA()
+
+clustering = HDDelayedClustering(**default_experts_twitter_stream_settings)
+clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 

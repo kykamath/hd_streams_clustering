@@ -42,6 +42,8 @@ class DataStreamMethods:
         DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
     @staticmethod
     def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): print 'shdnt come here'
+    @staticmethod
+    def clusteringMethod(hdStreamClusteringObject, currentMessageTime): pass
 
 class HDStreaminClustering(StreamingLSHClustering):
     def __init__(self, **stream_settings):
@@ -91,3 +93,36 @@ class HDStreaminClustering(StreamingLSHClustering):
             for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
             self.clusters[newCluster.clusterId] = newCluster
     
+class HDDelayedClustering(StreamingLSHClustering):
+    def __init__(self, **stream_settings):
+        super(HDStreaminClustering, self).__init__(**stream_settings)
+        self.stream_settings = stream_settings
+        self.phraseTextToPhraseObjectMap, self.streamIdToStreamObjectMap = {}, {}
+        
+        self.dimensionsUpdatingFrequency = stream_settings['dimension_update_frequency_in_seconds']
+        self.clusteringFrequency = stream_settings['clustering_frequency_in_seconds']
+        self.clustersAnalysisFrequency = stream_settings['cluster_analysis_frequency_in_seconds']
+        self.clustersFilteringFrequency = stream_settings['cluster_filtering_frequency_in_seconds']
+
+        self.updateDimensionsMethod = FixedIntervalMethod(stream_settings.get('update_dimensions_method', DataStreamMethods.updateDimensions), self.dimensionsUpdatingFrequency)
+        self.clusteringMethod = FixedIntervalMethod(stream_settings.get('cluster_analysis_method', DataStreamMethods.clusteringMethod), self.clusteringFrequency)
+        self.clusterAnalysisMethod = FixedIntervalMethod(stream_settings.get('cluster_analysis_method', DataStreamMethods.clusterAnalysisMethod), self.clustersAnalysisFrequency)
+        self.clusterFilteringMethod = FixedIntervalMethod(stream_settings.get('cluster_filtering_method', DataStreamMethods.clusterFilteringMethod), self.clustersFilteringFrequency)
+        
+        self.combineClustersMethod=stream_settings.get('combine_clusters_method',None)
+        self.convertDataToMessageMethod=stream_settings['convert_data_to_message_method']
+        
+        DataStreamMethods.messageInOrderVariable = None
+        
+    def cluster(self, dataIterator):
+        i = 1
+        for data in dataIterator:
+            message = self.convertDataToMessageMethod(data, **self.stream_settings)
+#            message = data
+            if DataStreamMethods.messageInOrder(message.timeStamp):
+                UtilityMethods.updatePhraseTextToPhraseObject(message.vector, message.timeStamp, self.phraseTextToPhraseObjectMap, **self.stream_settings)
+                if message.streamId not in self.streamIdToStreamObjectMap: self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
+                else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
+                streamObject=self.streamIdToStreamObjectMap[message.streamId]
+                print i, len(self.streamIdToStreamObjectMap)
+                i+=1
