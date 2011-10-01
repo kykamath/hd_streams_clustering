@@ -34,12 +34,18 @@ def generateData():
 def fileIterator(): 
     for id in xrange(20): yield FileIO.iterateJsonFromFile(time_to_process_points+'%s'%id)
     
+#def clusterAnalysis(hdStreamClusteringObject, currentMessageTime, numberOfMessages):
+#    global evaluation, previousTime
+#    iteration_data = {'iteration_time': time.time()-previousTime, 'type': 'stream-cda', 'number_of_messages': numberOfMessages}
+#    previousTime = time.time()
+#    print iteration_data
+#    FileIO.writeToFileAsJson(iteration_data, stream_cda_stats_file)
+
 def clusterAnalysis(hdStreamClusteringObject, currentMessageTime, numberOfMessages):
     global evaluation, previousTime
     iteration_data = {'iteration_time': time.time()-previousTime, 'type': 'stream-cda', 'number_of_messages': numberOfMessages}
-    previousTime = time.time()
+#    previousTime = time.time()
     print iteration_data
-#    FileIO.writeToFileAsJson(iteration_data, stream_cda_stats_file)
 
 def getStatsForCDA():
     global previousTime
