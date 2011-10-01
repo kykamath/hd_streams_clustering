@@ -38,7 +38,8 @@ def clusterAnalysis(hdStreamClusteringObject, currentMessageTime, numberOfMessag
     global evaluation, previousTime
     iteration_data = {'iteration_time': time.time()-previousTime, 'type': 'stream-cda', 'number_of_messages': numberOfMessages}
     previousTime = time.time()
-    FileIO.writeToFileAsJson(iteration_data, stream_cda_stats_file)
+    print iteration_data
+#    FileIO.writeToFileAsJson(iteration_data, stream_cda_stats_file)
 
 def getStatsForCDA():
     global previousTime
