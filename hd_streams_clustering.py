@@ -191,7 +191,7 @@ class HDSkipStreamClustering(StreamingLSHClustering):
                 self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp, numberOfMessages=i)
 #                print i, len(self.clusters), Vector.euclideanDistance(streamObject, message.vector)
                 i+=1
-                self.getClusterAndUpdateExistingClusters(streamObject)
+#                self.getClusterAndUpdateExistingClusters(streamObject)
 #            self.getClusterAndUpdateExistingClusters(message)
 
     def getClusterAndUpdateExistingClusters(self, stream):
