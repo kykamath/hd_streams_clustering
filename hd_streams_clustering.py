@@ -46,9 +46,9 @@ class DataStreamMethods:
     @timeit
     def clusteringMethod(hdStreamClusteringObject, stream_Settings, currentMessageTime): 
         print 'clustering'
-        clustering = StreamingLSHClustering(**stream_Settings)
-        for stream in hdStreamClusteringObject.streamIdToStreamObjectMap.values(): clustering.getClusterAndUpdateExistingClusters(stream)
-        print len(clustering.clusters)
+#        clustering = StreamingLSHClustering(**stream_Settings)
+        for stream in hdStreamClusteringObject.streamIdToStreamObjectMap.values(): hdStreamClusteringObject.getClusterAndUpdateExistingClusters(stream)
+        print len(hdStreamClusteringObject.clusters)
              
 
 class HDStreaminClustering(StreamingLSHClustering):
