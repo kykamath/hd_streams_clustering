@@ -192,7 +192,7 @@ class HDSkipStreamClustering(StreamingLSHClustering):
         
         #                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
         
-#                        self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp, numberOfMessages=i)
+                        self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp, numberOfMessages=i)
 
 #                print i, len(self.clusters)
                 i+=1
