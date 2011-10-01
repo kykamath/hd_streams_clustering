@@ -178,15 +178,20 @@ class HDSkipStreamClustering(StreamingLSHClustering):
                 if message.streamId not in self.streamIdToStreamObjectMap: 
                     self.streamIdToStreamObjectMap[message.streamId] = Stream(message.streamId, message)
                     self.getClusterAndUpdateExistingClusters(self.streamIdToStreamObjectMap[message.streamId])
-                else: self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
-                streamObject=self.streamIdToStreamObjectMap[message.streamId]
+                else: 
+                    previousStreamObject=self.streamIdToStreamObjectMap[message.streamId]
+                    self.streamIdToStreamObjectMap[message.streamId].updateForMessage(message, VectorUpdateMethods.exponentialDecay, **self.stream_settings )
+                    streamObject=self.streamIdToStreamObjectMap[message.streamId]
+                    if Vector.euclideanDistance(streamObject, previousStreamObject)>10: 
+                        i, len(self.clusters), Vector.euclideanDistance(streamObject, message.vector)
+                        self.getClusterAndUpdateExistingClusters(self.streamIdToStreamObjectMap[message.streamId])
                 self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
 #                self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp, numberOfMessages=i)
-                print i, len(self.clusters), Vector.euclideanDistance(streamObject, message.vector)
+#                print i, len(self.clusters), Vector.euclideanDistance(streamObject, message.vector)
                 i+=1
-#                self.getClusterAndUpdateExistingClusters(streamObject)
+                self.getClusterAndUpdateExistingClusters(streamObject)
 #            self.getClusterAndUpdateExistingClusters(message)
 
     def getClusterAndUpdateExistingClusters(self, stream):
