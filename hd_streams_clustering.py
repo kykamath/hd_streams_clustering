@@ -42,8 +42,8 @@ class DataStreamMethods:
         DataStreamMethods._resetClustersInSignatureTries(hdStreamClusteringObject, currentMessageTime)
     @staticmethod
     def clusterAnalysisMethod(hdStreamClusteringObject, currentMessageTime): print 'shdnt come here'
-    @timeit
     @staticmethod
+    @timeit
     def clusteringMethod(hdStreamClusteringObject, stream_Settings, currentMessageTime): 
         print 'clustering'
         clustering = StreamingLSHClustering(**stream_Settings)
