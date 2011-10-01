@@ -136,3 +136,12 @@ class HDDelayedClustering(StreamingLSHClustering):
                 self.updateDimensionsMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterFilteringMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
                 self.clusterAnalysisMethod.call(message.timeStamp, hdStreamClusteringObject=self, currentMessageTime=message.timeStamp)
+                
+    def getClusterAndUpdateExistingClusters(self, stream):
+        predictedCluster = self.getClusterForDocument(stream)
+        if predictedCluster!=None: self.clusters[predictedCluster].addDocument(stream, **self.stream_settings)
+        else:
+            newCluster = StreamCluster(stream)
+            newCluster.setSignatureUsingVectorPermutations(self.unitVector, self.vectorPermutations, self.phraseTextAndDimensionMap)
+            for permutation in self.signaturePermutations: permutation.addDocument(newCluster)
+            self.clusters[newCluster.clusterId] = newCluster
