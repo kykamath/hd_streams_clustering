@@ -5,6 +5,7 @@ Created on Sep 30, 2011
 '''
 import sys, os
 from library.mrjobwrapper import CJSONProtocol
+from library.plotting import getLatexForString
 sys.path.append('../')
 from library.vector import Vector
 from experiments.ssa.ssa import SimilarStreamAggregation,\
@@ -38,9 +39,9 @@ ssa_stats_file = time_to_process_points+'stats/ssa'
 ssa_mr_stats_file = time_to_process_points+'stats/ssa_mr'
 
 plot_info = { 
-             'stream_cda': {'id': 'stream_cda', 'label': 'stream_cda'},
-             'ssa': {'id': 'ssa', 'label': 'ssa'},
-             'ssa_mr': {'id': 'ssa_mr', 'label': 'ssa_mr'}
+             'stream_cda': {'id': 'Stream-CDA', 'label': 'stream_cda', 'color': '#7109AA', 'marker': '*'},
+             'ssa': {'id': 'ssa', 'label': 'Iterative CDA', 'color': '#FD0006', 'marker': 'o'},
+             'ssa_mr': {'id': 'ssa_mr', 'label': 'MR CDA', 'color': '#5AF522', 'marker': '>'}
              }
 
 def generateData():
@@ -126,9 +127,10 @@ def plotMessagesProcessedWithTime(iterators):
                     iteration_time+=data['iteration_time']
                     if iteration_time<time_limit: dataX.append(iteration_time), dataY.append(data['number_of_messages'])
 #        print info, dataX, dataY
-        plt.plot(dataX, dataY, lw=2, label=info['label'])
+        plt.plot(dataX, dataY, lw=2, label=info['label'], color=info['color'], marker=info['marker'])
 #    plt.xlim(xmax=2300)
     plt.legend(loc=2)
+    plt.xlabel(getLatexForString('Time (s)')); plt.ylabel(getLatexForString('\# of messages')); plt.title(getLatexForString('Message processing ability of the algorithms'))
     plt.plot()
     plt.savefig('messagesProcessedWithTime.pdf')
     plt.savefig('messagesProcessedWithTime.eps')
