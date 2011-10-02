@@ -37,6 +37,12 @@ stream_cda_stats_file = time_to_process_points+'stats/stream_cda'
 ssa_stats_file = time_to_process_points+'stats/ssa'
 ssa_mr_stats_file = time_to_process_points+'stats/ssa_mr'
 
+plot_info = { 
+             'stream_cda': {'label': 'stream_cda'},
+             'ssa': {'label': 'ssa'},
+             'ssa_mr': {'label': 'ssa_mr'}
+             }
+
 def generateData():
     i = 0
     for line in TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz'):
@@ -107,10 +113,11 @@ def getIterator(id):
     for line in FileIO.iterateJsonFromFile(time_to_process_points+'stats/%s'%id): yield line
 
 def plotMessagesProcessedWithTime(iterators):
-    for iterator in iterators:
+    for iterator, info in iterators:
         dataX, dataY = [], []
         for data in iterator: dataX.append(data['iteration_time']), dataY.append(data['number_of_messages'])
-        plt.plot(dataX, dataY)
+        plt.plot(dataX, dataY, lw=2, label=info['label'])
+    plt.legend()
     plt.plot()
     plt.savefig('messagesProcessedWithTime.pdf')
     plt.savefig('messagesProcessedWithTime.eps')
@@ -119,4 +126,6 @@ def plotMessagesProcessedWithTime(iterators):
 #getStatsForCDA()
 #getStatsForSSA()
 #getStatsForSSAMR()
-plotMessagesProcessedWithTime([getIterator('stream_cda')])
+plotMessagesProcessedWithTime([(getIterator('stream_cda'), plot_info['stream_cda']),
+                               (getIterator('ssa'), plot_info['ssa']),
+                               (getIterator('ssa_mr'), plot_info['ssa_mr'])])
