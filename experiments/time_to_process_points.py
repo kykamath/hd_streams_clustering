@@ -4,6 +4,7 @@ Created on Sep 30, 2011
 @author: kykamath
 '''
 import sys
+from library.vector import Vector
 sys.path.append('../')
 from library.twitter import TweetFiles
 from library.file_io import FileIO
@@ -12,7 +13,9 @@ from twitter_streams_clustering import TwitterCrowdsSpecificMethods
 from hd_streams_clustering import HDStreaminClustering,\
     HDSkipStreamClustering
 from experiments.algorithms_performance import Evaluation
+from collections import defaultdict
 import time
+
 
 time_to_process_points = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/time_to_process_points/'
 default_experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
@@ -55,9 +58,23 @@ def getStatsForCDA():
     clustering = HDSkipStreamClustering(**default_experts_twitter_stream_settings)
     previousTime = time.time()
     clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
+    
+def iterateUserDocuments():
+    dataForAggregation = defaultdict(Vector)
+    textToIdMap = defaultdict(int)
+    for tweet in FileIO.iterateJsonFromFile('/mnt/chevron/kykamath/data/twitter/lsh_clustering/time_to_process_points/10000/0'):
+        print tweet
+#        textVector = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).vector
+#        textIdVector = Vector()
+#        for phrase in textVector: 
+#            if phrase not in textToIdMap: textToIdMap[phrase]=str(len(textToIdMap))
+#            textIdVector[textToIdMap[phrase]]=textVector[phrase]
+#        dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
+#    for k, v in dataForAggregation.iteritems(): print k, v
 
 #getStatsForCDA()
 
-generateData()
+#generateData()
 
+iterateUserDocuments()
 
