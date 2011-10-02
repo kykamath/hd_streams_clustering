@@ -75,7 +75,8 @@ class CompareAlgorithms:
         plt.xlabel(getLatexForString('Length of information stream')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
         if xmax: plt.xlim(xmax=xmax) 
         if xmin: plt.xlim(xmin=xmin) 
-        plt.savefig(fileName)
+        plt.savefig(fileName+'.eps')
+        plt.savefig(fileName+'.pdf')
 #        plt.show()
         
     @staticmethod
@@ -108,7 +109,8 @@ class CompareAlgorithms:
         plt.xticks(locs, map(lambda x: "%d"%(x/10000), locs))
         if xmax: plt.xlim(xmax=xmax) 
         if xmin: plt.xlim(xmin=xmin) 
-        plt.savefig(fileName)
+        plt.savefig(fileName+'.eps')
+        plt.savefig(fileName+'.pdf')
 #        plt.show()
         
     @staticmethod
@@ -168,7 +170,7 @@ if __name__ == '__main__':
 #                                   ('kmeans', DataIterators.kmeans()), 
 #                                   ('kmeans_mr', DataIterators.kmeansmr()), 
 #                                   ('cda_unopt', DataIterators.unoptimized()),
-#                                   loc=2, file_name='running_time_kmeans.eps', xmin=800, xmax=1100000,
+#                                   loc=2, file_name='running_time_kmeans', xmin=800, xmax=1100000,
 #                                   title='Running time comparison of Stream-CDA with k-means'
 #                                )
     
@@ -176,14 +178,14 @@ if __name__ == '__main__':
 #                                   ('cda_it', DataIterators.cdait()), 
 #                                   ('cda_mr', DataIterators.cdamr()), 
 #                                   ('cda_unopt', DataIterators.unoptimized()),
-#                                   loc=2, file_name='running_time_cda.pdf', xmin=800, xmax=1100000,
+#                                   loc=2, file_name='running_time_cda', xmin=800, xmax=1100000,
 #                                   title='Running time comparison of Stream-CDA with other CDA'
 #                                )
 
     CompareAlgorithms.runningTimesWithCDA(
                                    ('cda', DataIterators.optimized()), 
                                    ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_opt_unopt_cda.eps', xmin=55000, xmax=1100000, log=True,
+                                   loc=2, file_name='running_time_opt_unopt_cda', xmin=55000, xmax=1100000, log=True,
                                    title='Running time performance after parameters estimation.'
                                 )
     
