@@ -3,7 +3,8 @@ Created on Sep 30, 2011
 
 @author: kykamath
 '''
-import sys
+import sys, os
+from library.mrjobwrapper import CJSONProtocol
 sys.path.append('../')
 from library.vector import Vector
 from experiments.ssa.ssa import SimilarStreamAggregation
@@ -15,11 +16,14 @@ from hd_streams_clustering import HDStreaminClustering,\
     HDSkipStreamClustering
 from experiments.algorithms_performance import Evaluation
 from collections import defaultdict
+from itertools import combinations
 import time
 
 
 time_to_process_points = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/time_to_process_points/'
 default_experts_twitter_stream_settings['convert_data_to_message_method'] = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage
+hdfsUnzippedPath='hdfs:///user/kykamath/lsh_experts_data/clustering_quality_ssa_unzipped_folder/'
+
 default_experts_twitter_stream_settings['min_phrase_length'] = 1
 default_experts_twitter_stream_settings['max_phrase_length'] = 1
 default_experts_twitter_stream_settings['threshold_for_document_to_be_in_cluster'] = 0.5
@@ -77,9 +81,23 @@ def getStatsForSSA():
     #    documentClusters = list(sstObject.iterateClusters())
         iteration_data = {'iteration_time': time.time()-ts, 'type': 'ssa', 'number_of_messages': batchSize*(id+1), 'batch_size': batchSize}
         FileIO.writeToFileAsJson(iteration_data, ssa_stats_file)
+        
+def getStatsForSSAMR():
+    batchSize = 50000
+    default_experts_twitter_stream_settings['ssa_threshold']=0.75
+    for id in range(0, 10):
+        fileName = time_to_process_points+'%s/%s'%(batchSize,id)
+        iteration_file = '%s_%s'%(batchSize, id)
+        print 'Generating data for ', iteration_file
+        with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(iterateUserDocuments(fileName),2)]
+        os.system('gunzip %s.gz'%iteration_file)
+        os.system('hadoop fs -put %s %s'%(iteration_file, hdfsUnzippedPath))    
+        break
 
 #getStatsForCDA()
 
 #generateData()
 
-getStatsForSSA()
+#getStatsForSSA()
+
+getStatsForSSAMR()
