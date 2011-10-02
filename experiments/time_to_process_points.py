@@ -28,7 +28,7 @@ stream_cda_stats_file = time_to_process_points+'stats/stream_cda'
 def generateData():
     i = 0
     for line in TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz'):
-        FileIO.writeToFileAsJson(line, time_to_process_points+'%s'%(i/50000))
+        FileIO.writeToFileAsJson(line, time_to_process_points+'10000/%s'%(i/10000))
         i+=1
         
 def fileIterator(): 
@@ -56,5 +56,8 @@ def getStatsForCDA():
     previousTime = time.time()
     clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
 
-getStatsForCDA()
+#getStatsForCDA()
+
+generateData()
+
 
