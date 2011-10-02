@@ -34,6 +34,7 @@ evaluation = Evaluation()
 
 stream_cda_stats_file = time_to_process_points+'stats/stream_cda'
 ssa_stats_file = time_to_process_points+'stats/ssa'
+ssa_mr_stats_file = time_to_process_points+'stats/ssa_mr'
 
 def generateData():
     i = 0
@@ -98,9 +99,8 @@ def getStatsForSSAMR():
         
         os.system('hadoop fs -rmr %s'%(hdfsUnzippedPath+'/%s'%iteration_file))
         os.system('rm -rf %s'%iteration_file)
-        iteration_data = {'iteration_time': time.time()-ts, 'type': 'ssa', 'number_of_messages': batchSize*(id+1), 'batch_size': batchSize}
-        print iteration_data
-        break
+        iteration_data = {'iteration_time': time.time()-ts, 'type': 'ssa_mr', 'number_of_messages': batchSize*(id+1), 'batch_size': batchSize}
+        FileIO.writeToFileAsJson(iteration_data, ssa_mr_stats_file)
 
 #getStatsForCDA()
 
