@@ -39,7 +39,7 @@ ssa_stats_file = time_to_process_points+'stats/ssa'
 ssa_mr_stats_file = time_to_process_points+'stats/ssa_mr'
 
 plot_info = { 
-             'stream_cda': {'id': 'Stream-CDA', 'label': 'stream_cda', 'color': '#7109AA', 'marker': '*'},
+             'stream_cda': {'id': 'Stream-CDA', 'label': 'Stream-CDA', 'color': '#7109AA', 'marker': '*'},
              'ssa': {'id': 'ssa', 'label': 'Iterative CDA', 'color': '#FD0006', 'marker': 'o'},
              'ssa_mr': {'id': 'ssa_mr', 'label': 'MR CDA', 'color': '#5AF522', 'marker': '>'}
              }
@@ -127,10 +127,10 @@ def plotMessagesProcessedWithTime(iterators):
                     iteration_time+=data['iteration_time']
                     if iteration_time<time_limit: dataX.append(iteration_time), dataY.append(data['number_of_messages'])
 #        print info, dataX, dataY
-        plt.plot(dataX, [y/10**3 for y in dataY], lw=2, label=info['label'], color=info['color'])
+        plt.semilogx(dataX, [y/10**3 for y in dataY], lw=2, label=info['label'], color=info['color'])
 #    plt.xlim(xmax=2300)
     plt.legend(loc=2)
-    plt.xlabel(getLatexForString('Time (s)')); plt.ylabel(getLatexForString('\# of messages $(10^3)$')); plt.title(getLatexForString('Message processing ability of the algorithms'))
+    plt.xlabel(getLatexForString('Time (s)')); plt.ylabel(getLatexForString('\# of messages (10^3)')); plt.title(getLatexForString('Message processing ability of the algorithms'))
     plt.plot()
     plt.savefig('messagesProcessedWithTime.pdf')
     plt.savefig('messagesProcessedWithTime.eps')
