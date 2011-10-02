@@ -120,7 +120,7 @@ def plotMessagesProcessedWithTime(iterators):
         else:
             iteration_time = 0
             for data in iterator: 
-                if data['batch_size']==50000:
+                if data['batch_size']==10000:
                     iteration_time+=data['iteration_time']
                     dataX.append(iteration_time), dataY.append(data['number_of_messages'])
         print info, dataX, dataY
