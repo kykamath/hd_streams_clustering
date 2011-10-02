@@ -72,7 +72,7 @@ class CompareAlgorithms:
             if not semilog: plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
             else: plt.semilogx(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
         plt.legend(loc=loc)
-        plt.xlabel(getLatexForString('\# of documents')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
+        plt.xlabel(getLatexForString('Length of information stream')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
         if xmax: plt.xlim(xmax=xmax) 
         if xmin: plt.xlim(xmin=xmin) 
         plt.savefig(fileName)
@@ -103,7 +103,7 @@ class CompareAlgorithms:
 #        for i, j in zip(dataX, dataDifference): print i,j
         
         plt.legend(loc=loc)
-        plt.xlabel(getLatexForString('\# of documents (10^4)')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
+        plt.xlabel(getLatexForString('Length of information stream (10^4)')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
         locs,labels = plt.xticks()
         plt.xticks(locs, map(lambda x: "%d"%(x/10000), locs))
         if xmax: plt.xlim(xmax=xmax) 
