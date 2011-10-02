@@ -4,9 +4,9 @@ Created on Sep 30, 2011
 @author: kykamath
 '''
 import sys
+sys.path.append('../')
 from library.vector import Vector
 from experiments.ssa.ssa import SimilarStreamAggregation
-sys.path.append('../')
 from library.twitter import TweetFiles
 from library.file_io import FileIO
 from settings import default_experts_twitter_stream_settings
