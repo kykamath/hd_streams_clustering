@@ -7,7 +7,8 @@ import sys, os
 from library.mrjobwrapper import CJSONProtocol
 sys.path.append('../')
 from library.vector import Vector
-from experiments.ssa.ssa import SimilarStreamAggregation
+from experiments.ssa.ssa import SimilarStreamAggregation,\
+    StreamSimilarityAggregationMR
 from library.twitter import TweetFiles
 from library.file_io import FileIO
 from settings import default_experts_twitter_stream_settings
@@ -90,9 +91,11 @@ def getStatsForSSAMR():
         iteration_file = '%s_%s'%(batchSize, id)
         print 'Generating data for ', iteration_file
         with open(iteration_file, 'w') as fp: [fp.write(CJSONProtocol.write('x', [doc1, doc2])+'\n') for doc1, doc2 in combinations(iterateUserDocuments(fileName),2)]
-        os.system('gunzip %s.gz'%iteration_file)
         os.system('hadoop fs -put %s %s'%(iteration_file, hdfsUnzippedPath))    
-        break
+        StreamSimilarityAggregationMR.estimate(hdfsUnzippedPath+'/%s'%iteration_file, args='-r hadoop'.split(), 
+                                        jobconf={'mapred.map.tasks':25, 'mapred.task.timeout': 7200000, 'mapred.reduce.tasks':25})
+        os.system('hadoop fs -rmr %s'%(hdfsUnzippedPath+'/%s'%iteration_file))
+        os.system('rm -rf %s'%iteration_file)
 
 #getStatsForCDA()
 
