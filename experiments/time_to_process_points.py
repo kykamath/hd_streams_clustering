@@ -127,10 +127,10 @@ def plotMessagesProcessedWithTime(iterators):
                     iteration_time+=data['iteration_time']
                     if iteration_time<time_limit: dataX.append(iteration_time), dataY.append(data['number_of_messages'])
 #        print info, dataX, dataY
-        plt.plot(dataX, dataY, lw=2, label=info['label'], color=info['color'], marker=info['marker'])
+        plt.plot(dataX, [y/10**3 for y in dataY], lw=2, label=info['label'], color=info['color'])
 #    plt.xlim(xmax=2300)
     plt.legend(loc=2)
-    plt.xlabel(getLatexForString('Time (s)')); plt.ylabel(getLatexForString('\# of messages')); plt.title(getLatexForString('Message processing ability of the algorithms'))
+    plt.xlabel(getLatexForString('Time (s)')); plt.ylabel(getLatexForString('\# of messages $(10^3)$')); plt.title(getLatexForString('Message processing ability of the algorithms'))
     plt.plot()
     plt.savefig('messagesProcessedWithTime.pdf')
     plt.savefig('messagesProcessedWithTime.eps')
