@@ -92,9 +92,9 @@ def getStatsForSSA():
         FileIO.writeToFileAsJson(iteration_data, ssa_stats_file)
         
 def getStatsForSSAMR():
-    batchSize = 10000
+    batchSize = 50000
     default_experts_twitter_stream_settings['ssa_threshold']=0.75
-    for id in range(21, 50):
+    for id in range(0, 10):
         ts = time.time()
         fileName = time_to_process_points+'%s/%s'%(batchSize,id)
         iteration_file = '%s_%s'%(batchSize, id)
@@ -120,7 +120,7 @@ def plotMessagesProcessedWithTime(iterators):
         else:
             iteration_time = 0
             for data in iterator: 
-                if data['batch_size']==10000:
+                if data['batch_size']==50000:
                     iteration_time+=data['iteration_time']
                     dataX.append(iteration_time), dataY.append(data['number_of_messages'])
         print info, dataX, dataY
@@ -133,7 +133,7 @@ def plotMessagesProcessedWithTime(iterators):
 #generateData()
 #getStatsForCDA()
 #getStatsForSSA()
-#getStatsForSSAMR()
-plotMessagesProcessedWithTime([(getIterator('stream_cda'), plot_info['stream_cda']),
-                               (getIterator('ssa'), plot_info['ssa']),
-                               (getIterator('ssa_mr'), plot_info['ssa_mr'])])
+getStatsForSSAMR()
+#plotMessagesProcessedWithTime([(getIterator('stream_cda'), plot_info['stream_cda']),
+#                               (getIterator('ssa'), plot_info['ssa']),
+#                               (getIterator('ssa_mr'), plot_info['ssa_mr'])])
