@@ -123,10 +123,10 @@ def plotMessagesProcessedWithTime(iterators):
                 if data['batch_size']==10000:
                     iteration_time+=data['iteration_time']
                     dataX.append(iteration_time), dataY.append(data['number_of_messages'])
-        print info, dataX, dataY
+#        print info, dataX, dataY
         plt.plot(dataX, dataY, lw=2, label=info['label'])
 #    plt.xlim(xmax=2000)
-    plt.legend(loc=3)
+    plt.legend(loc=2)
     plt.plot()
     plt.savefig('messagesProcessedWithTime.pdf')
     plt.savefig('messagesProcessedWithTime.eps')
