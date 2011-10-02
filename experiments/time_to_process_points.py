@@ -73,9 +73,9 @@ def iterateUserDocuments(fileName):
     for k, v in dataForAggregation.iteritems(): yield k, v
     
 def getStatsForSSA():
-    batchSize = 50000
+    batchSize = 10000
     default_experts_twitter_stream_settings['ssa_threshold']=0.75
-    for id in range(0, 10):
+    for id in range(21, 50):
         fileName = time_to_process_points+'%s/%s'%(batchSize,id)
         ts = time.time()
         sstObject = SimilarStreamAggregation(dict(iterateUserDocuments(fileName)), default_experts_twitter_stream_settings['ssa_threshold'])
@@ -106,6 +106,6 @@ def getStatsForSSAMR():
 
 #generateData()
 
-#getStatsForSSA()
+getStatsForSSA()
 
-getStatsForSSAMR()
+#getStatsForSSAMR()
