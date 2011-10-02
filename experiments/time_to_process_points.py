@@ -125,7 +125,7 @@ def plotMessagesProcessedWithTime(iterators):
                     dataX.append(iteration_time), dataY.append(data['number_of_messages'])
 #        print info, dataX, dataY
         plt.plot(dataX, dataY, lw=2, label=info['label'])
-#    plt.xlim(xmax=2000)
+    plt.xlim(xmax=2300)
     plt.legend(loc=2)
     plt.plot()
     plt.savefig('messagesProcessedWithTime.pdf')
