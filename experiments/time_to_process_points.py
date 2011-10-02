@@ -118,11 +118,11 @@ def plotMessagesProcessedWithTime(iterators):
         if not info['id'].startswith('ssa'):
             for data in iterator: dataX.append(data['iteration_time']), dataY.append(data['number_of_messages'])
         else:
-            number_of_messages_observed = 0
+            iteration_time = 0
             for data in iterator: 
-                if data['number_of_messages']==10000:
-                    number_of_messages_observed+=data['number_of_messages']
-                    dataX.append(data['iteration_time']), dataY.append(number_of_messages_observed)
+                if data['batch_size']==10000:
+                    iteration_time+=data['iteration_time']
+                    dataX.append(iteration_time, dataY.append(data['number_of_messages']))
         print info, dataX, dataY
         plt.plot(dataX, dataY, lw=2, label=info['label'])
     plt.legend()
