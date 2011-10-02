@@ -5,6 +5,7 @@ Created on Sep 30, 2011
 '''
 import sys
 from library.vector import Vector
+from experiments.ssa.ssa import SimilarStreamAggregation
 sys.path.append('../')
 from library.twitter import TweetFiles
 from library.file_io import FileIO
@@ -37,13 +38,6 @@ def generateData():
 def fileIterator(): 
     for id in xrange(20): yield FileIO.iterateJsonFromFile(time_to_process_points+'%s'%id)
     
-#def clusterAnalysis(hdStreamClusteringObject, currentMessageTime, numberOfMessages):
-#    global evaluation, previousTime
-#    iteration_data = {'iteration_time': time.time()-previousTime, 'type': 'stream-cda', 'number_of_messages': numberOfMessages}
-#    previousTime = time.time()
-#    print iteration_data
-#    FileIO.writeToFileAsJson(iteration_data, stream_cda_stats_file)
-
 def clusterAnalysis(hdStreamClusteringObject, currentMessageTime, numberOfMessages):
     global evaluation, previousTime
     iteration_data = {'iteration_time': time.time()-previousTime, 'type': 'stream-cda', 'number_of_messages': numberOfMessages}
@@ -69,11 +63,22 @@ def iterateUserDocuments():
             if phrase not in textToIdMap: textToIdMap[phrase]=str(len(textToIdMap))
             textIdVector[textToIdMap[phrase]]=textVector[phrase]
         dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
-    for k, v in dataForAggregation.iteritems(): print k, v
+    for k, v in dataForAggregation.iteritems(): yield k, v
+    
+def getStatsForSSA():
+    batchSize = 10000
+    id = 0
+    fileName = time_to_process_points+'%b/%s'%(id, batchSize)
+    ts = time.time()
+    sstObject = SimilarStreamAggregation(dict(iterateUserDocuments(fileName)), default_experts_twitter_stream_settings['ssa_threshold'])
+    sstObject.estimate()
+#    documentClusters = list(sstObject.iterateClusters())
+    iteration_data = {'iteration_time': time.time()-ts, 'type': 'ssa', 'number_of_messages': batchSize*(id+1), 'batch_size': batchSize}
+    print iteration_data
 
 #getStatsForCDA()
 
 #generateData()
 
-iterateUserDocuments()
-
+#iterateUserDocuments()
+getStatsForSSA()
