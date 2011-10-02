@@ -83,7 +83,7 @@ def getStatsForSSA():
         FileIO.writeToFileAsJson(iteration_data, ssa_stats_file)
         
 def getStatsForSSAMR():
-    batchSize = 50000
+    batchSize = 10000
     default_experts_twitter_stream_settings['ssa_threshold']=0.75
     for id in range(0, 10):
         fileName = time_to_process_points+'%s/%s'%(batchSize,id)
