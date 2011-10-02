@@ -132,9 +132,9 @@ def plotMessagesProcessedWithTime(iterators):
     plt.savefig('messagesProcessedWithTime.eps')
 
 #generateData()
-#getStatsForCDA()
+getStatsForCDA()
 #getStatsForSSA()
 #getStatsForSSAMR()
-plotMessagesProcessedWithTime([(getIterator('stream_cda'), plot_info['stream_cda']),
-                               (getIterator('ssa'), plot_info['ssa']),
-                               (getIterator('ssa_mr'), plot_info['ssa_mr'])])
+#plotMessagesProcessedWithTime([(getIterator('stream_cda'), plot_info['stream_cda']),
+#                               (getIterator('ssa'), plot_info['ssa']),
+#                               (getIterator('ssa_mr'), plot_info['ssa_mr'])])
