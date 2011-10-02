@@ -19,6 +19,7 @@ from experiments.algorithms_performance import Evaluation
 from collections import defaultdict
 from itertools import combinations
 import time
+import matplotlib.pyplot as plt
 
 
 time_to_process_points = '/mnt/chevron/kykamath/data/twitter/lsh_clustering/time_to_process_points/'
@@ -105,10 +106,17 @@ def getStatsForSSAMR():
 def getIterator(id):
     for line in FileIO.iterateJsonFromFile(time_to_process_points+'stats/%s'%id): yield line
 
+def plotMessagesProcessedWithTime(iterators):
+    for iterator in iterators:
+        dataX, dataY = [], []
+        for data in iterator: dataX.append(data['iteration_time']), dataY.append(data['number_of_messages'])
+        plt.plot(dataX, dataY)
+    plt.plot()
+    plt.savefig('messagesProcessedWithTime.pdf')
+    plt.savefig('messagesProcessedWithTime.eps')
+
 #generateData()
 #getStatsForCDA()
 #getStatsForSSA()
 #getStatsForSSAMR()
-
-for l in getIterator('ssa'):
-    print l
+plotMessagesProcessedWithTime([getIterator('stream_cda')])
