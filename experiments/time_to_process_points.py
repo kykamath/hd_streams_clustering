@@ -46,6 +46,7 @@ def clusterAnalysis(hdStreamClusteringObject, currentMessageTime, numberOfMessag
     iteration_data = {'iteration_time': time.time()-previousTime, 'type': 'stream-cda', 'number_of_messages': numberOfMessages}
 #    previousTime = time.time()
     print iteration_data
+    FileIO.writeToFileAsJson(iteration_data, stream_cda_stats_file)
 
 def getStatsForCDA():
     global previousTime
@@ -55,10 +56,5 @@ def getStatsForCDA():
     previousTime = time.time()
     clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
 
-#generateData()
-
-#for l in fileIterator(): print l
 getStatsForCDA()
 
-#clustering = HDDelayedClustering(**default_experts_twitter_stream_settings)
-#clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
