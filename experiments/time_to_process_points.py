@@ -101,11 +101,14 @@ def getStatsForSSAMR():
         os.system('rm -rf %s'%iteration_file)
         iteration_data = {'iteration_time': time.time()-ts, 'type': 'ssa_mr', 'number_of_messages': batchSize*(id+1), 'batch_size': batchSize}
         FileIO.writeToFileAsJson(iteration_data, ssa_mr_stats_file)
-
-#getStatsForCDA()
+        
+def getIterator(id):
+    for line in FileIO.iterateJsonFromFile(time_to_process_points+'stats/%s'%id): yield line
 
 #generateData()
-
-getStatsForSSA()
-
+#getStatsForCDA()
+#getStatsForSSA()
 #getStatsForSSAMR()
+
+for l in getIterator('ssa'):
+    print l
