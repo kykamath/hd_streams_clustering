@@ -63,14 +63,13 @@ def iterateUserDocuments():
     dataForAggregation = defaultdict(Vector)
     textToIdMap = defaultdict(int)
     for tweet in FileIO.iterateJsonFromFile('/mnt/chevron/kykamath/data/twitter/lsh_clustering/time_to_process_points/10000/0'):
-        print tweet
-#        textVector = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **self.stream_settings).vector
-#        textIdVector = Vector()
-#        for phrase in textVector: 
-#            if phrase not in textToIdMap: textToIdMap[phrase]=str(len(textToIdMap))
-#            textIdVector[textToIdMap[phrase]]=textVector[phrase]
-#        dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
-#    for k, v in dataForAggregation.iteritems(): print k, v
+        textVector = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **default_experts_twitter_stream_settings).vector
+        textIdVector = Vector()
+        for phrase in textVector: 
+            if phrase not in textToIdMap: textToIdMap[phrase]=str(len(textToIdMap))
+            textIdVector[textToIdMap[phrase]]=textVector[phrase]
+        dataForAggregation[tweet['user']['screen_name'].lower()]+=textIdVector
+    for k, v in dataForAggregation.iteritems(): print k, v
 
 #getStatsForCDA()
 
