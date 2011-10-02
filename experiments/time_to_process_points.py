@@ -106,6 +106,6 @@ def getStatsForSSAMR():
 
 #generateData()
 
-getStatsForSSA()
+#getStatsForSSA()
 
-#getStatsForSSAMR()
+getStatsForSSAMR()
