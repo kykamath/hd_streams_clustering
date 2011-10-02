@@ -28,6 +28,7 @@ previousTime = None
 evaluation = Evaluation()
 
 stream_cda_stats_file = time_to_process_points+'stats/stream_cda'
+ssa_stats_file = time_to_process_points+'stats/ssa'
 
 def generateData():
     i = 0
@@ -67,19 +68,18 @@ def iterateUserDocuments(fileName):
     
 def getStatsForSSA():
     batchSize = 10000
-    id = 0
     default_experts_twitter_stream_settings['ssa_threshold']=0.75
-    fileName = time_to_process_points+'%s/%s'%(batchSize,id)
-    ts = time.time()
-    sstObject = SimilarStreamAggregation(dict(iterateUserDocuments(fileName)), default_experts_twitter_stream_settings['ssa_threshold'])
-    sstObject.estimate()
-#    documentClusters = list(sstObject.iterateClusters())
-    iteration_data = {'iteration_time': time.time()-ts, 'type': 'ssa', 'number_of_messages': batchSize*(id+1), 'batch_size': batchSize}
-    print iteration_data
+    for id in range(0, 21):
+        fileName = time_to_process_points+'%s/%s'%(batchSize,id)
+        ts = time.time()
+        sstObject = SimilarStreamAggregation(dict(iterateUserDocuments(fileName)), default_experts_twitter_stream_settings['ssa_threshold'])
+        sstObject.estimate()
+    #    documentClusters = list(sstObject.iterateClusters())
+        iteration_data = {'iteration_time': time.time()-ts, 'type': 'ssa', 'number_of_messages': batchSize*(id+1), 'batch_size': batchSize}
+        FileIO.writeToFileAsJson(iteration_data, ssa_stats_file)
 
 #getStatsForCDA()
 
 #generateData()
 
-#iterateUserDocuments()
 getStatsForSSA()
