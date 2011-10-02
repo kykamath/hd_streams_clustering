@@ -53,10 +53,10 @@ def getStatsForCDA():
     previousTime = time.time()
     clustering.cluster(TweetFiles.iterateTweetsFromGzip('/mnt/chevron/kykamath/data/twitter/lsh_clustering/clustering_quality_experts_folder/data/1000000.gz')) 
     
-def iterateUserDocuments():
+def iterateUserDocuments(fileName):
     dataForAggregation = defaultdict(Vector)
     textToIdMap = defaultdict(int)
-    for tweet in FileIO.iterateJsonFromFile('/mnt/chevron/kykamath/data/twitter/lsh_clustering/time_to_process_points/10000/0'):
+    for tweet in FileIO.iterateJsonFromFile(fileName):
         textVector = TwitterCrowdsSpecificMethods.convertTweetJSONToMessage(tweet, **default_experts_twitter_stream_settings).vector
         textIdVector = Vector()
         for phrase in textVector: 
