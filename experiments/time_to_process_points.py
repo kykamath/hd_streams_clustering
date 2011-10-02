@@ -87,6 +87,7 @@ def getStatsForSSAMR():
     batchSize = 10000
     default_experts_twitter_stream_settings['ssa_threshold']=0.75
     for id in range(0, 10):
+        ts = time.time()
         fileName = time_to_process_points+'%s/%s'%(batchSize,id)
         iteration_file = '%s_%s'%(batchSize, id)
         print 'Generating data for ', iteration_file
@@ -94,13 +95,17 @@ def getStatsForSSAMR():
         os.system('hadoop fs -put %s %s'%(iteration_file, hdfsUnzippedPath))    
         StreamSimilarityAggregationMR.estimate(hdfsUnzippedPath+'/%s'%iteration_file, args='-r hadoop'.split(), 
                                         jobconf={'mapred.map.tasks':25, 'mapred.task.timeout': 7200000, 'mapred.reduce.tasks':25})
+        
         os.system('hadoop fs -rmr %s'%(hdfsUnzippedPath+'/%s'%iteration_file))
         os.system('rm -rf %s'%iteration_file)
+        iteration_data = {'iteration_time': time.time()-ts, 'type': 'ssa', 'number_of_messages': batchSize*(id+1), 'batch_size': batchSize}
+        print iteration_data
+        break
 
 #getStatsForCDA()
 
 #generateData()
 
-#getStatsForSSA()
+getStatsForSSA()
 
-getStatsForSSAMR()
+#getStatsForSSAMR()
