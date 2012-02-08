@@ -211,9 +211,9 @@ class JustifyDimensionsEstimation():
 #        plt.subplot(313); 
         for type in experimentsData:
             plt.plot([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['quality'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2, marker=pltInfo[type]['marker']);
-        plt.ylabel('$Mean\ purity\ per\ iteration$', fontsize=20); 
+        plt.ylabel('Mean purity per iteration', fontsize=20); 
 #        plt.title(getLatexForString('Impact of dimension ranking'))
-        plt.xlabel('$\#\ number\ of\ dimensions\ (10^3)$', fontsize=20)
+        plt.xlabel('# number of dimensions $(10^3)$', fontsize=20)
 #        plt.plot([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['quality']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819 dimensions'), lw=2);
         plt.ylim(ymin=0.80,ymax=1.0)
         plt.legend()
