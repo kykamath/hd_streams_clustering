@@ -424,7 +424,7 @@ class JustifyNotUsingVanillaLSH:
 if __name__ == '__main__':
 #    JustifyDimensionsEstimation.runExperiment()
 #    JustifyMemoryPruning.runExperiment()
-#    JustifyExponentialDecay.runExperiment()
-    JustifyTrie.runExperiment()
+    JustifyExponentialDecay.runExperiment()
+#    JustifyTrie.runExperiment()
 #    JustifyNotUsingVanillaLSH.runExperiment()
     
