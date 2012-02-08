@@ -14,7 +14,8 @@ from library.plotting import getLatexForString, CurveFit, \
     getCumulativeDistribution, getInverseCumulativeDistribution
 from library.math_modified import getSmallestPrimeNumberGreaterThan, \
     DateTimeAirthematic
-from hd_streams_clustering import CDA, HDStreaminClustering
+#from hd_streams_clustering import CDA, HDStreaminClustering
+from hd_streams_clustering import HDStreaminClustering
 from classes import UtilityMethods, Phrase
 from matplotlib.ticker import FuncFormatter
 from twitter_streams_clustering import TwitterIterators, TwitterCrowdsSpecificMethods
@@ -148,9 +149,10 @@ class ParameterEstimation:
         x = x[:numberOfTimeUnits]; y = y[:numberOfTimeUnits]
         plt.subplot(111).yaxis.set_major_formatter(FuncFormatter(lambda x, i: '%0.1f' % (x / 10. ** 6)))
         plt.text(0.0, 1.01, getLatexForString('10^6'), transform=plt.gca().transAxes)
-        plt.ylabel(getLatexForString('\# of dimensions')), plt.xlabel(getLatexForString(xlabelTimeUnits)), plt.title(getLatexForString('Growth in dimensions with increasing time.'))
+        plt.ylabel(getLatexForString('\# of dimensions'), fontsize=25), plt.xlabel(getLatexForString(xlabelTimeUnits), fontsize=25)#, plt.title(getLatexForString('Growth in dimensions with increasing time.'))
         plt.plot(y, color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label']), lw=2)
-        plt.legend(loc=4)
+        plt.legend(loc=2)
+        plt.savefig('growthOfDimensionsInTime.png')
         if returnAxisValuesOnly: plt.show()
     def plotDimensionsEstimation(self, returnAxisValuesOnly=True):
         def calculateDimensionsFor(params, percentageOfNewDimensions): 
@@ -460,8 +462,8 @@ experts_twitter_stream_settings['convert_data_to_message_method'] = houston_twit
 def dimensionsEstimation():
 #    ParameterEstimation(**experts_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsEstimation)
 #    ParameterEstimation(**houston_stream_settings).run(TwitterIterators.iterateTweetsFromHouston(), ParameterEstimation.dimensionsEstimation)
-#    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotGrowthOfPhrasesInTime, ParameterEstimation(**houston_twitter_stream_settings).plotGrowthOfPhrasesInTime])
-    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsEstimation, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsEstimation])
+    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotGrowthOfPhrasesInTime, ParameterEstimation(**houston_twitter_stream_settings).plotGrowthOfPhrasesInTime])
+#    ParameterEstimation.plotMethods([ParameterEstimation(**experts_twitter_stream_settings).plotDimensionsEstimation, ParameterEstimation(**houston_twitter_stream_settings).plotDimensionsEstimation])
 
 def dimensionsUpdateFrequencyEstimation():
 #    ParameterEstimation(**experts_twitter_stream_settings).run(TwitterIterators.iterateTweetsFromExperts(), ParameterEstimation.dimensionsUpdateFrequencyEstimation)

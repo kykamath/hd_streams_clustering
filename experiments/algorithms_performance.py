@@ -44,24 +44,25 @@ def loadExperimentsData(experimentsData, file):
             experimentsData[data['iteration_parameters']['type']]['quality'].append(data['purity'])
             experimentsData[data['iteration_parameters']['type']]['total_clusters'].append(data['iteration_parameters']['total_clusters'])
 def plotClusters(experimentsData, numberOfPoints, pltInfo):
-    for k in experimentsData: window = 4; plt.semilogy(range(numberOfPoints)[:-window], movingAverage(experimentsData[k]['total_clusters'][:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
-    plt.ylabel(getLatexForString('Clusters in memory'))
+    for k in experimentsData: window = 4; plt.semilogy(range(numberOfPoints)[:-window], movingAverage(experimentsData[k]['total_clusters'][:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2, marker=pltInfo[k]['marker'])
+    plt.ylabel(getLatexForString('\# of clusters'), fontsize=16)
+    plt.xticks([])
 def plotRunningTime(experimentsData, pltInfo, key1, key2, semilog=True):
     dataY1, dataY2 = [], []
     for y1, y2 in zip(experimentsData[key1]['iteration_time'], experimentsData[key2]['iteration_time']): dataY1.append(y1), dataY2.append(y2)
     numberOfPoints = len(dataY1)
     for k, dataY in zip([key1, key2], [dataY1, dataY2]): 
         window = 20; 
-        if semilog: plt.semilogy(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
-        else: plt.plot(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
-    plt.ylabel(getLatexForString('Running time (s)'))
+        if semilog: plt.semilogy(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], marker=pltInfo[k]['marker'])
+        else: plt.plot(range(numberOfPoints)[:-window], movingAverage(dataY[:numberOfPoints], window)[:-window], pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2, marker=pltInfo[k]['marker'])
+    plt.ylabel(getLatexForString('Running time (s)'), fontsize=16)
     return numberOfPoints
 def plotQuality(experimentsData, numberOfPoints, pltInfo):
     for k in experimentsData: 
         dataY = movingAverage(experimentsData[k]['quality'][:numberOfPoints], 4)
-        plt.plot(range(numberOfPoints), [np.mean(dataY)]*numberOfPoints,'--', color=pltInfo[k]['color'], lw=2)
-        plt.plot(range(numberOfPoints), dataY, pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2)
-    plt.ylabel(getLatexForString('Purity'))
+        plt.plot(range(numberOfPoints), [np.mean(dataY)]*numberOfPoints, '--', color=pltInfo[k]['color'], lw=2)
+        plt.plot(range(numberOfPoints), dataY, pltInfo[k]['type'], label=pltInfo[k]['label'], color=pltInfo[k]['color'], lw=2, marker=pltInfo[k]['marker'])
+    plt.ylabel(getLatexForString('Purity'), fontsize=16)
     
 class Evaluation():
     def __init__(self): self.expertsToClassMap = dict([(k, v['class']) for k,v in getExperts(byScreenName=True).iteritems()])
@@ -285,17 +286,17 @@ class JustifyExponentialDecay:
         previousTime = time.time()
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,4,1), expertsDataEndTime=datetime(2011,4,8))) 
     def plotJustifyExponentialDecay(self):
-        pltInfo =  {JustifyExponentialDecay.with_decay: {'label': getLatexForString('With decay'), 'color': '#7109AA', 'type': '-'}, JustifyExponentialDecay.without_decay: {'label': getLatexForString('With out decay'), 'color': '#5AF522', 'type': '-'}}
+        pltInfo =  {JustifyExponentialDecay.with_decay: {'label': getLatexForString('With decay'), 'color': '#7109AA', 'type': '-', 'marker':'x'}, JustifyExponentialDecay.without_decay: {'label': getLatexForString('With out decay'), 'color': '#5AF522', 'type': '-', 'marker':'o'}}
         experimentsData = {JustifyExponentialDecay.with_decay: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyExponentialDecay.without_decay: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
         loadExperimentsData(experimentsData, JustifyExponentialDecay.stats_file)
         numberOfPoints = 275
-        plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.title(getLatexForString('Impact of exponential decay')), plt.xlim(xmax=275)
+        plt.subplot(311); plotClusters(experimentsData, numberOfPoints, pltInfo); plt.xlim(xmax=275)#, plt.title(getLatexForString('Impact of exponential decay'))
         plt.subplot(312); plotRunningTime(experimentsData, pltInfo, JustifyExponentialDecay.with_decay, JustifyExponentialDecay.without_decay); plt.xticks([], tick1On=False), plt.xlim(xmax=275)
         plt.legend(loc=2, ncol=2)
-        plt.ylabel(getLatexForString('Running time (s)'))
+        plt.ylabel(getLatexForString('Running time'), fontsize=16)
         plt.subplot(313); plotQuality(experimentsData, numberOfPoints, pltInfo), plt.xlim(xmax=275)
-        plt.xlabel(getLatexForString('Time'))
-        plt.savefig('justifyExponentialDecay.pdf')
+        plt.xlabel(getLatexForString('Time'), fontsize=16)
+        plt.savefig('justifyExponentialDecay.png')
     def analyzeJustifyExponentialDecay(self):
         global evaluation
         experimentsData = {JustifyExponentialDecay.with_decay: {}, JustifyExponentialDecay.without_decay: {}}
@@ -360,7 +361,7 @@ class JustifyTrie:
         previousTime = time.time()
         HDStreaminClustering(**experts_twitter_stream_settings).cluster(TwitterIterators.iterateTweetsFromExperts(expertsDataStartTime=datetime(2011,3,19), expertsDataEndTime=datetime(2011,3,27))) 
     def plotJustifyTrie(self):
-            pltInfo = {JustifyTrie.with_trie: {'label': getLatexForString('With prefix tree'), 'color': '#7109AA', 'type': '-'}, JustifyTrie.with_sorted_list: {'label': getLatexForString('With sorted list'), 'color': '#5AF522', 'type': '-'}}
+            pltInfo = {JustifyTrie.with_trie: {'label': getLatexForString('With prefix tree'), 'color': '#7109AA', 'type': '-', 'marker':'x'}, JustifyTrie.with_sorted_list: {'label': getLatexForString('With sorted list'), 'color': '#5AF522', 'type': '-'}, 'marker':'o'}
             experimentsData = {JustifyTrie.with_trie: {'iteration_time': [], 'quality': [], 'total_clusters': []}, JustifyTrie.with_sorted_list: {'iteration_time': [], 'quality': [], 'total_clusters': []}}
             loadExperimentsData(experimentsData, JustifyTrie.stats_file)
             plt.subplot(312); numberOfPoints = plotRunningTime(experimentsData, pltInfo, JustifyTrie.with_trie, JustifyTrie.with_sorted_list); plt.xlim(xmax=200); plt.xticks([], tick1On=False); plt.ylim(ymin=1, ymax=35000);
@@ -372,8 +373,8 @@ class JustifyTrie:
             plt.savefig('justifyTrie.pdf')
     @staticmethod
     def runExperiment():
-#        JustifyTrie().generateExperimentData(withoutTrie=False)
-        JustifyTrie().plotJustifyTrie()
+        JustifyTrie().generateExperimentData(withoutTrie=True)
+#        JustifyTrie().plotJustifyTrie()
         
 class JustifyNotUsingVanillaLSH:
     with_vanilla_lsh = 'with_vanilla_lsh'
@@ -420,9 +421,9 @@ class JustifyNotUsingVanillaLSH:
         JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
-    JustifyDimensionsEstimation.runExperiment()
+#    JustifyDimensionsEstimation.runExperiment()
 #    JustifyMemoryPruning.runExperiment()
 #    JustifyExponentialDecay.runExperiment()
-#    JustifyTrie.runExperiment()
+    JustifyTrie.runExperiment()
 #    JustifyNotUsingVanillaLSH.runExperiment()
     

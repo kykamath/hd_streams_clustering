@@ -127,18 +127,19 @@ def plotMessagesProcessedWithTime(iterators):
                     iteration_time+=data['iteration_time']
                     if iteration_time<time_limit: dataX.append(iteration_time), dataY.append(data['number_of_messages'])
 #        print info, dataX, dataY
-        plt.plot(dataX, [y/10**3 for y in dataY], lw=2, label=info['label'], color=info['color'])
+#        dataX = [x/60*60 for x in dataX]
+        plt.plot(dataX, [y/10**3 for y in dataY], lw=2, label=info['label'], color=info['color'], marker=info['marker'])
 #    plt.xlim(xmin=15, xmax=3000)
     plt.legend(loc=2)
-    plt.xlabel(getLatexForString('Time (s)')); plt.ylabel(getLatexForString('\# of messages (10^3)')); plt.title(getLatexForString('Message processing rate'))
-    plt.plot()
-    plt.savefig('messagesProcessedWithTime.pdf')
-    plt.savefig('messagesProcessedWithTime.eps')
-
+    plt.xlabel(getLatexForString('Time (s)'), fontsize=20, fontweight='bold'); plt.ylabel(getLatexForString('\# of messages (10^3)'), fontsize=20, fontweight='bold')#; plt.title(getLatexForString('Message processing rate'))
+#    plt.plot()
+#    plt.savefig('messagesProcessedWithTime.pdf')
+#    plt.savefig('messagesProcessedWithTime.eps')
+    plt.savefig('messagesProcessedWithTime.png')
 #generateData()
 #getStatsForCDA()
 #getStatsForSSA()
 #getStatsForSSAMR()
-plotMessagesProcessedWithTime([(getIterator('stream_cda'), plot_info['stream_cda']),
-                               (getIterator('ssa'), plot_info['ssa']),
-                               (getIterator('ssa_mr'), plot_info['ssa_mr'])])
+plotMessagesProcessedWithTime([(getIterator('ssa'), plot_info['ssa']),
+                               (getIterator('ssa_mr'), plot_info['ssa_mr']),
+                               (getIterator('stream_cda'), plot_info['stream_cda']),])

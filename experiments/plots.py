@@ -72,11 +72,12 @@ class CompareAlgorithms:
             if not semilog: plt.loglog(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
             else: plt.semilogx(dataX, dataY, label=algorithm_info[id]['label'], color=algorithm_info[id]['color'], lw=2, marker=algorithm_info[id]['marker'])
         plt.legend(loc=loc)
-        plt.xlabel(getLatexForString('Length of information stream')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
+        plt.xlabel(getLatexForString('Length of information stream'), fontsize=20); plt.ylabel(getLatexForString('Running time (s)'), fontsize=20); #plt.title(getLatexForString(title))
         if xmax: plt.xlim(xmax=xmax) 
-        if xmin: plt.xlim(xmin=xmin) 
-        plt.savefig(fileName+'.eps')
-        plt.savefig(fileName+'.pdf')
+        if xmin: plt.xlim(xmin=xmin)
+#        plt.savefig(fileName+'.eps')
+#        plt.savefig(fileName+'.pdf')
+        plt.savefig(fileName+'.png')
 #        plt.show()
         
     @staticmethod
@@ -104,13 +105,14 @@ class CompareAlgorithms:
 #        for i, j in zip(dataX, dataDifference): print i,j
         
         plt.legend(loc=loc)
-        plt.xlabel(getLatexForString('Length of information stream (10^4)')); plt.ylabel(getLatexForString('Running time (s)')); plt.title(getLatexForString(title))
+        plt.xlabel(getLatexForString('Length of information stream (10^4)'), fontsize=20); plt.ylabel(getLatexForString('Running time (s)'), fontsize=20); #plt.title(getLatexForString(title))
         locs,labels = plt.xticks()
         plt.xticks(locs, map(lambda x: "%d"%(x/10000), locs))
         if xmax: plt.xlim(xmax=xmax) 
         if xmin: plt.xlim(xmin=xmin) 
-        plt.savefig(fileName+'.eps')
-        plt.savefig(fileName+'.pdf')
+#        plt.savefig(fileName+'.eps')
+#        plt.savefig(fileName+'.pdf')
+        plt.savefig(fileName+'.png')
 #        plt.show()
         
     @staticmethod
@@ -132,17 +134,18 @@ class CompareAlgorithms:
             
     @staticmethod
     def plotQuality():
-        kmeans = (0.79, 0.78, 0.80, 0.80, 0.79)
-        cda_it = (0.98, 0.93, 0.81, 0.84, 0.79)
-        cda_unopt = (0.95, 0.85, 0.86, 0.84, 0.87)
-        cda = (0.96, 0.88, 0.86, 0.85, 0.88)
-#        kmeans = (0.79, 0.78)
-#        cda_it = (0.98, 0.93)
-#        cda_unopt = (0.95, 0.85)
+#        kmeans = (0.79, 0.78, 0.80, 0.80, 0.79)
+#        cda_it = (0.98, 0.93, 0.81, 0.84, 0.79)
+#        cda_unopt = (0.95, 0.85, 0.86, 0.84, 0.87)
+#        cda = (0.96, 0.88, 0.86, 0.85, 0.88)
+        kmeans = (0.79, 0.78)
+        cda_it = (0.98, 0.93)
+        cda_unopt = (0.95, 0.85)
 #        cda = (0.96, 0.88)
         
         N = len(kmeans)
-        ind = np.arange(N)  # the x locations for the groups
+#        ind = np.arange(N)  # the x locations for the groups
+        ind = np.array([0.1,0.5])
         width = 0.1       # the width of the bars
         
         fig = plt.figure()
@@ -154,25 +157,26 @@ class CompareAlgorithms:
         rectsKmeans = ax.bar(ind, kmeans, width, color='#DCDCDC', label=getLatexForString('k-means'), hatch='\\')
         rectsCdaIt = ax.bar(ind+width, cda_it, width, color='#808080', label=getLatexForString('Iterative CDA'), hatch='/')
         rectsCdaUnopt = ax.bar(ind+2*width, cda_unopt, width, color='#778899', label=getLatexForString('Stream-CDA'), hatch='-')
-        rectsCda = ax.bar(ind+3*width, cda, width, color='#2F4F4F', label=getLatexForString('Tailored Stream-CDA'), hatch='x')
+#        rectsCda = ax.bar(ind+3*width, cda, width, color='#2F4F4F', label=getLatexForString('Tailored Stream-CDA'), hatch='x')
         
-        ax.set_ylabel(getLatexForString('Score'))
-        ax.set_title(getLatexForString('Quality of crowds discovered'))
+        ax.set_ylabel(getLatexForString('Score'), fontsize=20)
+#        ax.set_title(getLatexForString('Quality of crowds discovered'))
         ax.set_xticks(ind+width)
-        ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
-#        ax.set_xticklabels((getLatexForString('Purity'), getLatexForString('NMI')))
+#        ax.set_xticklabels( ('Purity', 'NMI', 'F1', 'Precision', 'Recall') )
+        ax.set_xticklabels((getLatexForString('Purity'), getLatexForString('NMI')), fontsize=20)
         
-        plt.legend(loc=8, ncol=2)
-        plt.savefig('crowds_quality.pdf')
+        plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.12), ncol=3, fancybox=True, shadow=False)
+        plt.savefig('crowds_quality.png')
+#        plt.show()
         
 if __name__ == '__main__':
-    CompareAlgorithms.runningTimes(
-                                   ('kmeans', DataIterators.kmeans()), 
-                                   ('kmeans_mr', DataIterators.kmeansmr()), 
-                                   ('cda_unopt', DataIterators.unoptimized()),
-                                   loc=2, file_name='running_time_kmeans', xmin=800, xmax=1100000,
-                                   title='Running time comparison of Stream-CDA with k-means'
-                                )
+#    CompareAlgorithms.runningTimes(
+#                                   ('kmeans', DataIterators.kmeans()), 
+#                                   ('kmeans_mr', DataIterators.kmeansmr()), 
+#                                   ('cda_unopt', DataIterators.unoptimized()),
+#                                   loc=2, file_name='running_time_kmeans', xmin=800, xmax=1100000,
+#                                   title='Running time comparison of Stream-CDA with k-means'
+#                                )
     
 #    CompareAlgorithms.runningTimes(
 #                                   ('cda_it', DataIterators.cdait()), 
@@ -195,5 +199,5 @@ if __name__ == '__main__':
 #    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='precision')
 #    CompareAlgorithms.quality('f1', ('kmeans', DataIterators.kmeans()), ('cda_it', DataIterators.cdait()), ('cda_unopt', DataIterators.unoptimized()), ('cda', DataIterators.optimized()), f1_id='recall')
     
-#    CompareAlgorithms.plotQuality()
+    CompareAlgorithms.plotQuality()
 
