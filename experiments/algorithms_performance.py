@@ -422,9 +422,9 @@ class JustifyNotUsingVanillaLSH:
         JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
-    JustifyDimensionsEstimation.runExperiment()
+#    JustifyDimensionsEstimation.runExperiment()
 #    JustifyMemoryPruning.runExperiment()
 #    JustifyExponentialDecay.runExperiment()
-#    JustifyTrie.runExperiment()
+    JustifyTrie.runExperiment()
 #    JustifyNotUsingVanillaLSH.runExperiment()
     
