@@ -148,9 +148,9 @@ class ParameterEstimation:
         x, y = [], []; [(x.append(getDateTimeObjectFromTweetTimestamp(line['time_stamp'])), y.append(line['total_number_of_phrases'])) for line in FileIO.iterateJsonFromFile(self.dimensionsEstimationFile)]
         x = x[:numberOfTimeUnits]; y = y[:numberOfTimeUnits]
         plt.subplot(111).yaxis.set_major_formatter(FuncFormatter(lambda x, i: '%0.1f' % (x / 10. ** 6)))
-        plt.text(0.0, 1.01, getLatexForString('10^6'), transform=plt.gca().transAxes)
-        plt.ylabel(getLatexForString('\# of dimensions'), fontsize=25), plt.xlabel(getLatexForString(xlabelTimeUnits), fontsize=25)#, plt.title(getLatexForString('Growth in dimensions with increasing time.'))
-        plt.plot(y, color=self.stream_settings['plot_color'], label=getLatexForString(self.stream_settings['plot_label']), lw=2)
+        plt.text(0.0, 1.01, '$10^6$', transform=plt.gca().transAxes)
+        plt.ylabel('# of dimensions', fontsize=25), plt.xlabel(xlabelTimeUnits, fontsize=20)#, plt.title(getLatexForString('Growth in dimensions with increasing time.'))
+        plt.plot(y, color=self.stream_settings['plot_color'], label=self.stream_settings['plot_label'], lw=2)
         plt.legend(loc=2)
         plt.savefig('growthOfDimensionsInTime.png')
         if returnAxisValuesOnly: plt.show()

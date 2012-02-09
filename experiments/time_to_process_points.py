@@ -131,7 +131,7 @@ def plotMessagesProcessedWithTime(iterators):
         plt.plot(dataX, [y/10**3 for y in dataY], lw=2, label=info['label'], color=info['color'], marker=info['marker'])
 #    plt.xlim(xmin=15, xmax=3000)
     plt.legend(loc=2)
-    plt.xlabel(getLatexForString('Time (s)'), fontsize=20, fontweight='bold'); plt.ylabel(getLatexForString('\# of messages (10^3)'), fontsize=20, fontweight='bold')#; plt.title(getLatexForString('Message processing rate'))
+    plt.xlabel('Time (s)', fontsize=20); plt.ylabel('# of messages ($10^3$)', fontsize=20)#; plt.title(getLatexForString('Message processing rate'))
 #    plt.plot()
 #    plt.savefig('messagesProcessedWithTime.pdf')
 #    plt.savefig('messagesProcessedWithTime.eps')

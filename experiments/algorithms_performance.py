@@ -196,19 +196,19 @@ class JustifyDimensionsEstimation():
         plotData = {JustifyDimensionsEstimation.top_n_dimension: defaultdict(list), JustifyDimensionsEstimation.first_n_dimension: defaultdict(list)}
         for type in experimentsData:
             for dimension in sorted(experimentsData[type]): plotData[type]['dataX'].append(dimension); [plotData[type][k].append(np.mean(experimentsData[type][dimension][k])) for k in experimentsData[type][dimension]]
-#        plt.subplot(311); 
-#        for type in experimentsData:
-#            plt.semilogy([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['total_clusters'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2);
-#        plt.semilogy([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['total_clusters']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819 dimensions'), lw=2);
-#        plt.ylim(ymin=1)
-#        
-#        plt.subplot(312); 
-#        for type in experimentsData:
-#            plt.semilogy([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['iteration_time'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2);
-#        plt.semilogy([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['iteration_time']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819'), lw=2);
-#        plt.ylim(ymin=1, ymax=1500)
-#        plt.legend(loc=2, ncol=2)
-#        plt.subplot(313); 
+        plt.subplot(311); 
+        for type in experimentsData:
+            plt.semilogy([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['total_clusters'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2);
+        plt.semilogy([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['total_clusters']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819 dimensions'), lw=2);
+        plt.ylim(ymin=1)
+        
+        plt.subplot(312); 
+        for type in experimentsData:
+            plt.semilogy([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['iteration_time'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2);
+        plt.semilogy([x/10**3 for x in plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']], [lshData['iteration_time']]*len(plotData[JustifyDimensionsEstimation.top_n_dimension]['dataX']), '--', color='#FF1300', label=getLatexForString('Top-76819'), lw=2);
+        plt.ylim(ymin=1, ymax=1500)
+        plt.legend(loc=2, ncol=2)
+        plt.subplot(313); 
         for type in experimentsData:
             plt.plot([x/10**3 for x in plotData[type]['dataX']], movingAverage(plotData[type]['quality'], 4), color=pltInfo[type]['color'], label=pltInfo[type]['label'], lw=2, marker=pltInfo[type]['marker']);
         plt.ylabel('Mean purity per iteration', fontsize=20); 
@@ -422,9 +422,9 @@ class JustifyNotUsingVanillaLSH:
         JustifyNotUsingVanillaLSH().plotJustifyNotUsingVanillaLSH()
     
 if __name__ == '__main__':
-#    JustifyDimensionsEstimation.runExperiment()
+    JustifyDimensionsEstimation.runExperiment()
 #    JustifyMemoryPruning.runExperiment()
-    JustifyExponentialDecay.runExperiment()
+#    JustifyExponentialDecay.runExperiment()
 #    JustifyTrie.runExperiment()
 #    JustifyNotUsingVanillaLSH.runExperiment()
     
